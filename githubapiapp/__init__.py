@@ -12,6 +12,10 @@ class APIHandler():
     def get(self, url):
         url = "https://api.github.com" + url
         return requests.get(url=url, headers=self.headers)
+    
+    def patch(self, url, params):
+        url = "https://api.github.com" + url
+        return requests.patch(url=url, headers=self.headers, json=params)
 
 if __name__ == "__main__":
     if not os.path.exists(".env"):
@@ -36,7 +40,31 @@ if __name__ == "__main__":
         # img = Image.open("image.jpg")
         # img.show()
 
-
+        # Output confirmation
         print(f"Authenticated as: {json["name"]} ({json["login"]})")
+
+        # Start CLI
+        exitCode = False
+
+        while not exitCode:
+            selection = int(input("""
+Please Select an Option:
+1. Update Bio
+                                  
+Type -1 to Quit.
+"""))
+            match selection:
+                case 1:
+                    oldBio = gh.get("/user").json()["bio"]
+                    print(oldBio)
+                    newBio = input("Input the new BIO: ")
+                    params = {"bio":newBio}
+                    response = gh.patch(url="/user", params=params)
+                    if response.status_code == 200:
+                        print("Success")
+                        newBio = gh.get("/user").json()["bio"]
+                        print(newBio)
+                case -1:
+                    exitCode = True
     else:
         print(f"Error Getting User Data. Error {userData.status_code}, {userData.json()["message"]}")
