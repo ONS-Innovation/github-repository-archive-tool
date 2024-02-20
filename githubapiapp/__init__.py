@@ -1,7 +1,7 @@
 import requests
 import dotenv
 import os
-from PIL import Image
+# from PIL import Image
 
 class APIHandler():
     def __init__(self) -> None:
