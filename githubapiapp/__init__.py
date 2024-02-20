@@ -17,6 +17,19 @@ class APIHandler():
         url = "https://api.github.com" + url
         return requests.patch(url=url, headers=self.headers, json=params)
 
+# User Functions
+def editBio():
+    oldBio = gh.get("/user").json()["bio"]
+    print(f"Old Bio: {oldBio}")
+    newBio = input("Input the new BIO: ")
+    params = {"bio":newBio}
+    response = gh.patch(url="/user", params=params)
+    if response.status_code == 200:
+        print("Success")
+    else:
+        print(f"Error updating bio. Error {response.status_code}, {response.json()["message"]}")
+
+
 if __name__ == "__main__":
     if not os.path.exists(".env"):
         print("Github Access Token Required.")
@@ -55,17 +68,7 @@ Type -1 to Quit.
 """))
             match selection:
                 case 1:
-                    oldBio = gh.get("/user").json()["bio"]
-                    print(oldBio)
-                    newBio = input("Input the new BIO: ")
-                    params = {"bio":newBio}
-                    response = gh.patch(url="/user", params=params)
-                    if response.status_code == 200:
-                        print("Success")
-                        newBio = gh.get("/user").json()["bio"]
-                        print(newBio)
-                    else:
-                        print(f"Error updating bio. Error {response.status_code}, {response.json()["message"]}")
+                    editBio()
                 case -1:
                     exitCode = True
     else:
