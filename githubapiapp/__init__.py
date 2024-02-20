@@ -64,6 +64,8 @@ Type -1 to Quit.
                         print("Success")
                         newBio = gh.get("/user").json()["bio"]
                         print(newBio)
+                    else:
+                        print(f"Error updating bio. Error {response.status_code}, {response.json()["message"]}")
                 case -1:
                     exitCode = True
     else:
