@@ -3,9 +3,14 @@ import dotenv
 import os
 # from PIL import Image
 
+
+def clearTerminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+# APIHandler class to manage all API interactions
 class APIHandler():
     def __init__(self) -> None:
-        dotenv.load_dotenv()
+        dotenv.load_dotenv(verbose=True, override=True)
         token = os.getenv("TOKEN")
         self.headers = {"Authorization": "token " + token}
 
@@ -18,6 +23,9 @@ class APIHandler():
         return requests.patch(url=url, headers=self.headers, json=params)
 
 # User Functions
+def viewProfile():
+    print(":)")
+
 def editBio():
     oldBio = gh.get("/user").json()["bio"]
     print(f"Old Bio: {oldBio}")
@@ -45,14 +53,6 @@ if __name__ == "__main__":
     if userData.status_code == 200:
         json = userData.json()
 
-        # Shows User Profile Image
-        # userPhoto = requests.get(json["avatar_url"])
-        # with open("image.jpg", "wb") as f:
-        #     f.write(userPhoto.content)
-
-        # img = Image.open("image.jpg")
-        # img.show()
-
         # Output confirmation
         print(f"Authenticated as: {json["name"]} ({json["login"]})")
 
@@ -60,16 +60,24 @@ if __name__ == "__main__":
         exitCode = False
 
         while not exitCode:
-            selection = int(input("""
+            selection = int(input(""" \n
 Please Select an Option:
-1. Update Bio
+1. View Profile
+2. Update Bio
                                   
 Type -1 to Quit.
 """))
+            clearTerminal()
             match selection:
                 case 1:
+                    viewProfile()
+                case 2:
                     editBio()
                 case -1:
                     exitCode = True
+                case _:
+                    print("Invalid Input")
+
+                    
     else:
         print(f"Error Getting User Data. Error {userData.status_code}, {userData.json()["message"]}")
