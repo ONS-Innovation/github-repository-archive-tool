@@ -15,8 +15,9 @@ class APIHandler():
         token = os.getenv("TOKEN")
         self.headers = {"Authorization": "token " + token}
 
-    def get(self, url):
-        url = "https://api.github.com" + url
+    def get(self, url, addPrefix: bool = True):
+        if addPrefix:
+            url = "https://api.github.com" + url
         return requests.get(url=url, headers=self.headers)
     
     def patch(self, url, params):
@@ -37,7 +38,7 @@ def viewProfile(json: dict):
     follows = f"{json["followers"]} / {json["following"]}"
     created = json["created_at"]
     modified = json["updated_at"]
-    link = json["url"]
+    link = json["html_url"]
 
     print(
         f"username: {username} \n" +
@@ -49,6 +50,30 @@ def viewProfile(json: dict):
         f"last updated: {datetime.datetime.strptime(modified, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y %H:%M")} \n" +
         f"link: {link} \n"
     )
+
+def viewFollows(json: dict):
+    noFollowers = json["followers"]
+    noFollowing = json["following"]
+
+    response = gh.get(json["followers_url"], False)
+    if response.status_code == 200:
+        followersJson = response.json()
+
+        print(f"Followers: {noFollowers} \n")
+        for follower in followersJson:
+            print(f"- {follower["login"]}")
+    else:
+        print(f"Error Getting Follower Data. Error {response.status_code}, {response.json()["message"]}")
+
+    response = gh.get(json["following_url"].replace("{/other_user}", ""), False)
+    if response.status_code == 200:
+        followingJson = response.json()
+
+        print(f"\nFollowing: {noFollowing} \n")
+        for following in followingJson:
+            print(f"- {following["login"]}")
+    else:
+        print(f"Error Getting Follower Data. Error {response.status_code}, {response.json()["message"]}")
 
 def editBio():
     oldBio = gh.get("/user").json()["bio"]
@@ -87,7 +112,8 @@ if __name__ == "__main__":
             selection = int(input(""" \n
 Please Select an Option:
 1. View Profile
-2. Update Bio
+2. View Followers/Following
+5. Update Bio
                                   
 Type -1 to Quit.
 """))
@@ -96,6 +122,8 @@ Type -1 to Quit.
                 case 1:
                     viewProfile(json)
                 case 2:
+                    viewFollows(json)
+                case 5:
                     editBio()
                 case -1:
                     exitCode = True
