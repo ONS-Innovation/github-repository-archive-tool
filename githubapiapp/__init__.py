@@ -1,6 +1,7 @@
 import requests
 import dotenv
 import os
+import datetime
 # from PIL import Image
 
 
@@ -23,8 +24,31 @@ class APIHandler():
         return requests.patch(url=url, headers=self.headers, json=params)
 
 # User Functions
-def viewProfile():
-    print(":)")
+def viewProfile(json: dict):
+    print(json)
+    print("\n")
+
+    # Basic User Data
+
+    username = json["login"]
+    name = json["name"]
+    bio = json["bio"]
+    blog = json["blog"]
+    follows = f"{json["followers"]} / {json["following"]}"
+    created = json["created_at"]
+    modified = json["updated_at"]
+    link = json["url"]
+
+    print(
+        f"username: {username} \n" +
+        f"name: {name} \n" +
+        f"bio: {bio} \n" +
+        f"blog: {blog} \n" +
+        f"followers / following: {follows} \n" +
+        f"member since: {datetime.datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y %H:%M")} \n" +
+        f"last updated: {datetime.datetime.strptime(modified, "%Y-%m-%dT%H:%M:%SZ").strftime("%d %B %Y %H:%M")} \n" +
+        f"link: {link} \n"
+    )
 
 def editBio():
     oldBio = gh.get("/user").json()["bio"]
@@ -70,11 +94,12 @@ Type -1 to Quit.
             clearTerminal()
             match selection:
                 case 1:
-                    viewProfile()
+                    viewProfile(json)
                 case 2:
                     editBio()
                 case -1:
                     exitCode = True
+                # Default
                 case _:
                     print("Invalid Input")
 
