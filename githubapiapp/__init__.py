@@ -65,7 +65,7 @@ def viewFollows(json: dict):
     noFollowers = json["followers"]
     noFollowing = json["following"]
 
-    response = gh.get(json["followers_url"], False)
+    response = gh.get(json["followers_url"], {}, False)
     if response.status_code == 200:
         followersJson = response.json()
 
@@ -75,7 +75,7 @@ def viewFollows(json: dict):
     else:
         print(f"Error Getting Follower Data. Error {response.status_code}, {response.json()["message"]}")
 
-    response = gh.get(json["following_url"].replace("{/other_user}", ""), False)
+    response = gh.get(json["following_url"].replace("{/other_user}", ""), "", False)
     if response.status_code == 200:
         followingJson = response.json()
 
