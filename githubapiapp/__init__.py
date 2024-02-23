@@ -141,7 +141,7 @@ def deleteRepo():
 
 
 def editBio():
-    oldBio = gh.get("/user").json()["bio"]
+    oldBio = gh.get("/user", {}).json()["bio"]
     print(f"Old Bio: {oldBio}")
     newBio = input("Input the new BIO: ")
     params = {"bio":newBio}
