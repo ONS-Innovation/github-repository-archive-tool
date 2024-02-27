@@ -151,6 +151,47 @@ def editBio():
     else:
         print(f"Error updating bio. Error {response.status_code}, {response.json()["message"]}")
 
+def GetOrgRepos(pageNo: int = 1):
+    # Get a list of Repos from an Org of the Auth'd user
+    # Which hasn't been updated in x years
+
+    # Get the No. of years
+    xYears = int(input("Enter the number of years: "))
+
+    # Get auth'd user's orgs
+    response = gh.get("/orgs/ONSdigital/repos", {"page": pageNo})
+
+    if response.status_code == 200:
+        orgsRepos = response.json()
+
+        print(response.links)
+        
+        for repo in orgsRepos:
+            # Check if repo has been updated in last x years
+            response = gh.get(repo["url"], {}, False)
+            
+            if response.status_code == 200:
+                repoJson = response.json()
+                lastUpdate = repoJson["updated_at"]
+                lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+                lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
+                currentDate = datetime.date.today()
+                compDate = datetime.date(currentDate.year - xYears, currentDate.month, currentDate.day)
+
+                if lastUpdate < compDate:
+                    archiveFlag = "True"
+                else:
+                    archiveFlag = "False"
+                
+                print(str(repo["id"]) + " : " + repo["name"] + " : " + repo["url"] + " : " + lastUpdate.strftime("%B %Y") + " : " + archiveFlag)
+            else:
+                print(f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}")
+                break
+            
+    else:
+        print(f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}")
+
 
 if __name__ == "__main__":
     if not os.path.exists(".env"):
@@ -182,6 +223,7 @@ Please Select an Option:
 4. Create Repo
 5. Delete Repo
 6. Update Bio
+7. Get Organisation Repos not updated in the last x years
                                   
 Type -1 to Quit.
 """)
@@ -199,6 +241,8 @@ Type -1 to Quit.
                     deleteRepo()
                 case "6":
                     editBio()
+                case "7":
+                    GetOrgRepos()
                 case "-1":
                     exitCode = True
                 # Default
