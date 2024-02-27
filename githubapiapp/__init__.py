@@ -2,6 +2,7 @@ import requests
 import dotenv
 import os
 import datetime
+from tqdm import tqdm
 # import pprint
 # from PIL import Image
 
@@ -250,8 +251,10 @@ def GetOrgRepos():
                 
         print(f"Midpoint found (Page {midpoint}). Writing archivable repos to archive.txt...")
 
-        # For now just print them
-        for i in range(midpoint, lastPage):
+        # For now just store them in a text file
+        reposToArchive = []
+
+        for i in tqdm(range(midpoint, lastPage), "Getting Repository Data"):
             response = gh.get(f"/orgs/{org}/repos", {"sort": "updated", "per_page": 2, "page": i})
 
             if response.status_code == 200:
@@ -263,24 +266,29 @@ def GetOrgRepos():
                     
                     if repoResponse.status_code == 200:
                         repoJson = repoResponse.json()
-                        lastUpdate = repoJson["updated_at"]
-                        lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                        lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
 
-                        if lastUpdate < compDate or i == midpoint:
+                        if i != midpoint:
                             archiveFlag = "True"
                         else:
-                            archiveFlag = "False"
+                            lastUpdate = repoJson["updated_at"]
+                            lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+                            lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+                            
+                            archiveFlag = True if lastUpdate < compDate else False
                         
                         if not repo["archived"] and archiveFlag:
                             # print(str(repo["id"]) + " : " + repo["name"] + " : " + repo["url"] + " : " + repo["visibility"] + " : " + str(repo["archived"]) + " : " + lastUpdate.strftime("%B %Y") + " : " + archiveFlag)
-                            with open("archive.txt", "a") as f:
-                                f.write(f"{repo["html_url"]}\n")
+                            reposToArchive.append(repo["html_url"])
                     else:
                         print(f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}")
                         break
-            else:
+            else: 
                 print(f"Error getting organisation Repos. Error {response.status_code}, {response.json()["message"]}")
+        
+        with open("archive.txt", "w") as f:
+            for url in tqdm(reposToArchive, "Writing Repositories to archive.txt"):
+                f.write(url + "\n")
+        print("Write Complete.")
     else:
         print(f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}")
 
