@@ -151,7 +151,18 @@ def editBio():
     else:
         print(f"Error updating bio. Error {response.status_code}, {response.json()["message"]}")
 
-def GetOrgRepos(pageNo: int = 1):
+def archiveFlag(repoUrl: str, compDate) -> bool:
+    repoResponse = gh.get(repoUrl, {}, False)
+            
+    if repoResponse.status_code == 200:
+        repoJson = repoResponse.json()
+        lastUpdate = repoJson["updated_at"]
+        lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+        lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
+        return True if lastUpdate < compDate else False
+
+def GetOrgRepos():
     # Get a list of Repos from an Org of the Auth'd user
     # Which hasn't been updated in x years
 
@@ -159,35 +170,96 @@ def GetOrgRepos(pageNo: int = 1):
     xYears = int(input("Enter the number of years: "))
 
     # Get auth'd user's orgs
-    response = gh.get("/orgs/ONSdigital/repos", {"page": pageNo})
+    response = gh.get("/orgs/ONSdigital/repos", {"sort": "updated", "per_page": 2, "page": 1})
 
     if response.status_code == 200:
         orgsRepos = response.json()
 
-        print(response.links)
-        
-        for repo in orgsRepos:
-            # Check if repo has been updated in last x years
-            response = gh.get(repo["url"], {}, False)
-            
-            if response.status_code == 200:
-                repoJson = response.json()
-                lastUpdate = repoJson["updated_at"]
-                lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+        # print(response.links)
 
-                currentDate = datetime.date.today()
-                compDate = datetime.date(currentDate.year - xYears, currentDate.month, currentDate.day)
+        # Looping through each repo on each page has a Big O notation of O(n^2) which is bad
 
-                if lastUpdate < compDate:
-                    archiveFlag = "True"
+        # As an efficiency fix, sort API response on updated date (Available through API)
+        # Then split in half until I find a page which contains repos older and younger than x years ago
+        # Find which repo in page is first repo to be older
+        # Archive all repos after this point (they should all be older than x years)
+        # Similar to Binary Search
+        # Big O notation of O(logN)
+
+        # Will still have to iterate through each repo on each page, but this will have significantly less repos.
+
+        # Get Number of Pages 
+        noOfPages = int(response.links["last"]["url"].split("=")[-1])
+        # print(noOfPages)
+
+
+        upperPointer = noOfPages
+        midpoint = 0
+        lowerPointer = 1
+        midpointFound = False
+
+        currentDate = datetime.date.today()
+        compDate = datetime.date(currentDate.year - xYears, currentDate.month, currentDate.day)
+
+        while not midpointFound:
+            if upperPointer - lowerPointer != 1:
+
+                midpoint = lowerPointer + round((upperPointer - lowerPointer) / 2)
+
+                response = gh.get("/orgs/ONSdigital/repos", {"sort": "updated", "per_page": 2, "page": midpoint})
+                repos = response.json()
+
+                minRepoFlag = archiveFlag(repos[0]["url"], compDate)
+                maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
+
+                # print("\n")
+                # print("min: " + str(minRepoFlag))
+                # print("max: " + str(maxRepoFlag))
+                # print("lower: " + str(lowerPointer))
+                # print("mp: " + str(midpoint))
+                # print("upper: " + str(upperPointer))
+
+                if not minRepoFlag and maxRepoFlag:
+                    midpointFound = True
+                elif minRepoFlag and maxRepoFlag:
+                    upperPointer = midpoint
                 else:
-                    archiveFlag = "False"
-                
-                print(str(repo["id"]) + " : " + repo["name"] + " : " + repo["url"] + " : " + lastUpdate.strftime("%B %Y") + " : " + archiveFlag)
+                    lowerPointer = midpoint
+            
             else:
-                print(f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}")
-                break
+                # If upper - lower = 1, pointers are next to eachother
+                # At this point upper both True and lower both False, midpoint between the pages
+                # so archive pages after and including upper
+
+                midpoint = upperPointer
+                midpointFound = True
+        
+        print(midpoint)
+
+        # Now midpoint is found, iterate through each repo between midpoint page and last page
+        # only need to check dates for midpoint page
+        # everything after midpoint can be archived
+                 
+
+        # for repo in orgsRepos:
+        #     # Check if repo has been updated in last x years
+        #     repoResponse = gh.get(repo["url"], {}, False)
+            
+        #     if repoResponse.status_code == 200:
+        #         repoJson = repoResponse.json()
+        #         lastUpdate = repoJson["updated_at"]
+        #         lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+        #         lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
+        #         if lastUpdate < compDate:
+        #             archiveFlag = "True"
+        #         else:
+        #             archiveFlag = "False"
+                
+        #         print(str(repo["id"]) + " : " + repo["name"] + " : " + repo["url"] + " : " + lastUpdate.strftime("%B %Y") + " : " + archiveFlag)
+        #     else:
+        #         print(f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}")
+        #         break
             
     else:
         print(f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}")
