@@ -154,7 +154,7 @@ def editBio():
 
 def GetOrgRepos():
     # Get a list of Repos from an Org
-    # Which hasn't been updated in x years
+    # Which hasn't been updated since x date
 
     
     def archiveFlag(repoUrl: str, compDate):
@@ -163,7 +163,7 @@ def GetOrgRepos():
                 
         if repoResponse.status_code == 200:
             repoJson = repoResponse.json()
-            lastUpdate = repoJson["updated_at"]
+            lastUpdate = repoJson["pushed_at"]
             lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
             lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
 
@@ -178,10 +178,15 @@ def GetOrgRepos():
     org = input("Enter the Organisation Name: ")
 
     # Get the No. of years
-    xYears = int(input("Enter the number of years: "))
+    # xYears = int(input("Enter the number of years: "))
 
-    # Get auth'd user's orgs
-    response = gh.get(f"/orgs/{org}/repos", {"sort": "updated", "per_page": 2, "page": 1})
+    # If this used UI, it would have validation
+    xDate = input("Enter the date you want to archive around (dd-mm-yyyy): ")
+    day, month, year = xDate.split("-")
+    xDate = datetime.date(int(year), int(month), int(day))
+
+    # Test API Call
+    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": 1})
 
     if response.status_code == 200:
         # Looping through each repo on each page has a Big O notation of O(n^2) which is bad
@@ -207,8 +212,9 @@ def GetOrgRepos():
         lowerPointer = 1
         midpointFound = False
 
-        currentDate = datetime.date.today()
-        compDate = datetime.date(currentDate.year - xYears, currentDate.month, currentDate.day)
+        # currentDate = datetime.date.today()
+        # compDate = datetime.date(currentDate.year - xYears, currentDate.month, currentDate.day)
+        compDate = xDate
 
         print("Calculating Midpoint... Please wait...")
 
@@ -217,18 +223,18 @@ def GetOrgRepos():
 
                 midpoint = lowerPointer + round((upperPointer - lowerPointer) / 2)
 
-                response = gh.get(f"/orgs/{org}/repos", {"sort": "updated", "per_page": 2, "page": midpoint})
+                response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": midpoint})
                 repos = response.json()
 
                 minRepoFlag = archiveFlag(repos[0]["url"], compDate)
                 maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
 
-                # print("\n")
-                # print("min: " + str(minRepoFlag))
-                # print("max: " + str(maxRepoFlag))
-                # print("lower: " + str(lowerPointer))
-                # print("mp: " + str(midpoint))
-                # print("upper: " + str(upperPointer))
+                print("\n")
+                print("min: " + str(minRepoFlag))
+                print("max: " + str(maxRepoFlag))
+                print("lower: " + str(lowerPointer))
+                print("mp: " + str(midpoint))
+                print("upper: " + str(upperPointer))
 
                 if not minRepoFlag and maxRepoFlag:
                     midpointFound = True
@@ -239,10 +245,13 @@ def GetOrgRepos():
             
             else:
                 # If upper - lower = 1, pointers are next to eachother
-                # At this point upper both True and lower both False, midpoint between the pages
-                # so archive pages after and including upper
+                # If the previous min and max flags are True, it needs to archive from the lower pointer
+                # If the previous min and max flags are False, it needs to archive from the upper bound
 
-                midpoint = upperPointer
+                if minRepoFlag and maxRepoFlag:
+                    midpoint = lowerPointer
+                else:
+                    midpoint = upperPointer
                 midpointFound = True
         
         # Now midpoint is found, iterate through each repo between midpoint page and last page
@@ -254,8 +263,8 @@ def GetOrgRepos():
         # For now just store them in a text file
         reposToArchive = []
 
-        for i in tqdm(range(midpoint, lastPage), "Getting Repository Data"):
-            response = gh.get(f"/orgs/{org}/repos", {"sort": "updated", "per_page": 2, "page": i})
+        for i in tqdm(range(midpoint, lastPage+1), "Getting Repository Data"):
+            response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": i})
 
             if response.status_code == 200:
                 pageRepos = response.json()
@@ -270,7 +279,7 @@ def GetOrgRepos():
                         if i != midpoint:
                             archiveFlag = "True"
                         else:
-                            lastUpdate = repoJson["updated_at"]
+                            lastUpdate = repoJson["pushed_at"]
                             lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
                             lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
                             
