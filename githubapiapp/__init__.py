@@ -229,12 +229,12 @@ def GetOrgRepos():
                 minRepoFlag = archiveFlag(repos[0]["url"], compDate)
                 maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
 
-                print("\n")
-                print("min: " + str(minRepoFlag))
-                print("max: " + str(maxRepoFlag))
-                print("lower: " + str(lowerPointer))
-                print("mp: " + str(midpoint))
-                print("upper: " + str(upperPointer))
+                # print("\n")
+                # print("min: " + str(minRepoFlag))
+                # print("max: " + str(maxRepoFlag))
+                # print("lower: " + str(lowerPointer))
+                # print("mp: " + str(midpoint))
+                # print("upper: " + str(upperPointer))
 
                 if not minRepoFlag and maxRepoFlag:
                     midpointFound = True
@@ -332,7 +332,9 @@ Please Select an Option:
 4. Create Repo
 5. Delete Repo
 6. Update Bio
-7. Get Organisation Repos not updated in the last x years, ready to archive
+7. Get Organisation Repos not updated after a date, ready to archive
+                              
+(Only 7. is important. Will clean at a later date)
                                   
 Type -1 to Quit.
 """)
