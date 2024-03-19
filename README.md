@@ -42,4 +42,6 @@ The script is now ready for use.
     - ~~Public~~
     - ~~Private~~
 - ~~Codebase Clean-up and Refactor~~ 
+- Add GUI
+- Create Tests
 - Data Logging for analysis (very future)
