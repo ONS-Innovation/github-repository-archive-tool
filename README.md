@@ -36,10 +36,10 @@ This must be generated on Github.
 The script is now ready for use.
 
 ## Future Developments
-- Add a parameter for the Repo type:
-    - All
-    - Internal
-    - Public
-    - Private
+- ~~Add a parameter for the Repo type:~~
+    - ~~All~~
+    - ~~Internal~~
+    - ~~Public~~
+    - ~~Private~~
 - ~~Codebase Clean-up and Refactor~~ 
 - Data Logging for analysis (very future)

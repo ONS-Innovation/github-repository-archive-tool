@@ -70,25 +70,51 @@ def GetOrgRepos():
     # Get Org name
     org = input("Enter the Organisation Name: ")
 
+    # Get Date
     # If this used UI, it would have validation
     xDate = input("Enter the date you want to archive around (dd-mm-yyyy): ")
     day, month, year = xDate.split("-")
     xDate = datetime.date(int(year), int(month), int(day))
 
+    # Get Repo Type (Public, Private, Internal, All)
+    repoType = int(input("Which type of repository would you like to archive? \n"
+                         "1. All \n"
+                         "2. Public \n"
+                         "3. Private \n"
+                         "4. Internal \n"))
+    
+    match repoType:
+        case 1:
+            repoType = "all"
+        case 2:
+            repoType = "public"
+        case 3:
+            repoType = "private"
+        case 4:
+            repoType = "internal"
+        case _:
+            print("Invalid Option, All selected.")
+            repoType = "all"
+
     # Test API Call
-    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": 1})
+    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": 1})
 
     if response.status_code == 200:
         # - Finds where the inputted date is in the list of repos (this position will be held in midpoint)
         # - After the midpoint is found, everything to the right of it can be archived as it is older than the inputted date
 
         # Get Number of Pages 
-        lastPage = int(response.links["last"]["url"].split("=")[-1])
-        print(f"{lastPage} pages. {lastPage*2} Repositories Found.")
+        try:
+            lastPage = int(response.links["last"]["url"].split("=")[-1])
+        except KeyError:
+            # If Key Error, Last doesn't exist therefore 1 page
+            lastPage = 1
+
+        print(f"{lastPage} page(s). Potential {lastPage*2} Repositories Found.")
 
 
         upperPointer = lastPage
-        midpoint = 0
+        midpoint = 1
         lowerPointer = 1
         midpointFound = False
 
@@ -101,7 +127,7 @@ def GetOrgRepos():
 
                 midpoint = lowerPointer + round((upperPointer - lowerPointer) / 2)
 
-                response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": midpoint})
+                response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": midpoint})
                 repos = response.json()
 
                 minRepoFlag = archiveFlag(repos[0]["url"], compDate)
@@ -126,10 +152,28 @@ def GetOrgRepos():
                 # If the previous min and max flags are True, it needs to archive from the lower pointer
                 # If the previous min and max flags are False, it needs to archive from the upper bound
 
+                # Check if min and max flags exist, if they don't, only 2 pages.
+                # Need to then calculate midpoint
+                try:
+                    print(minRepoFlag)
+                except UnboundLocalError:
+                    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": midpoint})
+                    repos = response.json()
+
+                    minRepoFlag = archiveFlag(repos[0]["url"], compDate)
+                    maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
+
+                    print(repos[0]["url"])
+                    print(repos[1]["url"])
+                    print(minRepoFlag)
+                    print(maxRepoFlag)
+
+
                 if minRepoFlag and maxRepoFlag:
                     midpoint = lowerPointer
-                else:
+                if not minRepoFlag and not maxRepoFlag:
                     midpoint = upperPointer
+
                 midpointFound = True
         
         # Now midpoint is found, iterate through each repo between midpoint page and last page
@@ -144,7 +188,7 @@ def GetOrgRepos():
         # For each repo between the midpoint and last page
         for i in tqdm(range(midpoint, lastPage+1), "Getting Repository Data"):
             # Get the page
-            response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "per_page": 2, "page": i})
+            response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": i})
 
             if response.status_code == 200:
                 pageRepos = response.json()
