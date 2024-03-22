@@ -36,11 +36,8 @@ This must be generated on Github.
 The script is now ready for use.
 
 ## Future Developments
-- ~~Add a parameter for the Repo type:~~
-    - ~~All~~
-    - ~~Internal~~
-    - ~~Public~~
-    - ~~Private~~
-- ~~Codebase Clean-up and Refactor~~ 
-- Add GUI
-- Data Logging for analysis (very future)
+1. UI (flask)
+2. Get information about Repo Owner
+3. Email
+4. Log when notice sent
+5. Log when repo archived (30 days after notice)
