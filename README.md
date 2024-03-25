@@ -37,3 +37,5 @@ The script is now ready for use.
 3. Email
 4. Log when notice sent
 5. Log when repo archived (30 days after notice)
+
+6. Update Readme with Flask changes once complete
