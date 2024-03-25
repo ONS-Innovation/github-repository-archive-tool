@@ -34,7 +34,7 @@ class APIHandler():
         return requests.delete(url=url, headers=self.headers)
 
 
-def GetOrgRepos():
+def GetOrgRepos(org: str, date: datetime.date, repoType: str):
     """ 
         Gets a list of repos which haven't been pushed to since a given date.
         These are currently written to archive.txt but will be automatically archived in the future
@@ -64,34 +64,6 @@ def GetOrgRepos():
 
         return archiveFlag
 
-    # Get Org name
-    org = input("Enter the Organisation Name: ")
-
-    # Get Date
-    # If this used UI, it would have validation
-    xDate = input("Enter the date you want to archive around (dd-mm-yyyy): ")
-    day, month, year = xDate.split("-")
-    xDate = datetime.date(int(year), int(month), int(day))
-
-    # Get Repo Type (Public, Private, Internal, All)
-    repoType = int(input("Which type of repository would you like to archive? \n"
-                         "1. All \n"
-                         "2. Public \n"
-                         "3. Private \n"
-                         "4. Internal \n"))
-    
-    match repoType:
-        case 1:
-            repoType = "all"
-        case 2:
-            repoType = "public"
-        case 3:
-            repoType = "private"
-        case 4:
-            repoType = "internal"
-        case _:
-            print("Invalid Option, All selected.")
-            repoType = "all"
 
     # Test API Call
     response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": 1})
