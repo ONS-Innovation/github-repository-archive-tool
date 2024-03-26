@@ -32,10 +32,9 @@ This must be generated on Github.
 The script is now ready for use.
 
 ## Future Developments
-1. UI (flask)
-2. Get information about Repo Owner
-3. Email
-4. Log when notice sent
-5. Log when repo archived (30 days after notice)
-
-6. Update Readme with Flask changes once complete
+1. Flask UI
+2. Adapt CLI script to use UI
+3. Email Notification to Repo Owner
+4. Some way to prevent archive if needed
+5. Archive Repo 30 days from notif
+6. Update README with Flask instructions (once setup)
