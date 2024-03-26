@@ -24,24 +24,22 @@ class Repositories(db.Model):
     def __repr__(self) -> str:
         return "<Repo %r>" % self.id
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
+    if flask.request.method == "POST":
+        flask.session['pat'] = flask.request.form['pat']
+
     try:
         return flask.render_template('index.html', pat=flask.session['pat'])
     except KeyError:
         return flask.render_template('index.html', pat='')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if flask.request.method == 'POST':
         flask.session['pat'] = flask.request.form['pat']
         return flask.redirect('/')
-    return '''
-        <form method="post">
-            <p><input type=text name=pat>
-            <p><input type=submit value=Login>
-        </form>
-    '''
+    return flask.redirect('/')
 
 @app.route('/logout')
 def logout():
