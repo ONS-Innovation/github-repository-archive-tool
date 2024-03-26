@@ -1,4 +1,15 @@
-function toggleThemeSwitch(){
+function loadTheme(){
+    if(sessionStorage.theme == "dark"){
+        document.documentElement.setAttribute("data-bs-theme", "dark");
+        document.getElementById("themeIcon").className = "fa fa-moon-o";
+    }
+    else {
+        document.documentElement.setAttribute("data-bs-theme", "light");
+        document.getElementById("themeIcon").className = "fa fa-sun-o";
+    }
+}
+
+function toggleTheme(){
     // Get current theme
     theme = document.documentElement.getAttribute("data-bs-theme");
 
@@ -10,7 +21,7 @@ function toggleThemeSwitch(){
         // Change theme icon
         document.getElementById("themeIcon").className = "fa fa-sun-o";
     }
-    else{
+    else {
         document.documentElement.setAttribute("data-bs-theme", "dark");
         sessionStorage.theme = "dark";
 

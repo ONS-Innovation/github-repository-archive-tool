@@ -17,7 +17,7 @@
     <!-- Block Template -->
     {% block head %}{% endblock %} 
 </head>
-<body>
+<body onload="loadTheme()">
     <header class="mb-3">
         <div class="container p-0">
             <div class="navbar bg-body-tertiary border rounded shadow p-3">
@@ -36,7 +36,7 @@
                 
                 <div style="margin-left: 20px;">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" onchange="toggleThemeSwitch()">
+                        <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" onchange="toggleTheme()">
                         <label class="form-check-label" for="themeSwitch"><i id="themeIcon" class="fa fa-sun-o" style="font-size: 24px;"></i></label>
                     </div>
                 </div>
