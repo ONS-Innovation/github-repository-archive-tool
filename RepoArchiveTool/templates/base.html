@@ -17,13 +17,13 @@
     <!-- Block Template -->
     {% block head %}{% endblock %} 
 </head>
-<body onload="loadTheme()">
+<body onload="loadTheme(); movePATForm();">
     <header class="mb-3">
         <div class="container p-0">
-            <div class="navbar bg-body-tertiary border rounded shadow p-3">
+            <div id="navbar" class="navbar bg-body-tertiary border rounded shadow p-3">
                 <span class="navbar-brand mb-0"><h1>Repository Archive Tool</h1></span>
                 
-                <div class="ms-auto">
+                <div id="tokenInput" class="ms-auto">
                     {% if pat != '' %}
                         <a class="btn btn-success" href="/logout">Remove Token</a>
                     {% else %}
@@ -34,13 +34,18 @@
                     {% endif %}    
                 </div>
                 
-                <div style="margin-left: 20px;">
+                <div id="themeSwitch" style="margin-left: 20px;">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" onchange="toggleTheme()">
+                        <input class="form-check-input" type="checkbox" role="switch" id="themeSwitch" onchange="toggleTheme()" checked>
                         <label class="form-check-label" for="themeSwitch"><i id="themeIcon" class="fa fa-sun-o" style="font-size: 24px;"></i></label>
                     </div>
                 </div>
             </div>
+
+            <div id="inputBar" class="bg-body-secondary border shadow rounded p-3 m-3">
+
+            </div>
+
         </div>
     </header>
 
