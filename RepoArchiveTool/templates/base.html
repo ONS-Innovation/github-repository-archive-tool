@@ -11,6 +11,9 @@
     <!-- Font Awesome 4 Icon Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
@@ -19,9 +22,9 @@
 </head>
 <body onload="loadTheme(); movePATForm();">
     <header class="mb-3">
-        <div class="container p-0">
+        <div class="container">
             <div id="navbar" class="navbar bg-body-tertiary border rounded shadow p-3">
-                <span class="navbar-brand mb-0"><h1>Repository Archive Tool</h1></span>
+                <a class="navbar-brand mb-0" href="/"><h1>Repository Archive Tool</h1></a>
                 
                 <div id="tokenInput" class="ms-auto">
                     {% if pat != '' %}
@@ -42,7 +45,7 @@
                 </div>
             </div>
 
-            <div id="inputBar" class="bg-body-secondary border shadow rounded p-3 m-3">
+            <div id="inputBar" class="bg-body-secondary border shadow rounded p-3 m-3" hidden>
 
             </div>
 

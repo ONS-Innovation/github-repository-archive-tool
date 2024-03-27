@@ -1,6 +1,8 @@
 // Event listener to change navbar when screen resizes
 window.addEventListener('resize', () => {
     movePATForm();
+
+    
 });
 
 // Moves the PAT token form between the navbar and inputBar
@@ -16,10 +18,12 @@ function movePATForm(){
 
     if(screenWidth <= 990 && parentID == "navbar"){
         inputBar.appendChild(tokenInput);
+        inputBar.hidden = false;
     }
     
     if(screenWidth > 990 && parentID == "inputBar"){
         navbar.insertBefore(tokenInput, themeSwitch);
+        inputBar.hidden = true;
     }
 }
 
