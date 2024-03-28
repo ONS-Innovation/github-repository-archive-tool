@@ -6,7 +6,8 @@ A Python application to archive outdated organisation repositories.
 2. Navigate into the project's folder and create a virtual environement using `python3 -m venv <environment_name>`.
 3. Activate the environment using `source <environment_name>/bin/activate`.
 4. Run `Poetry install` to install all the required dependencies.
-5. Run the project using `poetry run python3 RepoArchiveTool/app.py`.
+5. Navigate into the repoarchivetool directory.
+6. Run the project using `poetry run python3 app.py`.
 
 ## Getting a Personal Access Token (PAT)
 Before you can use the application, you will need a Personal Access Token (PAT).

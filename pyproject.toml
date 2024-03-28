@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "githubapiapp"
+name = "RepoArchiveTool"
 version = "0.1.0"
 description = ""
 authors = ["Kieran Pritchard <kieran.pritchard@ons.gov.uk>"]

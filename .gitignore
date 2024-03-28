@@ -1,5 +1,5 @@
 venv
 .env
 archive.txt
-**/RepoArchiveTool/instance/
-**/RepoArchiveTool/__pycache__/
+**/instance/
+**/__pycache__/
