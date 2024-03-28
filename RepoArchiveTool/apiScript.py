@@ -1,11 +1,5 @@
 import requests
-import os
 import datetime
-from tqdm import tqdm
-
-
-def clearTerminal():
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 # APIHandler class to manage all API interactions
 class APIHandler():
@@ -41,7 +35,7 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
     """
 
     
-    def archiveFlag(repoUrl: str, compDate) -> bool:
+    def archiveFlag(repoUrl: str, compDate) -> bool | str:
         """
             Calculates whether a given repo should be archived or not.
 
@@ -60,7 +54,7 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
             archiveFlag = True if lastUpdate < compDate else False
         
         else:
-            print(f"Error getting user's organisations. Error {repoResponse.status_code}, {repoResponse.json()["message"]}")
+            return f"Error getting user's organisations. Error {repoResponse.status_code}, {repoResponse.json()["message"]}"
 
         return archiveFlag
 
@@ -79,9 +73,6 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
             # If Key Error, Last doesn't exist therefore 1 page
             lastPage = 1
 
-        print(f"{lastPage} page(s). Potential {lastPage*2} Repositories Found.")
-
-
         upperPointer = lastPage
         midpoint = 1
         lowerPointer = 1
@@ -90,8 +81,6 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
         year, month, day = date.split("-")
         xDate = datetime.date(int(year), int(month), int(day))
         compDate = xDate
-
-        print("Calculating Midpoint... Please wait...")
 
         while not midpointFound:
             if upperPointer - lowerPointer != 1:
@@ -104,13 +93,14 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                 minRepoFlag = archiveFlag(repos[0]["url"], compDate)
                 maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
 
-                # print("\n")
-                # print("min: " + str(minRepoFlag))
-                # print("max: " + str(maxRepoFlag))
-                # print("lower: " + str(lowerPointer))
-                # print("mp: " + str(midpoint))
-                # print("upper: " + str(upperPointer))
+                # If min or max flags are of type string, an error has occured
+                if type(minRepoFlag) == str:
+                    return minRepoFlag
+                
+                if type(maxRepoFlag) == str:
+                    return maxRepoFlag
 
+            
                 if not minRepoFlag and maxRepoFlag:
                     midpointFound = True
                 elif minRepoFlag and maxRepoFlag:
@@ -145,13 +135,11 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
         # only need to check dates for midpoint page
         # everything after midpoint can be archived
                 
-        print(f"Midpoint found (Page {midpoint}). Writing archivable repos to archive.txt...")
-
-        # For now just store them in a text file
+        # List to hold Repos
         reposToArchive = []
 
         # For each repo between the midpoint and last page
-        for i in tqdm(range(midpoint, lastPage+1), "Getting Repository Data"):
+        for i in range(midpoint, lastPage+1):
             # Get the page
             response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": i})
 
@@ -191,11 +179,6 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                         return f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}"
             else: 
                 return f"Error getting organisation Repos. Error {response.status_code}, {response.json()["message"]}"
-        
-        # Write all repos in the archive list to Archive.txt (Will change to archive script later)
-        with open("archive.txt", "w") as f:
-            for repo in tqdm(reposToArchive, "Writing Repositories to archive.txt"):
-                f.write(repo["repoURL"] + "\n")
         
         return reposToArchive
     else:
