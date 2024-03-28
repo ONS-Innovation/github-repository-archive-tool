@@ -2,6 +2,7 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 import os
+import apiScript
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -56,6 +57,9 @@ def index():
 def login():
     if flask.request.method == 'POST':
         flask.session['pat'] = flask.request.form['pat']
+
+        # No need to test token here as tested when getting repos
+
         return flask.redirect('/')
     return flask.redirect('/')
 
@@ -64,6 +68,25 @@ def logout():
     # remove the username from the session if it's there
     flask.session.pop('pat', None)
     return flask.redirect('/')
+
+@app.route('/FindRepositories', methods=['POST', 'GET'])
+def findRepos():
+    if flask.request.method == 'POST':
+        # Create APIHandler instance
+        gh = apiScript.APIHandler(flask.session['pat'])
+
+        # Get form values
+        org = flask.request.form['org']
+        date = flask.request.form['date']
+        repoType = flask.request.form['repoType']
+
+        repos = apiScript.GetOrgRepos(org, date, repoType, gh)
+
+        if type(repos) == str:
+            # Error Message Returned
+            return repos
+
+        return repos
 
 if __name__ == "__main__":
     app.run(debug=True)

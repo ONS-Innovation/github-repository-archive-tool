@@ -34,14 +34,14 @@ class APIHandler():
         return requests.delete(url=url, headers=self.headers)
 
 
-def GetOrgRepos(org: str, date: datetime.date, repoType: str):
+def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | list:
     """ 
         Gets a list of repos which haven't been pushed to since a given date.
         These are currently written to archive.txt but will be automatically archived in the future
     """
 
     
-    def archiveFlag(repoUrl: str, compDate):
+    def archiveFlag(repoUrl: str, compDate) -> bool:
         """
             Calculates whether a given repo should be archived or not.
 
@@ -87,6 +87,8 @@ def GetOrgRepos(org: str, date: datetime.date, repoType: str):
         lowerPointer = 1
         midpointFound = False
 
+        year, month, day = date.split("-")
+        xDate = datetime.date(int(year), int(month), int(day))
         compDate = xDate
 
         print("Calculating Midpoint... Please wait...")
@@ -132,12 +134,6 @@ def GetOrgRepos(org: str, date: datetime.date, repoType: str):
                     minRepoFlag = archiveFlag(repos[0]["url"], compDate)
                     maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
 
-                    print(repos[0]["url"])
-                    print(repos[1]["url"])
-                    print(minRepoFlag)
-                    print(maxRepoFlag)
-
-
                 if minRepoFlag and maxRepoFlag:
                     midpoint = lowerPointer
                 if not minRepoFlag and not maxRepoFlag:
@@ -170,32 +166,37 @@ def GetOrgRepos(org: str, date: datetime.date, repoType: str):
                     if repoResponse.status_code == 200:
                         repoJson = repoResponse.json()
 
+                        lastUpdate = repoJson["pushed_at"]
+                        lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+                        lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
                         # If not on the midpoint page, archive
                         if i != midpoint:
                             archiveFlag = "True"
 
                         # If on the midpoint page, need to check repo date
-                        else:
-                            lastUpdate = repoJson["pushed_at"]
-                            lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                            lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
-                            
+                        else:                           
                             archiveFlag = True if lastUpdate < compDate else False
                         
                         # If needs archiving and hasn't already been archived, add it to the archive list
                         if not repo["archived"] and archiveFlag:
-                            # print(str(repo["id"]) + " : " + repo["name"] + " : " + repo["url"] + " : " + repo["visibility"] + " : " + str(repo["archived"]) + " : " + lastUpdate.strftime("%B %Y") + " : " + archiveFlag)
-                            reposToArchive.append(repo["html_url"])
+                            reposToArchive.append({
+                                "repoName": repo["name"],
+                                "repoURL": repo["html_url"],
+                                "repoAPIURL": repo["url"],
+                                "lastCommitDate": lastUpdate,
+                                "comparisonDate": compDate
+                            })
                     else:
-                        print(f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}")
-                        break
+                        return f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}"
             else: 
-                print(f"Error getting organisation Repos. Error {response.status_code}, {response.json()["message"]}")
+                return f"Error getting organisation Repos. Error {response.status_code}, {response.json()["message"]}"
         
         # Write all repos in the archive list to Archive.txt (Will change to archive script later)
         with open("archive.txt", "w") as f:
-            for url in tqdm(reposToArchive, "Writing Repositories to archive.txt"):
-                f.write(url + "\n")
-        print("Write Complete.")
+            for repo in tqdm(reposToArchive, "Writing Repositories to archive.txt"):
+                f.write(repo["repoURL"] + "\n")
+        
+        return reposToArchive
     else:
-        print(f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}")
+        return f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}"
