@@ -17,9 +17,27 @@ class Repositories(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     repoName = db.Column(db.String(100), nullable=False)
     repoURL = db.Column(db.String(255), nullable=False)
+    repoAPIURL = db.Column(db.String(255), nullable=False)
+    lastCommitDate = db.Column(db.DateTime, nullable=True)
+    comparisonDate = db.Column(db.DateTime, nullable=True)
     notificationDate = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    archiveDate = db.Column(db.DateTime, default=(datetime.now() + timedelta(days=30)), nullable=False)
+    dateToArchive = db.Column(db.DateTime, default=(datetime.now() + timedelta(days=30)), nullable=False)
     keepFlag = db.Column(db.Boolean, default=False)
+
+    # Table Structure Notes:
+
+    # id: record primary key
+    # repoName: the name of the repo
+    # repoURL: a link to the repo
+    # repoAPIURL: the api endpoint for the repo so further api calls can be made
+    # lastCommitDate: when the repo was last updated (pushed_at on github)
+    # comparisonDate: the archive date given by the user
+    # notificationDate: when the notification email was sent -> also shows when the record was added
+    # dateToArchive: when the repo can be archived from (30 days after email)
+    # keepFlag: whether the repo should remain unarchived
+
+    # When the repo gets archived, it should be removed from the table
+    
 
     def __repr__(self) -> str:
         return "<Repo %r>" % self.id
@@ -30,9 +48,9 @@ def index():
         flask.session['pat'] = flask.request.form['pat']
 
     try:
-        return flask.render_template('index.html', pat=flask.session['pat'])
+        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"))
     except KeyError:
-        return flask.render_template('index.html', pat='')
+        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():

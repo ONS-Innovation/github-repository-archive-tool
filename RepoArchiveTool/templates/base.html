@@ -30,7 +30,7 @@
                     {% if pat != '' %}
                         <a class="btn btn-success" href="/logout">Remove Token</a>
                     {% else %}
-                        <form class="d-flex" action="/login" method="post">
+                        <form class="d-flex pulse" action="/login" method="post">
                             <input class="form-control me-2" type="password" name="pat" placeholder="Personal Access Token" required>
                             <button class="btn btn-success" type="submit">Add Token</button>
                         </form>

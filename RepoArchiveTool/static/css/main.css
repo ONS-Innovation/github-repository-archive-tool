@@ -1,3 +1,17 @@
 .container {
     padding: 0px;
 }
+
+/* Pulse Animation */
+.pulse {
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0px rgba(255, 0, 0, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
+    }
+}

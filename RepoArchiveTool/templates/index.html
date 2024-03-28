@@ -23,11 +23,54 @@
             <div class="col-8 p-3">
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="pills-findRepos" role="tabpanel" aria-labelledby="pills-findRepos-tab" tabindex="0">
-                        button to get repos
+                        {% if pat == '' %}
+                            <div class="alert alert-danger">
+                                Please add a Personal Access Token before using this tool.
+                            </div>    
+                        {% endif %}
+                        
+                        <form action="/FindRepositories" method="post">
+                            <fieldset>
+                                <legend>Find Repositories:</legend>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="org" class="form-label">Organisation:</label>
+                                        <input type="text" class="form-control" name="org" maxlength="40" required placeholder="Organisation">
+                                    </div>
+    
+                                    <div class="col">
+                                        <label for="date" class="form-label">Archive Before:</label>
+                                        <input type="date" class="form-control" name="date" max="{{ date }}" required>
+                                    </div>
+    
+                                    <div class="col">
+                                        <label for="repoType" class="form-label">Repository Type:</label>
+                                        <select name="repoType" class="form-select">
+                                            <option selected value="all">All</option>
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                            <option value="internal">Internal</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="text-center m-3">
+                                    <button type="submit" class="btn btn-primary" {% if pat == '' %} disabled {% endif %}>Start!</button>
+                                </div>
+
+                            </fieldset>
+                        </form>
                     </div>
 
                     <div class="tab-pane fade" id="pills-manageRepos" role="tabpanel" aria-labelledby="pills-manageRepos-tab" tabindex="0">
-                        send notifs, stop repo from archive, archive
+                        {% if pat == '' %}
+                            <div class="alert alert-danger">
+                                Please add a Personal Access Token before using this tool.
+                            </div>    
+                        {% endif %}
+
+                        
                     </div>
                 </div>
             </div>
