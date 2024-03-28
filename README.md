@@ -28,9 +28,8 @@ Before you can use the application, you will need a Personal Access Token (PAT).
 You can now input this into the app and use it.
 
 ## Future Developments
-1. ~~ Flask UI ~~
-2. ~~ Adapt CLI script to use UI ~~
-3. Email Notification to Repo Owner
-4. Some way to prevent archive if needed
-5. Archive Repo 30 days from notif
-6. ~~ Update README with Flask instructions (once setup) ~~
+- Some sort of loading screen whilst it finds the repos
+- Store Repos for archive and display them
+- Email Notification to Repo Owner
+- Some way to prevent archive if needed (checkbox/button in display)
+- Archive Repo 30 days from notif (will trigger on button press)
