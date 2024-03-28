@@ -84,6 +84,7 @@ def findRepos():
 
         if type(repos) == str:
             # Error Message Returned
+            # Need to make an error page
             return repos
 
         return repos
