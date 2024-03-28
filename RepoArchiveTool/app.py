@@ -87,7 +87,10 @@ def findRepos():
             # Need to make an error page
             return repos
 
+        # Do stuff if repos
         return repos
+    
+    return flask.redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)
