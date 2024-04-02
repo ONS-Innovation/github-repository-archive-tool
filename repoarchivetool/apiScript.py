@@ -54,7 +54,7 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
             archiveFlag = True if lastUpdate < compDate else False
         
         else:
-            return f"Error getting user's organisations. Error {repoResponse.status_code}, {repoResponse.json()["message"]}"
+            return f"Error {repoResponse.status_code}: {repoResponse.json()["message"]} <br> Point of Failure: Getting Archive Flag."
 
         return archiveFlag
 
@@ -176,10 +176,10 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                                 "comparisonDate": compDate
                             })
                     else:
-                        return f"Error getting Repo Data. Error {response.status_code}, {response.json()["message"]}"
+                        return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Individual Repositories."
             else: 
-                return f"Error getting organisation Repos. Error {response.status_code}, {response.json()["message"]}"
+                return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Page of Repositories."
         
         return reposToArchive
     else:
-        return f"Error getting user's organisations. Error {response.status_code}, {response.json()["message"]}"
+        return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Test API Call."

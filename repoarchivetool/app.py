@@ -72,23 +72,35 @@ def logout():
 @app.route('/FindRepositories', methods=['POST', 'GET'])
 def findRepos():
     if flask.request.method == 'POST':
-        # Create APIHandler instance
-        gh = apiScript.APIHandler(flask.session['pat'])
+        try:
+            # Create APIHandler instance
+            gh = apiScript.APIHandler(flask.session['pat'])
+        
+        except KeyError:
+            try:
+                return flask.render_template('error.html', pat=flask.session['pat'], error='Personal Access Token Undefined.')
+            except KeyError:
+                return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+        
+        else:
+            # Get form values
+            org = flask.request.form['org']
+            date = flask.request.form['date']
+            repoType = flask.request.form['repoType']
 
-        # Get form values
-        org = flask.request.form['org']
-        date = flask.request.form['date']
-        repoType = flask.request.form['repoType']
+            repos = apiScript.GetOrgRepos(org, date, repoType, gh)
 
-        repos = apiScript.GetOrgRepos(org, date, repoType, gh)
+            if type(repos) == str:
+                # Error Message Returned
+                # Need to make an error page
+                
+                try:
+                    return flask.render_template('error.html', pat=flask.session['pat'], error=repos)
+                except KeyError:
+                    return flask.render_template('error.html', pat='', error=repos)
 
-        if type(repos) == str:
-            # Error Message Returned
-            # Need to make an error page
+            # Do stuff if repos
             return repos
-
-        # Do stuff if repos
-        return repos
     
     return flask.redirect('/')
 
