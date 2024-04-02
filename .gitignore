@@ -3,3 +3,4 @@ venv
 archive.txt
 **/instance/
 **/__pycache__/
+repositories.txt

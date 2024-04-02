@@ -169,11 +169,9 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                         # If needs archiving and hasn't already been archived, add it to the archive list
                         if not repo["archived"] and archiveFlag:
                             reposToArchive.append({
-                                "repoName": repo["name"],
-                                "repoURL": repo["html_url"],
-                                "repoAPIURL": repo["url"],
-                                "lastCommitDate": lastUpdate,
-                                "comparisonDate": compDate
+                                "name": repo["name"],
+                                "apiUrl": repo["url"],
+                                "lastCommitDate": lastUpdate
                             })
                     else:
                         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Individual Repositories."

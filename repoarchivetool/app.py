@@ -1,57 +1,33 @@
 import flask
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import apiScript
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///repoArchiveTool.db"
-db = SQLAlchemy(app)
-
-# Create the Database if it doesn't already exist
-with app.app_context():
-    db.create_all()
-
-# Declare the Database Table
-class Repositories(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    repoName = db.Column(db.String(100), nullable=False)
-    repoURL = db.Column(db.String(255), nullable=False)
-    repoAPIURL = db.Column(db.String(255), nullable=False)
-    lastCommitDate = db.Column(db.DateTime, nullable=True)
-    comparisonDate = db.Column(db.DateTime, nullable=True)
-    notificationDate = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    dateToArchive = db.Column(db.DateTime, default=(datetime.now() + timedelta(days=30)), nullable=False)
-    keepFlag = db.Column(db.Boolean, default=False)
-
-    # Table Structure Notes:
-
-    # id: record primary key
-    # repoName: the name of the repo
-    # repoURL: a link to the repo
-    # repoAPIURL: the api endpoint for the repo so further api calls can be made
-    # lastCommitDate: when the repo was last updated (pushed_at on github)
-    # comparisonDate: the archive date given by the user
-    # notificationDate: when the notification email was sent -> also shows when the record was added
-    # dateToArchive: when the repo can be archived from (30 days after email)
-    # keepFlag: whether the repo should remain unarchived
-
-    # When the repo gets archived, it should be removed from the table
-    
-
-    def __repr__(self) -> str:
-        return "<Repo %r>" % self.id
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if flask.request.method == "POST":
         flask.session['pat'] = flask.request.form['pat']
 
+    with open("repositories.txt", "r") as f:
+        repos = f.read().split(";")
+        repos.pop()
+
+    for i in range(0, len(repos)):
+        name, url, lastCommit, dateAdded, keep = repos[i].split(",")
+        repos[i] = {
+            "name": name,
+            "dateAdded": dateAdded,
+            "lastCommit": lastCommit,
+            "keep": keep
+        }
+
     try:
-        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"))
+        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"), repos=repos)
     except KeyError:
-        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"))
+        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"), repos=repos)
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -91,16 +67,26 @@ def findRepos():
             repos = apiScript.GetOrgRepos(org, date, repoType, gh)
 
             if type(repos) == str:
-                # Error Message Returned
-                # Need to make an error page
-                
+                # Error Message Returned                
                 try:
                     return flask.render_template('error.html', pat=flask.session['pat'], error=repos)
                 except KeyError:
                     return flask.render_template('error.html', pat='', error=repos)
 
-            # Do stuff if repos
-            return repos
+            with open("repositories.txt", "w") as f:
+                # Get current date for logging purposes
+                currentDate = datetime.today().strftime("%Y-%m-%d")
+
+                for repo in repos:
+                    f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
+                
+            return flask.redirect('/')
+            
+            # Test to get repo owner email
+            # need to make another api call to owner info and get it there
+                
+            # owner = gh.get("https://api.github.com/repos/ONS-Innovation/AI_Testing_App", {}, False).json()["owner"]["url"]
+            # return gh.get(owner, {}, False).json()["email"]
     
     return flask.redirect('/')
 

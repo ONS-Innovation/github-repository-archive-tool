@@ -28,9 +28,21 @@ Before you can use the application, you will need a Personal Access Token (PAT).
 
 You can now input this into the app and use it.
 
+## Data Storage
+This application stores repository data within a text file (repositories.txt).
+
+Each repository has 5 main parts which are separated by commas. Each repository entry is separated by semi-colons.
+
+The example below represents 2 repositories within repositories.txt
+
+<name>,<apiUrl>,<lastCommitDate>,<dateAdded>,<keepFlag>;<name>,<apiUrl>,<lastCommitDate>,<dateAdded>,<keepFlag>;
+
 ## Future Developments
-- Some sort of loading screen whilst it finds the repos
+- ~~Some sort of loading screen whilst it finds the repos~~
 - Store Repos for archive and display them
+    - Need to add functionality to keep flag
+    - Make it so that new records are added instead of overwriting table
+    - Add table searching and filters (JS)
 - Email Notification to Repo Owner
 - Some way to prevent archive if needed (checkbox/button in display)
 - Archive Repo 30 days from notif (will trigger on button press)
