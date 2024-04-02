@@ -11,18 +11,21 @@ def index():
     if flask.request.method == "POST":
         flask.session['pat'] = flask.request.form['pat']
 
-    with open("repositories.txt", "r") as f:
-        repos = f.read().split(";")
-        repos.pop()
+    try:
+        with open("repositories.txt", "r") as f:
+            repos = f.read().split(";")
+            repos.pop()
 
-    for i in range(0, len(repos)):
-        name, url, lastCommit, dateAdded, keep = repos[i].split(",")
-        repos[i] = {
-            "name": name,
-            "dateAdded": dateAdded,
-            "lastCommit": lastCommit,
-            "keep": keep
-        }
+            for i in range(0, len(repos)):
+                name, url, lastCommit, dateAdded, keep = repos[i].split(",")
+                repos[i] = {
+                    "name": name,
+                    "dateAdded": dateAdded,
+                    "lastCommit": lastCommit,
+                    "keep": keep
+                }
+    except FileNotFoundError:
+        repos = ""
 
     try:
         return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"), repos=repos)
@@ -73,7 +76,7 @@ def findRepos():
                 except KeyError:
                     return flask.render_template('error.html', pat='', error=repos)
 
-            with open("repositories.txt", "w") as f:
+            with open("repositories.txt", "a+") as f:
                 # Get current date for logging purposes
                 currentDate = datetime.today().strftime("%Y-%m-%d")
 
