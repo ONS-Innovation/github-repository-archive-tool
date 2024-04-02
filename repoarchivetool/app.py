@@ -98,5 +98,35 @@ def clearRepos():
     os.remove("repositories.txt")
     return flask.redirect('/')
 
+@app.route('/changeKeepFlag')
+def changeFlag():
+    repoName = flask.request.args.get("repoName")
+
+    if repoName == None:
+        return flask.redirect('/')
+    
+    updatedRepos = []
+
+    with open("repositories.txt", "r") as f:
+        repos = f.read().split(';')
+        repos.pop()
+
+        for i in range(0, len(repos)):
+            name, apiUrl, lastCommitDate, dateAdded, keep = repos[i].split(',')
+
+            if repoName == name:
+                if keep == "1":
+                    updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},0;")
+                else:
+                    updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},1;")
+            else:
+                updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},{keep};")
+    
+    with open("repositories.txt", "w") as f:
+        for repo in updatedRepos:
+            f.write(repo)
+        
+    return flask.redirect('/')
+
 if __name__ == "__main__":
     app.run(debug=True)

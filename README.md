@@ -40,7 +40,7 @@ The example below represents 2 repositories within repositories.txt
 ## Future Developments
 - ~~Some sort of loading screen whilst it finds the repos~~
 - Store Repos for archive and display them (In Progress)
-    - Need to add functionality to keep flag
+    - ~~Need to add functionality to keep flag~~
     - Make it so that new records are added instead of overwriting table
     - Add table searching and filters (JS)
 - Email Notification to Repo Owner
