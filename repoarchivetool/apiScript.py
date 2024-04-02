@@ -83,8 +83,6 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
         compDate = xDate
 
         while not midpointFound:
-            print(upperPointer - lowerPointer)
-
             if upperPointer - lowerPointer != 1 and upperPointer - lowerPointer != 0:
 
                 midpoint = lowerPointer + round((upperPointer - lowerPointer) / 2)
@@ -111,8 +109,6 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                     lowerPointer = midpoint
             
             else:
-                print('here')
-
                 # If upper - lower = 1, pointers are next to eachother
                 # If the previous min and max flags are True, it needs to archive from the lower pointer
                 # If the previous min and max flags are False, it needs to archive from the upper bound
