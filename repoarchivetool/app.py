@@ -93,5 +93,10 @@ def findRepos():
     
     return flask.redirect('/')
 
+@app.route('/clearRepositories')
+def clearRepos():
+    os.remove("repositories.txt")
+    return flask.redirect('/')
+
 if __name__ == "__main__":
     app.run(debug=True)
