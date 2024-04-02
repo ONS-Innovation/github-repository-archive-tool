@@ -2,7 +2,7 @@
     padding: 0px;
 }
 
-/* Pulse Animation */
+/* Pulse Animation for PAT form */
 .pulse {
     animation: pulse-animation 2s infinite;
 }
@@ -15,3 +15,24 @@
         box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
     }
 }
+
+/* Loader Animation */
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 3px solid var(--bs-secondary);
+    border-right: 3px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+  
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  } 
