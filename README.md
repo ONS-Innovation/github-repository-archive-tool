@@ -41,7 +41,9 @@ The example below represents 2 repositories within repositories.txt
 - ~~Some sort of loading screen whilst it finds the repos~~
 - Store Repos for archive and display them (In Progress)
     - ~~Need to add functionality to keep flag~~
-    - Make it so that new records are added instead of overwriting table
+    - ~~Make it so that new records are added instead of overwriting table~~
+    - Need a success page once repos are stored
+    - Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5
     - Add table searching and filters (JS)
 - Email Notification to Repo Owner
 - Some way to prevent archive if needed (checkbox/button in display)

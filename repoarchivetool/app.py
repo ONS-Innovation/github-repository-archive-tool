@@ -76,12 +76,21 @@ def findRepos():
                 except KeyError:
                     return flask.render_template('error.html', pat='', error=repos)
 
-            with open("repositories.txt", "a+") as f:
+            with open("repositories.txt", "r+") as f:
                 # Get current date for logging purposes
                 currentDate = datetime.today().strftime("%Y-%m-%d")
 
+                storedRepos = f.read().split(";")
+                storedRepos.pop()
+
+                for i in range(0, len(storedRepos)):
+                    storedRepos[i] = storedRepos[i].split(",")[0]
+
                 for repo in repos:
-                    f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
+                    print(repo['name'])
+                    print(storedRepos)
+                    if repo['name'] not in storedRepos:
+                        f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
                 
             return flask.redirect('/')
             
