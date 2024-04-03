@@ -35,7 +35,7 @@ Each repository has 5 main parts which are separated by commas. Each repository 
 
 The example below represents 2 repositories within repositories.txt
 
-<name>,<apiUrl>,<lastCommitDate>,<dateAdded>,<keepFlag>;<name>,<apiUrl>,<lastCommitDate>,<dateAdded>,<keepFlag>;
+![Data Storage Format](/assets/readme/DataStorage.png)
 
 ## Future Developments
 - ~~Some sort of loading screen whilst it finds the repos~~
