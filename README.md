@@ -44,8 +44,11 @@ The example below represents 2 repositories within repositories.txt
     - ~~Make it so that new records are added instead of overwriting table~~
     - ~~Need a success page once repos are stored~~
     - ~~Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5~~
-    - Add table searching and filters (JS)
+    - ~~Add table searching~~
+    - Add table sorting
     - Make table scrollable
+
+    - Might put all the file reading in a separate py file - repeating code in a few places?
 - Email Notification to Repo Owner
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - Archive Repo 30 days from notif (will trigger on button press)
