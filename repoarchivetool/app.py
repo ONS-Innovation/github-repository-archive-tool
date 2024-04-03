@@ -12,25 +12,9 @@ def index():
         flask.session['pat'] = flask.request.form['pat']
 
     try:
-        with open("repositories.txt", "r") as f:
-            repos = f.read().split(";")
-            repos.pop()
-
-            for i in range(0, len(repos)):
-                name, url, lastCommit, dateAdded, keep = repos[i].split(",")
-                repos[i] = {
-                    "name": name,
-                    "dateAdded": dateAdded,
-                    "lastCommit": lastCommit,
-                    "keep": keep
-                }
-    except FileNotFoundError:
-        repos = ""
-
-    try:
-        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"), repos=repos)
+        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"))
     except KeyError:
-        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"), repos=repos)
+        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -76,23 +60,28 @@ def findRepos():
                 except KeyError:
                     return flask.render_template('error.html', pat='', error=repos)
 
-            with open("repositories.txt", "r+") as f:
-                # Get current date for logging purposes
-                currentDate = datetime.today().strftime("%Y-%m-%d")
+            # Get current date for logging purposes
+            currentDate = datetime.today().strftime("%Y-%m-%d")
+            
+            try:
+                with open("repositories.txt", "r+") as f:
 
-                storedRepos = f.read().split(";")
-                storedRepos.pop()
+                    storedRepos = f.read().split(";")
+                    storedRepos.pop()
 
-                for i in range(0, len(storedRepos)):
-                    storedRepos[i] = storedRepos[i].split(",")[0]
+                    for i in range(0, len(storedRepos)):
+                        storedRepos[i] = storedRepos[i].split(",")[0]
 
-                for repo in repos:
-                    print(repo['name'])
-                    print(storedRepos)
-                    if repo['name'] not in storedRepos:
+                    for repo in repos:
+                        if repo['name'] not in storedRepos:
+                            f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
+            
+            except FileNotFoundError:
+                with open("repositories.txt", "w") as f:
+                    for repo in repos:
                         f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
                 
-            return flask.redirect('/')
+            return flask.redirect('/manageRepositories')
             
             # Test to get repo owner email
             # need to make another api call to owner info and get it there
@@ -102,17 +91,40 @@ def findRepos():
     
     return flask.redirect('/')
 
+@app.route('/manageRepositories')
+def manageRepos():
+    try:
+        with open("repositories.txt", "r") as f:
+            repos = f.read().split(";")
+            repos.pop()
+
+            for i in range(0, len(repos)):
+                name, url, lastCommit, dateAdded, keep = repos[i].split(",")
+                repos[i] = {
+                    "name": name,
+                    "dateAdded": dateAdded,
+                    "lastCommit": lastCommit,
+                    "keep": keep
+                }
+    except FileNotFoundError:
+        repos = ""
+
+    try:
+        return flask.render_template('manageRepositories.html', pat=flask.session['pat'],repos=repos)
+    except KeyError:
+        return flask.render_template('manageRepositories.html', pat='', repos=repos)
+
 @app.route('/clearRepositories')
 def clearRepos():
     os.remove("repositories.txt")
-    return flask.redirect('/')
+    return flask.redirect('/manageRepositories')
 
 @app.route('/changeKeepFlag')
 def changeFlag():
     repoName = flask.request.args.get("repoName")
 
     if repoName == None:
-        return flask.redirect('/')
+        return flask.redirect('/manageRepositories')
     
     updatedRepos = []
 
@@ -135,7 +147,7 @@ def changeFlag():
         for repo in updatedRepos:
             f.write(repo)
         
-    return flask.redirect('/')
+    return flask.redirect('/manageRepositories')
 
 if __name__ == "__main__":
     app.run(debug=True)
