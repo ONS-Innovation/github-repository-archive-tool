@@ -25,6 +25,12 @@
                     <div class="alert alert-danger text-center">
                         Please add a Personal Access Token before using this tool.
                     </div>    
+                {% endif %} 
+                
+                {% if reposAdded > 0 %}
+                    <div class="alert alert-success text-center">
+                        {{ reposAdded }} Repositories Added.
+                    </div>    
                 {% endif %}  
 
                 {% if repos|length < 1 %}

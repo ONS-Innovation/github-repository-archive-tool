@@ -62,7 +62,9 @@ def findRepos():
 
             # Get current date for logging purposes
             currentDate = datetime.today().strftime("%Y-%m-%d")
-            
+
+            reposAdded = 0
+
             try:
                 with open("repositories.txt", "r+") as f:
 
@@ -75,13 +77,15 @@ def findRepos():
                     for repo in repos:
                         if repo['name'] not in storedRepos:
                             f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
+                            reposAdded += 1
             
             except FileNotFoundError:
                 with open("repositories.txt", "w") as f:
                     for repo in repos:
                         f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
+                        reposAdded += 1
                 
-            return flask.redirect('/manageRepositories')
+            return flask.redirect(f'/manageRepositories?reposAdded={reposAdded}')
             
             # Test to get repo owner email
             # need to make another api call to owner info and get it there
@@ -109,10 +113,17 @@ def manageRepos():
     except FileNotFoundError:
         repos = ""
 
+    reposAdded = flask.request.args.get("reposAdded")
+
+    if reposAdded == None:
+        reposAdded = 0
+    else:
+        reposAdded = int(reposAdded)
+
     try:
-        return flask.render_template('manageRepositories.html', pat=flask.session['pat'],repos=repos)
+        return flask.render_template('manageRepositories.html', pat=flask.session['pat'], repos=repos, reposAdded=reposAdded)
     except KeyError:
-        return flask.render_template('manageRepositories.html', pat='', repos=repos)
+        return flask.render_template('manageRepositories.html', pat='', repos=repos, reposAdded=reposAdded)
 
 @app.route('/clearRepositories')
 def clearRepos():
