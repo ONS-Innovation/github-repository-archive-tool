@@ -5,6 +5,7 @@
 <title>Repository Archive Tool</title>
 
 <script src="{{ url_for('static', filename='js/tableFunctions.js') }}"></script>
+
 {% endblock %}
 
 {% block body %}
@@ -44,12 +45,12 @@
                 {% else %}
                     <input type="text" id="tableSearch" class="form-control" onkeyup="searchTable('repoTable', 'tableSearch', 0)" placeholder="&#128269; Search Repositories...">
 
-                    <table id="repoTable" class="table table-striped table-hover" onload="sortTable('repoTable', 1)">
+                    <table id="repoTable" class="table table-striped table-hover">
                         <caption>Repositories to Archive</caption>
                         <thead>
                             <tr>
                                 <th onclick="sortTable('repoTable', 0)">Name:</th>
-                                <th onclick="sortTable('repoTable', 1)">Date Added:</th>
+                                <th onclick="sortTable('repoTable', 1)" class="asc">Date Added:</th>
                                 <th onclick="sortTable('repoTable', 2)">Last Commit:</th>
                                 <th>Avoid Archiving?</th>
                             </tr>
@@ -93,5 +94,10 @@
         </div>
     </div>
 </main>
+
+<!-- Javascript to sort the table on Date Added once the page is loaded -->
+<script>
+    sortTable('repoTable', 1)
+</script>
 
 {% endblock %}

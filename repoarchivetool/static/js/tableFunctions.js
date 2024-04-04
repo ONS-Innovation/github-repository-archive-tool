@@ -21,6 +21,8 @@ function searchTable(tableID, searchbarID, columnIndex) {
 }
 
 function sortTable(tableID, columnIndex){
+    console.log("sorting")
+
     table = document.getElementById(tableID);
 
     switching = true;
