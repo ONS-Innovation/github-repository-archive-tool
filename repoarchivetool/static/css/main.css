@@ -26,13 +26,36 @@
     border-right: 3px solid transparent;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
-  }
+}
   
-  @keyframes rotation {
+@keyframes rotation {
     0% {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     100% {
-      transform: rotate(360deg);
+        transform: rotate(360deg);
     }
-  } 
+} 
+
+.desc:after,
+.asc:after {
+    content: ' ';
+    position: relative;
+    left: 2px;
+    border: 8px solid transparent;
+}
+
+.desc:after {
+    top: 10px;
+    border-top-color: var(--bs-secondary);
+}
+
+.asc:after {
+    bottom: 15px;
+    border-bottom-color: var(--bs-secondary);
+}
+
+.desc,
+.asc {
+    padding-right: 10px;
+}

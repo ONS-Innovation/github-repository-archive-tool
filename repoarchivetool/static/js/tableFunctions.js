@@ -21,8 +21,6 @@ function searchTable(tableID, searchbarID, columnIndex) {
 }
 
 function sortTable(tableID, columnIndex){
-    console.log("sorting")
-
     table = document.getElementById(tableID);
 
     switching = true;
@@ -30,18 +28,28 @@ function sortTable(tableID, columnIndex){
     // Get the table heading of the column being sorted to work out if column should be sorted
     // in asc or desc order
     rows = table.rows;
-    columnHeading = rows[0].getElementsByTagName('th')[columnIndex];
 
-    if(columnHeading.classList.contains("asc")){
+    columnHeadings = rows[0].getElementsByTagName('th')
+
+    for(i = 0; i < columnHeadings.length; i++){
+        if(i != columnIndex){
+            columnHeadings[i].classList.remove('asc')
+            columnHeadings[i].classList.remove('desc')
+        }
+    }
+
+    selectedColumn = columnHeadings[columnIndex];
+
+    if(selectedColumn.classList.contains("asc")){
         sortOrder = "desc";
-        columnHeading.classList.remove("asc");
+        selectedColumn.classList.remove("asc");
     }
     else{
         sortOrder = "asc";
-        columnHeading.classList.remove("desc");
+        selectedColumn.classList.remove("desc");
     }
 
-    columnHeading.classList.add(sortOrder);
+    selectedColumn.classList.add(sortOrder);
 
     while(switching){
         switching = false;
