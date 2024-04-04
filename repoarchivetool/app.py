@@ -40,10 +40,7 @@ def findRepos():
             gh = apiScript.APIHandler(flask.session['pat'])
         
         except KeyError:
-            try:
-                return flask.render_template('error.html', pat=flask.session['pat'], error='Personal Access Token Undefined.')
-            except KeyError:
-                return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+            return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
         
         else:
             # Get form values
@@ -159,6 +156,18 @@ def changeFlag():
             f.write(repo)
         
     return flask.redirect('/manageRepositories')
+
+@app.route('/archiveRepositories')
+def archiveRepos():
+    # https://api.github.com/repos/ONS-Innovation/KPArchiveTest
+
+    try:
+        gh = apiScript.APIHandler(flask.session['pat'])
+    except KeyError:
+        return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+
+    response = gh.patch("https://api.github.com/repos/ONS-Innovation/KPArchiveTest", {"archived":False}, False)
+    return response.json()
 
 if __name__ == "__main__":
     app.run(debug=True)

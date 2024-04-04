@@ -39,7 +39,7 @@ The example below represents 2 repositories within repositories.txt
 
 ## Future Developments
 - ~~Some sort of loading screen whilst it finds the repos~~
-- Store Repos for archive and display them (In Progress)
+- ~~Store Repos for archive and display them~~
     - ~~Need to add functionality to keep flag~~
     - ~~Make it so that new records are added instead of overwriting table~~
     - ~~Need a success page once repos are stored~~
@@ -47,8 +47,7 @@ The example below represents 2 repositories within repositories.txt
     - ~~Add table searching~~
     - ~~Add table sorting~~
     - Make table scrollable (unsure if needed?)
-
     - Might put all the file reading in a separate py file - repeating code in a few places?
-- Email Notification to Repo Owner
+- Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
-- Archive Repo 30 days from notif (will trigger on button press)
+- Archive Repo 30 days from being stored (In Progress)
