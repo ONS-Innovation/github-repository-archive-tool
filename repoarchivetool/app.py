@@ -1,5 +1,5 @@
 import flask
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import apiScript
 
@@ -12,9 +12,9 @@ def index():
         flask.session['pat'] = flask.request.form['pat']
 
     try:
-        return flask.render_template('index.html', pat=flask.session['pat'], date=datetime.now().strftime("%Y-%m-%d"))
+        return flask.render_template('index.html', pat=flask.session['pat'], date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
     except KeyError:
-        return flask.render_template('index.html', pat='', date=datetime.now().strftime("%Y-%m-%d"))
+        return flask.render_template('index.html', pat='', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
