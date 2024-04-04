@@ -45,8 +45,8 @@ The example below represents 2 repositories within repositories.txt
     - ~~Need a success page once repos are stored~~
     - ~~Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5~~
     - ~~Add table searching~~
-    - Add table sorting
-    - Make table scrollable
+    - ~~Add table sorting~~
+    - Make table scrollable (unsure if needed?)
 
     - Might put all the file reading in a separate py file - repeating code in a few places?
 - Email Notification to Repo Owner
