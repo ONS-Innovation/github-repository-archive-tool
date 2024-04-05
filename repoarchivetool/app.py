@@ -1,6 +1,8 @@
 import flask
 from datetime import datetime, timedelta
 import os
+import json
+
 import apiScript
 
 app = flask.Flask(__name__)
@@ -48,39 +50,42 @@ def findRepos():
             date = flask.request.form['date']
             repoType = flask.request.form['repoType']
 
-            repos = apiScript.GetOrgRepos(org, date, repoType, gh)
+            newRepos = apiScript.GetOrgRepos(org, date, repoType, gh)
 
-            if type(repos) == str:
+            if type(newRepos) == str:
                 # Error Message Returned                
                 try:
-                    return flask.render_template('error.html', pat=flask.session['pat'], error=repos)
+                    return flask.render_template('error.html', pat=flask.session['pat'], error=newRepos)
                 except KeyError:
-                    return flask.render_template('error.html', pat='', error=repos)
+                    return flask.render_template('error.html', pat='', error=newRepos)
 
             # Get current date for logging purposes
             currentDate = datetime.today().strftime("%Y-%m-%d")
 
             reposAdded = 0
 
+            # Get repos from storage
             try:
-                with open("repositories.txt", "r+") as f:
-
-                    storedRepos = f.read().split(";")
-                    storedRepos.pop()
-
-                    for i in range(0, len(storedRepos)):
-                        storedRepos[i] = storedRepos[i].split(",")[0]
-
-                    for repo in repos:
-                        if repo['name'] not in storedRepos:
-                            f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
-                            reposAdded += 1
-            
+                with open("repositories.json", "r") as f:
+                    storedRepos = json.load(f) 
             except FileNotFoundError:
-                with open("repositories.txt", "w") as f:
-                    for repo in repos:
-                        f.write(f"{repo['name']},{repo['apiUrl']},{repo['lastCommitDate']},{currentDate},0;")
-                        reposAdded += 1
+                # File doesn't exist therefore no repos stored
+                storedRepos = []
+
+            for repo in newRepos:
+                if not any(d["name"] == repo["name"] for d in storedRepos):
+                    storedRepos.append({
+                        "name": repo["name"],
+                        "apiUrl": repo["apiUrl"],
+                        "lastCommit": repo["lastCommitDate"],
+                        "dateAdded": currentDate,
+                        "keep": False
+                    })
+
+                    reposAdded += 1
+
+            with open("repositories.json", "w") as f:
+                f.write(json.dumps(storedRepos, indent=4))
                 
             return flask.redirect(f'/manageRepositories?reposAdded={reposAdded}')
             
@@ -94,21 +99,15 @@ def findRepos():
 
 @app.route('/manageRepositories')
 def manageRepos():
-    try:
-        with open("repositories.txt", "r") as f:
-            repos = f.read().split(";")
-            repos.pop()
 
-            for i in range(0, len(repos)):
-                name, url, lastCommit, dateAdded, keep = repos[i].split(",")
-                repos[i] = {
-                    "name": name,
-                    "dateAdded": dateAdded,
-                    "lastCommit": lastCommit,
-                    "keep": keep
-                }
+    # Get repos from storage
+    try:
+        with open("repositories.json", "r") as f:
+            repos = json.load(f) 
+            repos.sort(key=lambda x: x["name"])
     except FileNotFoundError:
-        repos = ""
+        # File doesn't exist therefore no repos stored
+        repos = []
 
     reposAdded = flask.request.args.get("reposAdded")
 
@@ -133,27 +132,17 @@ def changeFlag():
 
     if repoName == None:
         return flask.redirect('/manageRepositories')
-    
-    updatedRepos = []
 
-    with open("repositories.txt", "r") as f:
-        repos = f.read().split(';')
-        repos.pop()
+    with open("repositories.json", "r") as f:
+        repos = json.load(f)
 
-        for i in range(0, len(repos)):
-            name, apiUrl, lastCommitDate, dateAdded, keep = repos[i].split(',')
+    for i in range(0, len(repos)):
+        if repoName == repos[i]["name"]:
+            repos[i]["keep"] = not repos[i]["keep"]
+            break
 
-            if repoName == name:
-                if keep == "1":
-                    updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},0;")
-                else:
-                    updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},1;")
-            else:
-                updatedRepos.append(f"{name},{apiUrl},{lastCommitDate},{dateAdded},{keep};")
-    
-    with open("repositories.txt", "w") as f:
-        for repo in updatedRepos:
-            f.write(repo)
+    with open("repositories.json", "w") as f:
+        f.write(json.dumps(repos, indent=4))
         
     return flask.redirect('/manageRepositories')
 
@@ -167,35 +156,30 @@ def archiveRepos():
     # A list of dictionaries to keep track of what repos have been archived (w/ success status)
     archiveList = []
 
-    with open("repositories.txt", "r") as f:
-        repos = f.read().split(';')
-        repos.pop()
+    with open("repositories.json", "r") as f:
+        repos = json.load(f)
 
-        for i in range(0, len(repos)):
-            name, apiUrl, lastCommitDate, dateAdded, keep = repos[i].split(',')
+    for repo in repos:
+        if not repo["keep"]:
+            if (datetime.now() - datetime.strptime(repo["dateAdded"], "%Y-%m-%d")).days >= 30:
+                response = gh.patch(repo["apiUrl"], {"archived":True}, False)
 
-            if keep != 1:
-                print((datetime.now() - datetime.strptime(dateAdded, "%Y-%m-%d")).days)
+                if response.status_code == 200:
 
-                if (datetime.now() - datetime.strptime(dateAdded, "%Y-%m-%d")).days >= 30:
-                    response = gh.patch(apiUrl, {"archived":True}, False)
+                    archiveList.append({
+                        "name": repo["name"],
+                        "apiurl": repo["apiUrl"],
+                        "status": "Success",
+                        "message": "Repository Archived Successfully."
+                    })
 
-                    if response.status_code == 200:
-
-                        archiveList.append({
-                            "name": name,
-                            "apiurl": apiUrl,
-                            "status": "Success",
-                            "message": "Repository Archived Successfully."
-                        })
-
-                    else:
-                        archiveList.append({
-                            "name": name,
-                            "apiurl": apiUrl,
-                            "status": "Failed",
-                            "message": f"Error {response.status_code}: {response.json()["message"]}"
-                        })
+                else:
+                    archiveList.append({
+                        "name": repo["name"],
+                        "apiurl": repo["apiUrl"],
+                        "status": "Failed",
+                        "message": f"Error {response.status_code}: {response.json()["message"]}"
+                    })
 
     return archiveList
 

@@ -63,13 +63,13 @@ function sortTable(tableID, columnIndex){
             nextRow = rows[i + 1].getElementsByTagName('TD')[columnIndex];
 
             if(sortOrder == "asc"){
-                if(currentRow.innerHTML.toLowerCase() > nextRow.innerHTML.toLowerCase()){
+                if(currentRow.innerHTML > nextRow.innerHTML){
                     swap = true;
                     break;
                 }
             }
             else{
-                if(currentRow.innerHTML.toLowerCase() < nextRow.innerHTML.toLowerCase()){
+                if(currentRow.innerHTML < nextRow.innerHTML){
                     swap = true;
                     break;
                 }

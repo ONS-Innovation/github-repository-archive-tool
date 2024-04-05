@@ -46,6 +46,7 @@ The example below represents 2 repositories within repositories.txt
     - ~~Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5~~
     - ~~Add table searching~~
     - ~~Add table sorting~~
+    - Add Key contributer and repo type to table
 - Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - ~~Archive Repo 30 days from being stored~~
@@ -53,4 +54,4 @@ The example below represents 2 repositories within repositories.txt
     - Display Repos
     - Undo Button (All Repos)
 
-- Need to convert to using JSON over a text file
+- ~~Need to convert to using JSON over a text file~~

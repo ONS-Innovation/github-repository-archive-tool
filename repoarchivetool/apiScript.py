@@ -174,7 +174,7 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                             reposToArchive.append({
                                 "name": repo["name"],
                                 "apiUrl": repo["url"],
-                                "lastCommitDate": lastUpdate
+                                "lastCommitDate": str(lastUpdate)
                             })
                     else:
                         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Individual Repositories."
