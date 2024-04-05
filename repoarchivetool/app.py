@@ -165,6 +165,8 @@ def archiveRepos():
         "repos": []
     }
 
+    reposToRemove = []
+
     with open("repositories.json", "r") as f:
         repos = json.load(f)
 
@@ -182,7 +184,7 @@ def archiveRepos():
                         "message": "Repository Archived Successfully."
                     })
 
-                    repos.pop(i)
+                    reposToRemove.append(i)
 
                 else:
                     archiveInstance["repos"].append({
@@ -199,12 +201,15 @@ def archiveRepos():
         with open("archived.json", "w") as f:
             f.write(json.dumps(archiveList, indent=4))
 
+        popCount = 0
+        for i in reposToRemove:
+            repos.pop(i - popCount)
+            popCount += 1
+
         with open("repositories.json", "w") as f:
             f.write(json.dumps(repos, indent=4))
 
-    return archiveList
-
-    # Need to write archiveList to JSON then redirect to /recentlyArchived
+    return flask.redirect('/recentlyArchived')
 
 @app.route('/recentlyArchived')
 def recentlyArchived():
