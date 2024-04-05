@@ -123,7 +123,7 @@ def manageRepos():
 
 @app.route('/clearRepositories')
 def clearRepos():
-    os.remove("repositories.txt")
+    os.remove("repositories.json")
     return flask.redirect('/manageRepositories')
 
 @app.route('/changeKeepFlag')
@@ -154,32 +154,53 @@ def archiveRepos():
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
     # A list of dictionaries to keep track of what repos have been archived (w/ success status)
-    archiveList = []
+    try:
+        with open("archived.json", "r") as f:
+            archiveList = json.load(f)
+    except FileNotFoundError:
+        archiveList = []
+
+    archiveInstance = {
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "repos": []
+    }
 
     with open("repositories.json", "r") as f:
         repos = json.load(f)
 
-    for repo in repos:
-        if not repo["keep"]:
-            if (datetime.now() - datetime.strptime(repo["dateAdded"], "%Y-%m-%d")).days >= 30:
-                response = gh.patch(repo["apiUrl"], {"archived":True}, False)
+    for i in range(0, len(repos)):
+        if not repos[i]["keep"]:
+            if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= 30:
+                response = gh.patch(repos[i]["apiUrl"], {"archived":True}, False)
 
                 if response.status_code == 200:
 
-                    archiveList.append({
-                        "name": repo["name"],
-                        "apiurl": repo["apiUrl"],
+                    archiveInstance["repos"].append({
+                        "name": repos[i]["name"],
+                        "apiurl": repos[i]["apiUrl"],
                         "status": "Success",
                         "message": "Repository Archived Successfully."
                     })
 
+                    repos.pop(i)
+
                 else:
-                    archiveList.append({
-                        "name": repo["name"],
-                        "apiurl": repo["apiUrl"],
+                    archiveInstance["repos"].append({
+                        "name": repos[i]["name"],
+                        "apiurl": repos[i]["apiUrl"],
                         "status": "Failed",
                         "message": f"Error {response.status_code}: {response.json()["message"]}"
                     })
+
+    if len(archiveInstance["repos"]) > 0:
+        
+        archiveList.append(archiveInstance)
+
+        with open("archived.json", "w") as f:
+            f.write(json.dumps(archiveList, indent=4))
+
+        with open("repositories.json", "w") as f:
+            f.write(json.dumps(repos, indent=4))
 
     return archiveList
 

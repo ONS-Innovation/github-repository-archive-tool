@@ -4,3 +4,4 @@ archive.txt
 **/instance/
 **/__pycache__/
 repositories.json
+archived.json
