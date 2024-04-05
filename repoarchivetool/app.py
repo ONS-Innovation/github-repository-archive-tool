@@ -198,7 +198,15 @@ def archiveRepos():
                         })
 
     return archiveList
-    # return flask.redirect(f'/manageRepositories')
+
+    # Need to write archiveList to JSON then redirect to /recentlyArchived
+
+@app.route('/recentlyArchived')
+def recentlyArchived():
+    try:
+        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'])
+    except KeyError:
+        return flask.render_template('recentlyArchived.html', pat='')
 
 if __name__ == "__main__":
     app.run(debug=True)
