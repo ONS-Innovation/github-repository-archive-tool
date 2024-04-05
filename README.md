@@ -51,3 +51,7 @@ The example below represents 2 repositories within repositories.txt
 - Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - Archive Repo 30 days from being stored (In Progress)
+- Last Archived Page (to show which repos were archived last time the tool run)
+    - Display Repos
+    - Undo Button (All Repos)
+    - Unarchive individual Repos

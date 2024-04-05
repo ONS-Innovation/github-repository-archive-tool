@@ -157,17 +157,48 @@ def changeFlag():
         
     return flask.redirect('/manageRepositories')
 
-@app.route('/archiveRepositories')
+@app.route('/archiveRepositories', methods=['POST', 'GET'])
 def archiveRepos():
-    # https://api.github.com/repos/ONS-Innovation/KPArchiveTest
-
     try:
         gh = apiScript.APIHandler(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
-    response = gh.patch("https://api.github.com/repos/ONS-Innovation/KPArchiveTest", {"archived":False}, False)
-    return response.json()
+    # A list of dictionaries to keep track of what repos have been archived (w/ success status)
+    archiveList = []
+
+    with open("repositories.txt", "r") as f:
+        repos = f.read().split(';')
+        repos.pop()
+
+        for i in range(0, len(repos)):
+            name, apiUrl, lastCommitDate, dateAdded, keep = repos[i].split(',')
+
+            if keep != 1:
+                print((datetime.now() - datetime.strptime(dateAdded, "%Y-%m-%d")).days)
+
+                if (datetime.now() - datetime.strptime(dateAdded, "%Y-%m-%d")).days >= 30:
+                    response = gh.patch(apiUrl, {"archived":True}, False)
+
+                    if response.status_code == 200:
+
+                        archiveList.append({
+                            "name": name,
+                            "apiurl": apiUrl,
+                            "status": "Success",
+                            "message": "Repository Archived Successfully."
+                        })
+
+                    else:
+                        archiveList.append({
+                            "name": name,
+                            "apiurl": apiUrl,
+                            "status": "Failed",
+                            "message": f"Error {response.status_code}: {response.json()["message"]}"
+                        })
+
+    return archiveList
+    # return flask.redirect(f'/manageRepositories')
 
 if __name__ == "__main__":
     app.run(debug=True)

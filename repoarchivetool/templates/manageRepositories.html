@@ -36,6 +36,8 @@
                     </div>    
                 {% endif %}  
 
+                <h2>Repositories to Archive:</h2>
+
                 {% if repos|length < 1 %}
                     <div class="alert alert-info text-center">
                         <p>No Repositories Stored.</p>
@@ -68,27 +70,57 @@
                         </tbody>
                     </table>
 
-                    <div class="text-end">
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmRepoClear"><i class="fa fa-trash" style="font-size: 24px;"></i></button>
-                    </div>
+                    <div class="row">
+                        <!-- Archive Repos Button -->
+                        <div class="col">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmArchive" {% if pat == '' %} disabled {% endif %}>Archive Repositories</button>
+                        </div>
+    
+                        <div class="modal fade" id="confirmArchive" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
 
-                    <div class="modal fade" id="confirmRepoClear" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <form>
+                                        <div class="modal-body">
+                                            Are you sure you want to archive the repositories added over 30 days ago?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <a class="btn btn-primary" href="/archiveRepositories">Confirm</a>
+                                        </div>
+                                    </form>
                                 </div>
-                                <div class="modal-body">
-                                    Are you sure you want to clear all stored repository information? This cannot be undone.
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <a class="btn btn-danger" href="/clearRepositories">Confirm</a>
+                            </div>
+                        </div>
+    
+                        <!-- Clear Repos Button -->
+                        <div class="col text-end">
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmRepoClear"><i class="fa fa-trash" style="font-size: 24px;"></i></button>
+                        </div>
+    
+                        <div class="modal fade" id="confirmRepoClear" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to clear all stored repository information? This cannot be undone.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <a class="btn btn-danger" href="/clearRepositories">Confirm</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 {% endif %}
             </div>
         </div>
