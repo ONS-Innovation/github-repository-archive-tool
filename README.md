@@ -28,15 +28,6 @@ Before you can use the application, you will need a Personal Access Token (PAT).
 
 You can now input this into the app and use it.
 
-## Data Storage
-This application stores repository data within a text file (repositories.txt).
-
-Each repository has 5 main parts which are separated by commas. Each repository entry is separated by semi-colons.
-
-The example below represents 2 repositories within repositories.txt
-
-![Data Storage Format](/assets/readme/DataStorage.png)
-
 ## Future Developments
 - ~~Some sort of loading screen whilst it finds the repos~~
 - ~~Store Repos for archive and display them~~
@@ -51,7 +42,9 @@ The example below represents 2 repositories within repositories.txt
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - ~~Archive Repo 30 days from being stored~~
 - Last Archived Page (to show which repos were archived last time the tool run)
-    - Display Repos
-    - Undo Button (All Repos)
+    - ~~Display Repos~~
+    - ~~Undo Button (All Repos)~~
+    - Bug where if 2 batches with the same repo, can put multiple row of the same repo in manage repos
+        > need to add a check if it aleady exists in repositories.json before adding it back
 
 - ~~Need to convert to using JSON over a text file~~

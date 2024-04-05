@@ -29,6 +29,12 @@
                         Please add a Personal Access Token before using this tool.
                     </div>    
                 {% endif %}
+
+                {% if batchID is defined %}
+                    <div class="alert alert-success text-center">
+                        Batch {{ batchID }} has been successfully reverted.
+                    </div>   
+                {% endif %}
                 
                 <div class="accordion" id="batchAccordion">
                     {% for batch in archiveList %}
@@ -37,7 +43,11 @@
                                 <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ batch["batchID"] }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ batch["batchID"] }}">
                                     <div class="col">
                                         <p class="m-0"><b>Batch {{ batch["batchID"] }}</b>{% if loop.first %} | <i>Most Recent</i> {% endif %}</p>
-                                        <p class="m-0 align-self-end text-body-secondary">{{ batch["repos"]|length }} Repositories Archived</p>
+                                        {% if batch["repos"]|length > 0 %}
+                                            <p class="m-0 text-body-secondary">{{ batch["repos"]|length }} Repositories Archived</p>
+                                        {% else %}
+                                            <p class="m-0 text-body-secondary">Archive Reverted</p>
+                                        {% endif %}
                                     </div>
                                     <div class="col text-end me-3">
                                         <p class="m-auto"><i>{{ batch["date"] }}</i></p>
@@ -45,7 +55,7 @@
                                 </button>
                             </h2>
                             <div id="collapse{{ batch["batchID"] }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ batch["batchID"] }}" data-bs-parent="#batchAccordion">
-                                <div class="accordion-body text-center">
+                                <div class="accordion-body text-center" {% if batch["repos"]|length == 0 %}hidden{% endif %}>
                                     <h4>Batch Contents:</h4>
                                     <div class="row row-cols-1 row-cols-md-2">
                                         {% for repo in batch["repos"] %}
@@ -59,8 +69,29 @@
                                             </div>
                                         {% endfor %}
                                     </div>
-
-                                    <a class="btn btn-primary m-3" href="">Undo Archive</a>
+                                    
+                                    <button class="btn btn-danger m-3" data-bs-toggle="modal" data-bs-target="#confirmUndo{{ batch["batchID"] }}" {% if pat == '' %} disabled {% endif %}>Undo Archive <i class="fa fa-undo"></i></button>
+                
+                                    <div class="modal fade" id="confirmUndo{{ batch["batchID"] }}" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+            
+                                                <form>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to unarchive <b>{{ batch["repos"]|length }}</b> repositories?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <a class="btn btn-danger" href="/undoBatch?batchID={{ batch["batchID"] }}">Confirm</a>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

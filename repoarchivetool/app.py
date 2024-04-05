@@ -1,5 +1,5 @@
 import flask
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import os
 import json
 
@@ -217,6 +217,7 @@ def recentlyArchived():
     try:
         with open("archived.json", "r") as f:
             archiveList = json.load(f)
+            archiveList.reverse()
     except FileNotFoundError:
         archiveList = []
 
@@ -224,6 +225,76 @@ def recentlyArchived():
         return flask.render_template('recentlyArchived.html', pat=flask.session['pat'], archiveList=archiveList)
     except KeyError:
         return flask.render_template('recentlyArchived.html', pat='', archiveList=archiveList)
+
+@app.route('/undoBatch')
+def undoBatch():
+    try:
+        gh = apiScript.APIHandler(flask.session['pat'])
+    except KeyError:
+        return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+
+    batchID = flask.request.args.get("batchID")
+
+    if batchID != None:
+        batchID = int(batchID)
+
+        with open("archived.json", "r") as f:
+            archiveList = json.load(f)
+
+        batchToUndo = archiveList[batchID - 1]
+
+        popCount = 0
+
+        for i in range(0, len(batchToUndo["repos"])):
+            # Unarchive the repo
+            response = gh.patch(batchToUndo["repos"][i - popCount]["apiurl"], {"archived": False}, False)
+
+            if response.status_code != 200:
+                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]}")
+
+            # Add the repo to repositories.json
+            response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
+
+            if response.status_code != 200:
+                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
+
+            repoJson = response.json()
+
+            # Get repos from storage
+            try:
+                with open("repositories.json", "r") as f:
+                    storedRepos = json.load(f) 
+            except FileNotFoundError:
+                # File doesn't exist therefore no repos stored
+                storedRepos = []
+
+            currentDate = datetime.now().strftime("%Y-%m-%d")
+
+            lastUpdate = repoJson["pushed_at"]
+            lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+            lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
+            storedRepos.append({
+                "name": repoJson["name"],
+                "apiUrl": repoJson["url"],
+                "lastCommit": str(lastUpdate),
+                "dateAdded": currentDate,
+                "keep": False
+            })
+
+            with open("repositories.json", "w") as f:
+                f.write(json.dumps(storedRepos, indent=4))
+
+            # Remove the repo from archived.json
+            archiveList[batchID - 1]["repos"].pop(i - popCount)
+            popCount += 1
+
+            with open("archived.json", "w") as f:
+                f.write(json.dumps(archiveList, indent=4))
+
+        return flask.redirect(f"/recentlyArchived?batchID={batchID}")
+
+    return flask.redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
