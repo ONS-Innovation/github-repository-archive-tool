@@ -19,7 +19,7 @@
                         <a class="nav-link" href="/manageRepositories">Manage Repositories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/recentlyArchived">View Recently Archived Repositories</a>
+                        <a class="nav-link active" href="/recentlyArchived">View Archive Batches</a>
                     </li>
                 </ul>
             </div>
@@ -30,7 +30,42 @@
                     </div>    
                 {% endif %}
                 
-                
+                <div class="accordion" id="batchAccordion">
+                    {% for batch in archiveList %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ batch["batchID"] }}">
+                                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ batch["batchID"] }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ batch["batchID"] }}">
+                                    <div class="col">
+                                        <p class="m-0"><b>Batch {{ batch["batchID"] }}</b>{% if loop.first %} | <i>Most Recent</i> {% endif %}</p>
+                                        <p class="m-0 align-self-end text-body-secondary">{{ batch["repos"]|length }} Repositories Archived</p>
+                                    </div>
+                                    <div class="col text-end me-3">
+                                        <p class="m-auto"><i>{{ batch["date"] }}</i></p>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ batch["batchID"] }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ batch["batchID"] }}" data-bs-parent="#batchAccordion">
+                                <div class="accordion-body text-center">
+                                    <h4>Batch Contents:</h4>
+                                    <div class="row row-cols-1 row-cols-md-2">
+                                        {% for repo in batch["repos"] %}
+                                            <div class="col">
+                                                <div class="card {% if repo["status"] == "Success" %}border-success{% else %}border-danger{% endif %}">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">{{ repo["name"] }}</h5>
+                                                        {{ repo["status"] }} | {{ repo["message"] }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <a class="btn btn-primary m-3" href="">Undo Archive</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>

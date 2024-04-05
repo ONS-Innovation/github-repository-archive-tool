@@ -161,6 +161,7 @@ def archiveRepos():
         archiveList = []
 
     archiveInstance = {
+        "batchID": len(archiveList)+1,
         "date": datetime.now().strftime("%Y-%m-%d"),
         "repos": []
     }
@@ -214,9 +215,15 @@ def archiveRepos():
 @app.route('/recentlyArchived')
 def recentlyArchived():
     try:
-        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'])
+        with open("archived.json", "r") as f:
+            archiveList = json.load(f)
+    except FileNotFoundError:
+        archiveList = []
+
+    try:
+        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'], archiveList=archiveList)
     except KeyError:
-        return flask.render_template('recentlyArchived.html', pat='')
+        return flask.render_template('recentlyArchived.html', pat='', archiveList=archiveList)
 
 if __name__ == "__main__":
     app.run(debug=True)
