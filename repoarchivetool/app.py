@@ -74,8 +74,31 @@ def findRepos():
 
             for repo in newRepos:
                 if not any(d["name"] == repo["name"] for d in storedRepos):
+                    # Get contributors information
+                    response = gh.get(repo["contributorsUrl"], {}, False)
+
+                    if response.status_code not in (200, 204):
+                        return flask.render_template('error.html', pat='', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting contributor information for the {repo["name"]} repository.")
+
+                    contributorList = []
+
+                    if response.status_code == 200:
+                        contributors = response.json()
+                        
+                        for contributor in contributors:
+                            contributorList.append({
+                                "avatar": contributor["avatar_url"],
+                                "login": contributor["login"],
+                                "url": contributor["html_url"],
+                                "contributions": contributor["contributions"]
+
+                                # Maybe add their email to contact them?
+                            })
+
                     storedRepos.append({
                         "name": repo["name"],
+                        "type": repo["type"],
+                        "contributors": contributorList,
                         "apiUrl": repo["apiUrl"],
                         "lastCommit": repo["lastCommitDate"],
                         "dateAdded": currentDate,
@@ -99,7 +122,6 @@ def findRepos():
 
 @app.route('/manageRepositories')
 def manageRepos():
-
     # Get repos from storage
     try:
         with open("repositories.json", "r") as f:

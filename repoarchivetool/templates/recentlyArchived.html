@@ -10,8 +10,8 @@
 <main>
     <div class="container">
         <div class="row border rounded shadow m-3">
-            <div class="col-4 bg-body-secondary p-3">
-                <ul class="nav nav-pills nav-justified flex-column">
+            <div class="col p-3">
+                <ul class="nav nav-tabs nav-justified rounded m-3">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Find Repositories</a>
                     </li>
@@ -22,8 +22,7 @@
                         <a class="nav-link active" href="/recentlyArchived">View Archive Batches</a>
                     </li>
                 </ul>
-            </div>
-            <div class="col-8 p-3">
+
                 {% if pat == '' %}
                     <div class="alert alert-danger text-center">
                         Please add a Personal Access Token before using this tool.

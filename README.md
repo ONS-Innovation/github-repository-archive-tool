@@ -37,7 +37,8 @@ You can now input this into the app and use it.
     - ~~Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5~~
     - ~~Add table searching~~
     - ~~Add table sorting~~
-    - Add Key contributer and repo type to table
+    - ~~Add Key contributer and repo type to table~~
+    - Add search for contributors
 - Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - ~~Archive Repo 30 days from being stored~~
@@ -46,6 +47,6 @@ You can now input this into the app and use it.
     - ~~Undo Button (All Repos)~~
     - ~~Bug where if 2 batches with the same repo, can put multiple row of the same repo in manage repos~~
         ~~> need to add a check if it aleady exists in repositories.json before adding it back~~
-    - Add search    
+    - Add search for repos  
 
 - ~~Need to convert to using JSON over a text file~~

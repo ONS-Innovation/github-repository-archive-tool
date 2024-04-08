@@ -2,6 +2,10 @@
     padding: 0px;
 }
 
+th {
+    white-space: nowrap;
+}
+
 /* Pulse Animation for PAT form */
 .pulse {
     animation: pulse-animation 2s infinite;

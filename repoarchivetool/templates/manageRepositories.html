@@ -13,8 +13,8 @@
 <main>
     <div class="container">
         <div class="row border rounded shadow m-3">
-            <div class="col-4 bg-body-secondary p-3">
-                <ul class="nav nav-pills nav-justified flex-column">
+            <div class="col p-3">
+                <ul class="nav nav-tabs nav-justified rounded m-3">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Find Repositories</a>
                     </li>
@@ -25,8 +25,7 @@
                         <a class="nav-link" href="/recentlyArchived">View Archive Batches</a>
                     </li>
                 </ul>
-            </div>
-            <div class="col-8 p-3">
+
                 {% if pat == '' %}
                     <div class="alert alert-danger text-center">
                         Please add a Personal Access Token before using this tool.
@@ -56,8 +55,10 @@
                             <thead>
                                 <tr>
                                     <th onclick="sortTable('repoTable', 0)">Name:</th>
-                                    <th onclick="sortTable('repoTable', 1)" class="asc">Date Added:</th>
-                                    <th onclick="sortTable('repoTable', 2)">Last Commit:</th>
+                                    <th onclick="sortTable('repoTable', 1)">Type:</th>
+                                    <th>Contributors:</th>
+                                    <th onclick="sortTable('repoTable', 3)" class="asc">Date Added:</th>
+                                    <th onclick="sortTable('repoTable', 4)">Last Commit:</th>
                                     <th>Avoid Archiving?</th>
                                 </tr>
                             </thead>
@@ -66,9 +67,19 @@
                                 {% for repo in repos %}
                                     <tr>
                                         <td>{{ repo["name"] }}</td>
-                                        <td>{{ repo["dateAdded"] }}</td>
-                                        <td>{{ repo["lastCommit"] }}</td>
-                                        <td><input class="form-check-input" type="checkbox" role="switch" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}></td>
+                                        <td>{{ repo["type"] }}</td>
+                                        <td style="max-width: 600px;">
+                                            {% for contributor in repo["contributors"] %}
+                                                <span class="tt" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="<b>{{ contributor["login"] }}</b><br>{{ contributor["contributions"] }} contribution(s).">
+                                                    <a href="{{ contributor["url"] }}" target="_blank">
+                                                        <img class="rounded-circle" src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
+                                                    </a>
+                                                </span>
+                                            {% endfor %}
+                                        </td>
+                                        <td style="min-width: 100px;">{{ repo["dateAdded"] }}</td>
+                                        <td style="min-width: 100px;">{{ repo["lastCommit"] }}</td>
+                                        <td class="text-center"><input class="form-check-input" type="checkbox" role="switch" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -134,7 +145,13 @@
 
 <!-- Javascript to sort the table on Date Added once the page is loaded -->
 <script>
-    sortTable('repoTable', 1)
+    sortTable('repoTable', 3)
+
+    // Enable Bootstrap Tooltips
+    const tooltips = document.querySelectorAll(".tt")
+    tooltips.forEach(t => {
+        new bootstrap.Tooltip(t)
+    })
 </script>
 
 {% endblock %}
