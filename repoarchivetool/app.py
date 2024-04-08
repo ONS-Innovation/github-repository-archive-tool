@@ -253,13 +253,6 @@ def undoBatch():
                 return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]}")
 
             # Add the repo to repositories.json
-            response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
-
-            if response.status_code != 200:
-                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
-
-            repoJson = response.json()
-
             # Get repos from storage
             try:
                 with open("repositories.json", "r") as f:
@@ -267,20 +260,32 @@ def undoBatch():
             except FileNotFoundError:
                 # File doesn't exist therefore no repos stored
                 storedRepos = []
+            
+            # If repository not already stored, add it to storage
+            for repo in batchToUndo["repos"]:
+                if not any(d["name"] == repo["name"] for d in storedRepos):
 
-            currentDate = datetime.now().strftime("%Y-%m-%d")
+                    response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
 
-            lastUpdate = repoJson["pushed_at"]
-            lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-            lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+                    if response.status_code != 200:
+                        return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
 
-            storedRepos.append({
-                "name": repoJson["name"],
-                "apiUrl": repoJson["url"],
-                "lastCommit": str(lastUpdate),
-                "dateAdded": currentDate,
-                "keep": False
-            })
+                    repoJson = response.json()
+
+
+                    currentDate = datetime.now().strftime("%Y-%m-%d")
+
+                    lastUpdate = repoJson["pushed_at"]
+                    lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+                    lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+
+                    storedRepos.append({
+                        "name": repoJson["name"],
+                        "apiUrl": repoJson["url"],
+                        "lastCommit": str(lastUpdate),
+                        "dateAdded": currentDate,
+                        "keep": False
+                    })
 
             with open("repositories.json", "w") as f:
                 f.write(json.dumps(storedRepos, indent=4))
