@@ -10,9 +10,9 @@ app.config['SECRET_KEY'] = os.urandom(24)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    if flask.request.method == "POST":
-        flask.session['pat'] = flask.request.form['pat']
-
+    """
+        Returns a render of index.html.
+    """
     try:
         return flask.render_template('index.html', pat=flask.session['pat'], date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
     except KeyError:
@@ -20,22 +20,59 @@ def index():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    """
+        Registers the user's inputted personal access token for Github Authentication.
+
+        ==========
+
+        When posted to, the function will set the session variable, pat, to the posted value.
+        The session variable is intended to hold the user's personal access token for Github API authentication.
+
+        Returns a redirect back to the homepage.
+    """
     if flask.request.method == 'POST':
         flask.session['pat'] = flask.request.form['pat']
 
         # No need to test token here as tested when getting repos
 
-        return flask.redirect('/')
     return flask.redirect('/')
 
 @app.route('/logout')
 def logout():
+    """
+        Removes the user's personal access token.
+        
+        ==========
+        
+        Unsets the session variable, pat, which holds the user's personal access token.
+
+        Returns a redirect back to the homepage.
+    """
     # remove the username from the session if it's there
     flask.session.pop('pat', None)
     return flask.redirect('/')
 
 @app.route('/FindRepositories', methods=['POST', 'GET'])
 def findRepos():
+    """
+        Gets and stores any Github repositories, using apiScript.py, which fits the given parameters.
+        
+        ==========
+        
+        When posted to, the function will use the inputted values from the homepage to make
+        a request to the Github API using apiScript.py and its APIHandler class.
+        The request will return any repositories which fit the inputted parameters, in which
+        this function will store ANY NEW repositories in JSON (repositories.json).
+
+        If this function is not posted to, it will return a redirect to the homepage.
+
+        If the function receives an error after using apiScript.py, it will return a render of
+        error.html with an appropriate error message.
+
+        If the function is successful with obtaining the information, it will return a redirect to
+        /manageRepositories with an in-URL arguement (reposAdded) which is used to display how many
+        repositories are added to JSON.
+    """
     if flask.request.method == 'POST':
         try:
             # Create APIHandler instance
@@ -92,17 +129,21 @@ def findRepos():
                 f.write(json.dumps(storedRepos, indent=4))
                 
             return flask.redirect(f'/manageRepositories?reposAdded={reposAdded}')
-            
-            # Test to get repo owner email
-            # need to make another api call to owner info and get it there
-                
-            # owner = gh.get("https://api.github.com/repos/ONS-Innovation/AI_Testing_App", {}, False).json()["owner"]["url"]
-            # return gh.get(owner, {}, False).json()["email"]
     
     return flask.redirect('/')
 
 @app.route('/manageRepositories')
 def manageRepos():
+    """
+        Returns a render of manageRepositories.html.
+
+        ==========
+        
+        Loads a list of repositories from repositories.json to display within the render.
+
+        This function can also be passed an arguement called reposAdded, which is used to
+        display a success message when being redirected from findRepos().
+    """
     # Get repos from storage
     try:
         with open("repositories.json", "r") as f:
@@ -126,11 +167,28 @@ def manageRepos():
 
 @app.route('/clearRepositories')
 def clearRepos():
+    """ 
+        Removes all stored repositories by deleting repositories.json.
+        
+        Returns a redirect to manageRepositories.
+    """
     os.remove("repositories.json")
     return flask.redirect('/manageRepositories')
 
 @app.route('/changeKeepFlag')
 def changeFlag():
+    """
+        Inverts the keep flag which prevents repositories from being archived.
+
+        ==========
+
+        The function loads all repositories from repositories.json, then, using the passed arguement repoName,
+        toggles the keep attribute within the JSON from True to False or vice versa.
+
+        Returns a redirect to manageRepositories.
+
+        If no arguement is passed, it will return a redirect back to manageRepositories without making any changes.
+    """
     repoName = flask.request.args.get("repoName")
 
     if repoName == None:
@@ -151,6 +209,30 @@ def changeFlag():
 
 @app.route('/archiveRepositories', methods=['POST', 'GET'])
 def archiveRepos():
+    """
+        Archives any repositories which are:
+            - older than 30 days within the system
+            - have not been marked to be kept using the keep attribute in repositories.json
+        
+        ==========
+        
+        Creates an instance of the APIHandler class from apiScript.py.
+        Loads any archive batches from archived.json into archiveList.
+        Loads all stored repositories from repositories.json into repos.
+        Adds any repositories older than 30 days which do not have a keep attribute of True
+        to the reposToRemove array.
+        If there are repositories which need archiving, archive them using a patch request from the
+        APIHandler class instance.
+        Store the status of the archive attempt in archiveInstance["repos"].
+        Add the new archiveInstance to archiveList and write it to archived.json.
+        Remove any archived repositories from repos and write it to repositories.json.
+
+        Returns a redirect to recentlyArchived.
+
+        If the function fails to create an APIHandler instance, it will return a render of error.html
+        with an appropriate error message.
+
+    """
     try:
         gh = apiScript.APIHandler(flask.session['pat'])
     except KeyError:
@@ -217,6 +299,16 @@ def archiveRepos():
 
 @app.route('/recentlyArchived')
 def recentlyArchived():
+    """
+        Returns a render of recentlyArchived.html.
+
+        ==========
+
+        Loads a list of archive batches from archived.json to display within the render.
+
+        This function can also be passed an arguement called batchID, which is used to 
+        display a success message when redirected from undoBatch().
+    """
     try:
         with open("archived.json", "r") as f:
             archiveList = json.load(f)
@@ -224,13 +316,42 @@ def recentlyArchived():
     except FileNotFoundError:
         archiveList = []
 
+    batchID = flask.request.args.get("batchID")
+
+    if batchID == None:
+        batchID = ""
+
     try:
-        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'], archiveList=archiveList)
+        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'], archiveList=archiveList, batchID=batchID)
     except KeyError:
-        return flask.render_template('recentlyArchived.html', pat='', archiveList=archiveList)
+        return flask.render_template('recentlyArchived.html', pat='', archiveList=archiveList, batchID=batchID)
 
 @app.route('/undoBatch')
 def undoBatch():
+    """
+        Unarchives a batch of archived repositories.
+
+        ==========
+
+        Creates an instance of the APIHandler class from apiScript.py.
+        Gets the passed batchID arguement.
+        Loads any archive batches from archived.json into archiveList.
+        Gets the batch that needs undoing from archiveList using the given batchID.
+        Unarchives all repositories within the batch using a patch request from the APIHandler class instance.
+        Loads all stored repositories from repositories.json into storedRepos.
+        If any now unarchived repositories are not already stored, fetch their information from Github using a get request
+        from the APIHandler class instance and add it to storedRepos.
+        Write storedRepos back to repositories.json.
+        Remove any now archived repositories from the batch in archiveList and write it back to archived.json.
+
+        Returns a redirect to recentlyArchived with a passed arguement, batchID, which is used to show a success message.
+
+        If the function fails to create an APIHandler instance, it will return a render of error.html
+        with an appropriate error message.
+
+        If the function fails to unarchive a repository or get the repository's information from Github, it will return a render of error.html
+        with an appropriate error message.
+    """
     try:
         gh = apiScript.APIHandler(flask.session['pat'])
     except KeyError:

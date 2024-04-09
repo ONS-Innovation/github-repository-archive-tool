@@ -3,28 +3,82 @@ import datetime
 
 # APIHandler class to manage all API interactions
 class APIHandler():
+    """
+        A class used to interact with the Github API.
+
+        The class can perform get, patch, post and delete requests using the
+        get(), patch(), post() and delete() functions respectively.
+    """
     def __init__(self, token) -> None:
         """
             Creates the header attribute containing the Personal Access token to make auth'd API requests.
         """
         self.headers = {"Authorization": "token " + token}
 
-    def get(self, url, params, addPrefix: bool = True):
+    def get(self, url: str, params: dict, addPrefix: bool = True) -> requests.Response:
+        """
+            Performs a get request using the passed url.
+
+            Args:
+                url (str): The url endpoint of the request.
+                params (dict): A Dictionary containing any Query Parameters.
+                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                to the beginning of the passed url.
+
+            Returns:
+                Response: The response from the API.
+        """
         if addPrefix:
             url = "https://api.github.com" + url
         return requests.get(url=url, headers=self.headers, params=params)
     
     def patch(self, url, params, addPrefix: bool = True):
+        """
+            Performs a patch request using the passed url.
+
+            Args:
+                url (str): The url endpoint of the request.
+                params (dict): A Dictionary containing any Query Parameters.
+                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                to the beginning of the passed url.
+
+            Returns:
+                Response: The response from the API.
+        """
         if addPrefix:
             url = "https://api.github.com" + url
         return requests.patch(url=url, headers=self.headers, json=params)
     
     def post(self, url, params, addPrefix: bool = True):
+        """
+            Performs a post request using the passed url.
+
+            Args:
+                url (str): The url endpoint of the request.
+                params (dict): A Dictionary containing any Query Parameters.
+                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                to the beginning of the passed url.
+
+            Returns:
+                Response: The response from the API.
+        """
         if addPrefix:
             url = "https://api.github.com" + url
         return requests.post(url=url, headers=self.headers, json=params)
     
     def delete(self, url, addPrefix: bool = True):
+        """
+            Performs a delete request using the passed url.
+
+            Args:
+                url (str): The url endpoint of the request.
+                params (dict): A Dictionary containing any Query Parameters.
+                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                to the beginning of the passed url.
+
+            Returns:
+                Response: The response from the API.
+        """
         if addPrefix:
             url = "https://api.github.com" + url
 
@@ -33,16 +87,56 @@ class APIHandler():
 
 def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | list:
     """ 
-        Gets a list of repos which haven't been pushed to since a given date.
-        These are currently written to archive.txt but will be automatically archived in the future
+        Gets all repositories which fit the given parameters.
+
+        ==========
+
+        Makes a test call to the API.
+        If successful, get the total number of repository pages (2 repositories per page)
+        Convert the given string, date, to a date object.
+        Calculate the midpoint of the repositories, which denotes where the given archive
+        date is.
+        Any repositories to the left of the midpoint page are newer than the given date,
+        and cannot be archived.
+        Any repositories to the right of the midpoint page are newer than the given date,
+        and can be archived.
+        For each repository between the midpoint and last page of repositories,
+        add the repository to reposToArchive but only if it hasn't already been archived.
+        Return reposToArchive.
+
+        Args:
+            org (str): The name of the organisation whose repositories are to be returned.
+            date (str): The date which repositories that have been committed prior to will be archived.
+            repoType (str): The type of repository to be returned (public, private, internal or all).
+            gh (APIHandler): An instance of the APIHandler class to interact with the Github API.
+
+        Returns:
+            str: An error message.
+            or
+            list: A list of dictionaries containing information about the repositories collected from 
+            the Github API.
     """
 
     
-    def archiveFlag(repoUrl: str, compDate) -> bool | str:
+    def archiveFlag(repoUrl: str, compDate: date) -> bool | str:
         """
             Calculates whether a given repo should be archived or not.
 
-            Returns True or Falase
+            ==========
+
+            Gets the given repository's information using the given repoUrl.
+            Gets the repository's pushed_at date and converts it from a string to a date object (now called lastUpdate).
+            Compares lastUpdate to compDate.
+            If lastUpdate is before compDate return True, otherwise False.
+
+            Args:
+                repoUrl (str): The API URL of the repository.
+                compDate (date): The date which repositories that have been committed prior to should be archived.
+
+            Returns:
+                str: An error message.
+                or
+                bool: Whether the repository should be archived or not.
         """
 
         archiveFlag = False
@@ -189,6 +283,22 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
     
 
 def getRepoContributors(gh: APIHandler, contributorsUrl: str) -> str | list:
+    """
+        Gets the list of contributors for a given repository.
+
+        ==========
+
+        Args:
+            gh (APIHandler): An instance of the APIHandler class.
+            contributorsUrl (str): The Github API endpoint URL for the repository's contributors.
+
+        Returns:
+            str: An error message.
+            or
+            list: A list of dictionaries containing information about the contributors to the given 
+            repository collected from the Github API.
+    """
+
     # Get contributors information
     response = gh.get(contributorsUrl, {}, False)
 
