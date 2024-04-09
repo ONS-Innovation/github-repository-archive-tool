@@ -47,6 +47,8 @@ You can now input this into the app and use it.
     - ~~Undo Button (All Repos)~~
     - ~~Bug where if 2 batches with the same repo, can put multiple row of the same repo in manage repos~~
         ~~> need to add a check if it aleady exists in repositories.json before adding it back~~
-    - Add search for repos  
+    - ~~Add search for repos~~  
+
+    - Bug: contributer and type info not displayed when archive undone
 
 - ~~Need to convert to using JSON over a text file~~

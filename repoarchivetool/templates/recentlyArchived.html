@@ -3,6 +3,38 @@
 
 {% block head %}
 <title>Repository Archive Tool</title>
+
+<script>
+    function searchRepo(searchbarID){
+        searchBar = document.getElementById(searchbarID);
+        searchValue = searchBar.value.toUpperCase();
+
+        batches = document.getElementsByClassName("accordion-item");
+
+        for(batch of batches){
+            repoCards = batch.getElementsByClassName("card-title");
+
+            if(repoCards.length == 0){
+                if(searchValue != ""){
+                    batch.style.display = "none";
+                }
+                else {
+                    batch.style.display = "";
+                }
+            }
+            else {
+                for(card of repoCards){
+                    if(card.innerText.toUpperCase().indexOf(searchValue) > -1){
+                        batch.style.display = "";
+                    }
+                    else {
+                        batch.style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+</script>
 {% endblock %}
 
 {% block body %}
@@ -34,10 +66,12 @@
                         Batch {{ batchID }} has been successfully reverted.
                     </div>   
                 {% endif %}
+
+                <input type="text" id="archiveSearch" class="form-control mt-3 mb-3" onkeyup="searchRepo('archiveSearch')" placeholder="&#128269; Search for a Repository...">
                 
                 <div class="accordion" id="batchAccordion">
                     {% for batch in archiveList %}
-                        <div class="accordion-item">
+                        <div id="batch{{ batch["batchID"] }}" class="accordion-item">
                             <h2 class="accordion-header" id="heading{{ batch["batchID"] }}">
                                 <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ batch["batchID"] }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ batch["batchID"] }}">
                                     <div class="col">
@@ -59,9 +93,9 @@
                                     <div class="row row-cols-1 row-cols-md-2">
                                         {% for repo in batch["repos"] %}
                                             <div class="col">
-                                                <div class="card {% if repo["status"] == "Success" %}border-success{% else %}border-danger{% endif %}">
+                                                <div class="card {% if repo['status'] == 'Success' %}border-success{% else %}border-danger{% endif %} mt-2">
                                                     <div class="card-body">
-                                                        <h5 class="card-title">{{ repo["name"] }}</h5>
+                                                        <h5 class="card-title" aria-label="{{ batch["batchID"] }}">{{ repo["name"] }}</h5>
                                                         {{ repo["status"] }} | {{ repo["message"] }}
                                                     </div>
                                                 </div>
