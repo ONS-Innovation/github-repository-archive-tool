@@ -74,26 +74,7 @@ def findRepos():
 
             for repo in newRepos:
                 if not any(d["name"] == repo["name"] for d in storedRepos):
-                    # Get contributors information
-                    response = gh.get(repo["contributorsUrl"], {}, False)
-
-                    if response.status_code not in (200, 204):
-                        return flask.render_template('error.html', pat='', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting contributor information for the {repo["name"]} repository.")
-
-                    contributorList = []
-
-                    if response.status_code == 200:
-                        contributors = response.json()
-                        
-                        for contributor in contributors:
-                            contributorList.append({
-                                "avatar": contributor["avatar_url"],
-                                "login": contributor["login"],
-                                "url": contributor["html_url"],
-                                "contributions": contributor["contributions"]
-
-                                # Maybe add their email to contact them?
-                            })
+                    contributorList = apiScript.getRepoContributors(gh, repo["contributorsUrl"])
 
                     storedRepos.append({
                         "name": repo["name"],
@@ -294,15 +275,18 @@ def undoBatch():
 
                     repoJson = response.json()
 
-
                     currentDate = datetime.now().strftime("%Y-%m-%d")
 
                     lastUpdate = repoJson["pushed_at"]
                     lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
                     lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
 
+                    contributorList = apiScript.getRepoContributors(gh, repoJson["contributors_url"])
+
                     storedRepos.append({
                         "name": repoJson["name"],
+                        "type": repoJson["visibility"],
+                        "contributors": contributorList,
                         "apiUrl": repoJson["url"],
                         "lastCommit": str(lastUpdate),
                         "dateAdded": currentDate,

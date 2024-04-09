@@ -186,3 +186,28 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
         return reposToArchive
     else:
         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Test API Call."
+    
+
+def getRepoContributors(gh: APIHandler, contributorsUrl: str) -> str | list:
+    # Get contributors information
+    response = gh.get(contributorsUrl, {}, False)
+
+    if response.status_code not in (200, 204):
+        return f"Error {response.status_code}: {response.json()["message"]}"
+
+    contributorList = []
+
+    if response.status_code == 200:
+        contributors = response.json()
+        
+        for contributor in contributors:
+            contributorList.append({
+                "avatar": contributor["avatar_url"],
+                "login": contributor["login"],
+                "url": contributor["html_url"],
+                "contributions": contributor["contributions"]
+
+                # Maybe add their email to contact them?
+            })
+
+    return contributorList

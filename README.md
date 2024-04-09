@@ -29,6 +29,10 @@ Before you can use the application, you will need a Personal Access Token (PAT).
 You can now input this into the app and use it.
 
 ## Future Developments
+- Email Notification to Repo Owner at time of storage
+- Think about efficiency and readability improvements
+
+
 - ~~Some sort of loading screen whilst it finds the repos~~
 - ~~Store Repos for archive and display them~~
     - ~~Need to add functionality to keep flag~~
@@ -39,16 +43,15 @@ You can now input this into the app and use it.
     - ~~Add table sorting~~
     - ~~Add Key contributer and repo type to table~~
     - ~~Add search for contributors~~
-- Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - ~~Archive Repo 30 days from being stored~~
-- Last Archived Page (to show which repos were archived last time the tool run)
+- ~~Last Archived Page (to show which repos were archived last time the tool run)~~
     - ~~Display Repos~~
     - ~~Undo Button (All Repos)~~
     - ~~Bug where if 2 batches with the same repo, can put multiple row of the same repo in manage repos~~
         ~~> need to add a check if it aleady exists in repositories.json before adding it back~~
     - ~~Add search for repos~~  
 
-    - Bug: contributer and type info not displayed when archive undone
+    - ~~Bug: contributer and type info not displayed when archive undone~~
 
 - ~~Need to convert to using JSON over a text file~~
