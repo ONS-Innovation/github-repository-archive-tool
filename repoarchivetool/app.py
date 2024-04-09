@@ -264,34 +264,32 @@ def undoBatch():
                 # File doesn't exist therefore no repos stored
                 storedRepos = []
             
-            # If repository not already stored, add it to storage
-            for repo in batchToUndo["repos"]:
-                if not any(d["name"] == repo["name"] for d in storedRepos):
+            if not any(d["name"] == batchToUndo["repos"][i - popCount]["name"] for d in storedRepos):
 
-                    response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
+                response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
 
-                    if response.status_code != 200:
-                        return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
+                if response.status_code != 200:
+                    return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
 
-                    repoJson = response.json()
+                repoJson = response.json()
 
-                    currentDate = datetime.now().strftime("%Y-%m-%d")
+                currentDate = datetime.now().strftime("%Y-%m-%d")
 
-                    lastUpdate = repoJson["pushed_at"]
-                    lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                    lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+                lastUpdate = repoJson["pushed_at"]
+                lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
+                lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
 
-                    contributorList = apiScript.getRepoContributors(gh, repoJson["contributors_url"])
+                contributorList = apiScript.getRepoContributors(gh, repoJson["contributors_url"])
 
-                    storedRepos.append({
-                        "name": repoJson["name"],
-                        "type": repoJson["visibility"],
-                        "contributors": contributorList,
-                        "apiUrl": repoJson["url"],
-                        "lastCommit": str(lastUpdate),
-                        "dateAdded": currentDate,
-                        "keep": False
-                    })
+                storedRepos.append({
+                    "name": repoJson["name"],
+                    "type": repoJson["visibility"],
+                    "contributors": contributorList,
+                    "apiUrl": repoJson["url"],
+                    "lastCommit": str(lastUpdate),
+                    "dateAdded": currentDate,
+                    "keep": False
+                })
 
             with open("repositories.json", "w") as f:
                 f.write(json.dumps(storedRepos, indent=4))

@@ -53,5 +53,6 @@ You can now input this into the app and use it.
     - ~~Add search for repos~~  
 
     - ~~Bug: contributer and type info not displayed when archive undone~~
+    - ~~Bug: when undoing multiple records, multiple of the same repo are added -> due to double iteration by mistake~~
 
 - ~~Need to convert to using JSON over a text file~~
