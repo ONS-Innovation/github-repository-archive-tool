@@ -38,7 +38,7 @@ You can now input this into the app and use it.
     - ~~Add table searching~~
     - ~~Add table sorting~~
     - ~~Add Key contributer and repo type to table~~
-    - Add search for contributors
+    - ~~Add search for contributors~~
 - Email Notification to Repo Owner at time of storage
 - ~~Some way to prevent archive if needed (checkbox/button in display)~~
 - ~~Archive Repo 30 days from being stored~~

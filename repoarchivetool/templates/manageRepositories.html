@@ -47,8 +47,16 @@
                     </div>
 
                 {% else %}
-                    <input type="text" id="tableSearch" class="form-control" onkeyup="searchTable('repoTable', 'tableSearch', 0)" placeholder="&#128269; Search Repositories...">
-                    
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" id="repoSearch" class="form-control" onkeyup="searchTable('repoTable', 'repoSearch', 0)" placeholder="&#128269; Search Repositories...">
+                        </div>
+
+                        <div class="col">
+                            <input type="text" id="contribSearch" class="form-control" onkeyup="searchContributors('repoTable', 'contribSearch', 2)" placeholder="&#128269; Search Contributors...">
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table id="repoTable" class="table table-striped table-hover">
                             <caption>Repositories to Archive</caption>
@@ -71,7 +79,7 @@
                                         <td style="max-width: 600px;">
                                             {% for contributor in repo["contributors"] %}
                                                 <span class="tt" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="<b>{{ contributor["login"] }}</b><br>{{ contributor["contributions"] }} contribution(s).">
-                                                    <a href="{{ contributor["url"] }}" target="_blank">
+                                                    <a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
                                                         <img class="rounded-circle" src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
                                                     </a>
                                                 </span>

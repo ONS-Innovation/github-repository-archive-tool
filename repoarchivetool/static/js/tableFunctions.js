@@ -7,10 +7,58 @@ function searchTable(tableID, searchbarID, columnIndex) {
     // Loop through all table rows, and hide those who don't match the search query
     for(i = 0; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
+        console.log(rowData)
         if(rowData){
             rowValue = rowData.textContent || rowData.innerText;
 
             if(rowValue.toUpperCase().indexOf(searchValue) > -1){
+                rows[i].style.display = "";
+            }
+            else{
+                rows[i].style.display = "none";
+            }
+        }
+    }
+}
+
+function searchContributors(tableID, searchbarID, columnIndex) {
+    searchBar = document.getElementById(searchbarID);
+    searchValue = searchBar.value.toUpperCase();
+    table = document.getElementById(tableID);
+    rows = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for(i = 0; i < rows.length; i++){
+        rowData = rows[i].getElementsByTagName("td")[columnIndex];
+
+        if(rowData){
+            rowChildren = rowData.children;
+
+            found = false;
+
+            for(const child of rowChildren){
+                contributorElement = child.children[0];
+                contributorName = contributorElement.ariaLabel;
+
+                if(contributorName.toUpperCase().indexOf(searchValue) > -1 && searchValue != ""){
+                    found = true;
+
+                    // Add a border to the contributor's avatar
+                    contributorElement.children[0].classList.add("border", "border-info", "border-3");
+                }
+                else {
+                    // Remove the border
+                    if(contributorElement.children[0].classList.contains("border")){
+                        contributorElement.children[0].classList.remove("border", "border-info", "border-3");
+                    }
+                }
+            }      
+            
+            if(searchValue == ""){
+                found = true;
+            }
+
+            if(found){
                 rows[i].style.display = "";
             }
             else{
