@@ -316,8 +316,6 @@ def getRepoContributors(gh: APIHandler, contributorsUrl: str) -> str | list:
                 "login": contributor["login"],
                 "url": contributor["html_url"],
                 "contributions": contributor["contributions"]
-
-                # Maybe add their email to contact them?
             })
 
     return contributorList

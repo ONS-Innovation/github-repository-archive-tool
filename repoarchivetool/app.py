@@ -238,7 +238,7 @@ def archiveRepos():
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
-    # A list of dictionaries to keep track of what repos have been archived (w/ success status)
+    # Get archive batches from storage
     try:
         with open("archived.json", "r") as f:
             archiveList = json.load(f)
@@ -253,9 +253,13 @@ def archiveRepos():
 
     reposToRemove = []
 
+    # Get repos from storage
     with open("repositories.json", "r") as f:
         repos = json.load(f)
 
+
+    # For each repo, if keep is false and it was added to storage over 30 days ago,
+    # Archive them
     for i in range(0, len(repos)):
         if not repos[i]["keep"]:
             if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= 30:
@@ -280,6 +284,7 @@ def archiveRepos():
                         "message": f"Error {response.status_code}: {response.json()["message"]}"
                     })
 
+    # If repos have been archived, log changes in storage 
     if len(archiveInstance["repos"]) > 0:
         
         archiveList.append(archiveInstance)
@@ -309,6 +314,8 @@ def recentlyArchived():
         This function can also be passed an arguement called batchID, which is used to 
         display a success message when redirected from undoBatch().
     """
+
+    # Get archive batches from storage
     try:
         with open("archived.json", "r") as f:
             archiveList = json.load(f)
