@@ -11,14 +11,14 @@
       <span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
       <div class="ons-panel__body">
         <div class="ons-field ons-question__answer">
-          <label class="ons-label ons-label--with-description" aria-describedby="description-hint"
-            for="pat">Enter your Github Personal Access Token</label>
-          <span id="description-hint" class="ons-label__description  ons-input--with-description">Keep this
-            code safe. You will need to enter it before using the tool</span>
-          <input type="password" id="access-code-example"
-            class="ons-input ons-input--text ons-input-type__input ons-access-code__input ons-js-access-code ons-u-mb-xs"
-            name="pat" data-group-size="4" autocomplete="off"
-            autocapitalize="characters" aria-describedby="description-hint" required />
+          <div class="ons-field">
+            <label class="ons-label ons-label--with-description" aria-describedby="pat-hint"
+              for="pat">Personal Access Token</label>
+            <span id="pat-hint" class="ons-label__description  ons-input--with-description">Keep this
+              code safe. You will need to enter it before using the tool.</span>
+            <input type="text" name="pat" id="pat" class="ons-input ons-input--text ons-input-type__input"
+              aria-describedby="pat-hint" required/>
+          </div>
           <a class="ons-u-fs-s ons-input__post-link" href="https://github.com/ONS-Innovation/RepoArchiveTool" target="_blank">Where to get a Personal Access Token</a>
         </div>
       </div>

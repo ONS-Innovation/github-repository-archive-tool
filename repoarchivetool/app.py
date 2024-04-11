@@ -13,10 +13,17 @@ def index():
     """
         Returns a render of index.html.
     """
+
     try:
-        return flask.render_template('index.html', pat=flask.session['pat'], date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
+        type(flask.session["pat"])
     except KeyError:
-        return flask.render_template('index.html', pat='', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
+        return flask.redirect('/personal_access_token')
+
+    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
+
+@app.route('/personal_access_token')
+def pat():
+    return flask.render_template('accessToken.html')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -432,14 +439,6 @@ def undoBatch():
         return flask.redirect(f"/recentlyArchived?batchID={batchID}")
 
     return flask.redirect("/")
-
-@app.route('/pat')
-def testpat():
-    return flask.render_template("access_token.html")
-
-@app.route('/testindex')
-def testindex():
-    return flask.render_template("indexNew.html", date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
 
 if __name__ == "__main__":
     app.run(debug=True)
