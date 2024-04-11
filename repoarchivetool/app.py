@@ -439,7 +439,7 @@ def testpat():
 
 @app.route('/testindex')
 def testindex():
-    return flask.render_template("indexNew.html")
+    return flask.render_template("indexNew.html", date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
 
 if __name__ == "__main__":
     app.run(debug=True)

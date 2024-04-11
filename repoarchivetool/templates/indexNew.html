@@ -7,6 +7,39 @@
 <!-- Personal Access Token Entry -->
 <h1 class="ons-u-mt-l">Find Repositories</h1>
 
+<form action="" method="post">
+	<fieldset class="ons-fieldset ons-u-mb-l">
+		<div class="ons-field">
+			<label class="ons-label ons-label--with-description" aria-describedby="description-hint"
+				for="text-example-input-with-description">Organisation Name</label>
+			<span id="description-hint" class="ons-label__description  ons-input--with-description">For example, ons-digital</span>
+			<input type="text" id="text-example-input-with-description" class="ons-input ons-input--text ons-input-type__input"
+				aria-describedby="description-hint" maxlength="40" placeholder="Organisation" required/>
+		</div>
 
+		<div class="ons-field">
+			<label class="ons-label ons-label--with-description" aria-describedby="description-hint"
+				for="text-example-input-with-description">Archive Date</label>
+			<span id="description-hint" class="ons-label__description  ons-input--with-description">For example, 01/01/2024 will get any repositories with no commits since January 1st 2024</span>
+			<input type="date" id="text-example-input-with-description" class="ons-input ons-input--text ons-input-type__input"
+				aria-describedby="description-hint" max="{{ date }}" required/>
+		</div>
+
+		<div class="ons-field">
+			<label class="ons-label" for="select-example">Repository Type</label>
+			<select id="select-example" name="select" class="ons-input ons-input--select">
+				<option selected value="all">All</option>
+				<option value="public">Public</option>
+				<option value="private">Private</option>
+				<option value="internal">Internal</option>
+			</select>
+		</div>
+	</fieldset>
+
+	<button type="submit" class="ons-btn">
+		<span class="ons-btn__inner"><span class="ons-btn__text">Find Repositories</span>
+		</span>
+	</button>
+</form>
 
 {% endblock %}
