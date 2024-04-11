@@ -433,5 +433,13 @@ def undoBatch():
 
     return flask.redirect("/")
 
+@app.route('/pat')
+def testpat():
+    return flask.render_template("access_token.html")
+
+@app.route('/testindex')
+def testindex():
+    return flask.render_template("indexNew.html")
+
 if __name__ == "__main__":
     app.run(debug=True)

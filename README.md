@@ -30,30 +30,4 @@ You can now input this into the app and use it.
 
 ## Future Developments
 - Email Notification to Repo Owner at time of storage
-- Think about efficiency and readability improvements
-- Convert to use ONS Design Tool
-
-
-- ~~Some sort of loading screen whilst it finds the repos~~
-- ~~Store Repos for archive and display them~~
-    - ~~Need to add functionality to keep flag~~
-    - ~~Make it so that new records are added instead of overwriting table~~
-    - ~~Need a success page once repos are stored~~
-    - ~~Need to separate find repos and manage repos into separate pages instead of using dynamic pills from BS5~~
-    - ~~Add table searching~~
-    - ~~Add table sorting~~
-    - ~~Add Key contributer and repo type to table~~
-    - ~~Add search for contributors~~
-- ~~Some way to prevent archive if needed (checkbox/button in display)~~
-- ~~Archive Repo 30 days from being stored~~
-- ~~Last Archived Page (to show which repos were archived last time the tool run)~~
-    - ~~Display Repos~~
-    - ~~Undo Button (All Repos)~~
-    - ~~Bug where if 2 batches with the same repo, can put multiple row of the same repo in manage repos~~
-        ~~> need to add a check if it aleady exists in repositories.json before adding it back~~
-    - ~~Add search for repos~~  
-
-    - ~~Bug: contributer and type info not displayed when archive undone~~
-    - ~~Bug: when undoing multiple records, multiple of the same repo are added -> due to double iteration by mistake~~
-
-- ~~Need to convert to using JSON over a text file~~
+- Convert to use ONS Design Tool (In Progress)
