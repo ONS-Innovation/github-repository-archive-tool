@@ -47,83 +47,115 @@
 
 {% else %}
 
-	<table class="ons-table ons-table--sortable ons-table--compact ons-table--row-hover" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending">
-  <caption class="ons-table__caption">Repositories to Archive</caption>
-  <thead class="ons-table__head">
-    <tr class="ons-table__row">
-      <th scope="col" class="ons-table__header" aria-sort="ascending">
-        <span class="ons-table__header-text">Name</span>
-        <svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-			<th scope="col" class="ons-table__header" aria-sort="none">
-        <span class="ons-table__header-text">Type</span>
-        <svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-			<th scope="col" class="ons-table__header" aria-sort="none">
-        <span class="ons-table__header-text">Contributors</span>
-				<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-			<th scope="col" class="ons-table__header" aria-sort="none">
-        <span class="ons-table__header-text">Date Added</span>
-        <svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-			<th scope="col" class="ons-table__header" aria-sort="none">
-        <span class="ons-table__header-text">Last Commit</span>
-        <svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-			<th scope="col" class="ons-table__header" aria-sort="none">
-        <span class="ons-table__header-text">Avoid Archiving</span>
-				<svg id="sort-sprite-avoid-archiving" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-          focusable="false" fill="currentColor">
-          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-        </svg>
-      </th>
-		</tr>
-  </thead>
-  <tbody class="ons-table__body">
-		{% for repo in repos %}
+	<div class="ons-field">
+		<span class="ons-grid--flex  ons-input_search-button">
+			<label class="ons-label ons-label--placeholder" for="repoSearch">Search Repositories...</label>
+			<input type="search" id="repoSearch"
+				class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+				placeholder="Search Repositories..." />
+			<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchTable('repoTable', 'repoSearch', 0)">
+				<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true" fill="currentColor">
+						<path
+							d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+					</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+				</span>
+			</button>
+		</span>
+	</div>
+
+	<div class="ons-field">
+		<span class="ons-grid--flex  ons-input_search-button">
+			<label class="ons-label ons-label--placeholder" for="contribSearch">Search Contributors...</label>
+			<input type="search" id="contribSearch"
+				class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+				placeholder="Search Contributors..."/>
+			<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchContributors('repoTable', 'contribSearch', 2)">
+				<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+						aria-hidden="true" fill="currentColor">
+						<path
+							d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+					</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+				</span>
+			</button>
+		</span>
+	</div>
+
+	<table id="repoTable" class="ons-table ons-table--sortable ons-table--compact" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending">
+		<caption class="ons-table__caption">Repositories to Archive</caption>
+		<thead class="ons-table__head">
 			<tr class="ons-table__row">
-				<td class="ons-table__cell">{{ repo["name"] }}</td>
-				<td class="ons-table__cell">{{ repo["type"] }}</td>
-				<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
-					{% for contributor in repo["contributors"] %}
-						<span class="tt" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="<b>{{ contributor["login"] }}</b><br>{{ contributor["contributions"] }} contribution(s).">
-							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
-								<img class="rounded-circle" src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
-							</a>
-						</span>
-					{% endfor %}
-				</td>
-				<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}">{{ repo["dateAdded"] }}</td>
-				<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}">{{ repo["lastCommit"] }}</td>
-				<td class="ons-table__cell text-centre" data-sort-value="{% if repo["keep"] %} 1 {% else %} 0 {% endif %}">
-					<input type="checkbox" class="ons-checkbox__input ons-js-checkbox" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}>
-				</td>
+				<th scope="col" class="ons-table__header" aria-sort="ascending">
+					<span class="ons-table__header-text">Name</span>
+					<svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Type</span>
+					<svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Contributors</span>
+					<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Date Added</span>
+					<svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Last Commit</span>
+					<svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Avoid Archiving</span>
+					<svg id="sort-sprite-avoid-archiving" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
 			</tr>
-		{% endfor %}
-	</tbody>
-</table>
+		</thead>
+		<tbody class="ons-table__body">
+			{% for repo in repos %}
+				<tr class="ons-table__row">
+					<td class="ons-table__cell">{{ repo["name"] }}</td>
+					<td class="ons-table__cell">{{ repo["type"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
+						{% for contributor in repo["contributors"] %}
+							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
+								<img src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
+							</a>
+						{% endfor %}
+					</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}">{{ repo["dateAdded"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}">{{ repo["lastCommit"] }}</td>
+					<td class="ons-table__cell text-centre" data-sort-value="{% if repo["keep"] %} 1 {% else %} 0 {% endif %}">
+						<input type="checkbox" class="ons-checkbox__input ons-js-checkbox" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
 {% endif %}
 

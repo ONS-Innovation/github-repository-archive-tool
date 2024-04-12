@@ -11,3 +11,7 @@ th {
     top: 0px;
     left: 0px;
 }
+
+.highlight {
+    border: 3px solid blue;
+}
