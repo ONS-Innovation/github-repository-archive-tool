@@ -440,5 +440,25 @@ def undoBatch():
 
     return flask.redirect("/")
 
+@app.route('/testpage')
+def testPage():
+    # Get repos from storage
+    try:
+        with open("repositories.json", "r") as f:
+            repos = json.load(f) 
+            repos.sort(key=lambda x: x["name"])
+    except FileNotFoundError:
+        # File doesn't exist therefore no repos stored
+        repos = []
+
+    reposAdded = flask.request.args.get("reposAdded")
+
+    if reposAdded == None:
+        reposAdded = -1
+    else:
+        reposAdded = int(reposAdded)
+
+    return flask.render_template("manageRepositoriesNew.html", repos=repos, reposAdded=reposAdded)
+
 if __name__ == "__main__":
     app.run(debug=True)

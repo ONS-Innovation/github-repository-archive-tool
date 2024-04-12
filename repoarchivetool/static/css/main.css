@@ -1,65 +1,13 @@
-.container {
-    padding: 0px;
-}
-
 th {
     white-space: nowrap;
 }
 
-/* Pulse Animation for PAT form */
-.pulse {
-    animation: pulse-animation 2s infinite;
+.text-centre {
+    text-align: center;
 }
 
-@keyframes pulse-animation {
-    0% {
-        box-shadow: 0 0 0 0px rgba(255, 0, 0, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 0 20px rgba(255, 0, 0, 0);
-    }
-}
-
-/* Loader Animation */
-.loader {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: inline-block;
-    border-top: 3px solid var(--bs-secondary);
-    border-right: 3px solid transparent;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
-  
-@keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-} 
-
-.desc:after,
-.asc:after {
-    content: ' ';
+.ons-checkbox__input {
     position: relative;
-    left: 2px;
-    border: 8px solid transparent;
-}
-
-.desc:after {
-    top: 10px;
-    border-top-color: var(--bs-secondary);
-}
-
-.asc:after {
-    bottom: 15px;
-    border-bottom-color: var(--bs-secondary);
-}
-
-.desc,
-.asc {
-    padding-right: 10px;
+    top: 0px;
+    left: 0px;
 }

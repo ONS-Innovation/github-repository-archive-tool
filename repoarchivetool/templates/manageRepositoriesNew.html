@@ -1,0 +1,130 @@
+{% extends 'baseNew.html' %}
+
+{% block pagetitle %}Repository Archive Tool - Manage Repositories{% endblock %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+	<script src="{{ url_for('static', filename='js/tableFunctions.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+
+{% if reposAdded > 0 %}
+
+	<div aria-labelledby="alert" role="alert" tabindex="-1" class="ons-panel ons-panel--success ons-panel--no-title"
+		id="success-id">
+		<span id="alert" class="ons-panel__assistive-text ons-u-vh">Completed: </span>
+		<span class="ons-panel__icon ons-u-fs-r"><svg class="ons-icon" viewBox="0 0 13 10" xmlns="http://www.w3.org/2000/svg"
+			focusable="false" fill="currentColor">
+			<path
+				d="M14.35,3.9l-.71-.71a.5.5,0,0,0-.71,0h0L5.79,10.34,3.07,7.61a.51.51,0,0,0-.71,0l-.71.71a.51.51,0,0,0,0,.71l3.78,3.78a.5.5,0,0,0,.71,0h0L14.35,4.6A.5.5,0,0,0,14.35,3.9Z"
+				transform="translate(-1.51 -3.04)" />
+			</svg></span>
+		<div class="ons-panel__body">{{ reposAdded }} repositories added.</div>
+	</div>
+
+{% elif reposAdded == 0 %}
+
+	<div class="ons-panel ons-panel--info ons-panel--no-title">
+		<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+		<div class="ons-panel__body">
+			<p>No new repositories to add.</p>
+		</div>
+	</div>
+
+{% endif %}
+
+<h1 class="ons-u-mt-l">Manage Repositories</h1>
+
+{% if repos|length < 1 %}
+
+	<div class="ons-panel ons-panel--info ons-panel--no-title">
+		<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+		<div class="ons-panel__body">
+			<p>No Repositories Stored. Please <a href="/">find repositories</a> first.</p>
+		</div>
+	</div>
+
+{% else %}
+
+	<table class="ons-table ons-table--sortable ons-table--compact ons-table--row-hover" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending">
+  <caption class="ons-table__caption">Repositories to Archive</caption>
+  <thead class="ons-table__head">
+    <tr class="ons-table__row">
+      <th scope="col" class="ons-table__header" aria-sort="ascending">
+        <span class="ons-table__header-text">Name</span>
+        <svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+			<th scope="col" class="ons-table__header" aria-sort="none">
+        <span class="ons-table__header-text">Type</span>
+        <svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+			<th scope="col" class="ons-table__header" aria-sort="none">
+        <span class="ons-table__header-text">Contributors</span>
+				<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+			<th scope="col" class="ons-table__header" aria-sort="none">
+        <span class="ons-table__header-text">Date Added</span>
+        <svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+			<th scope="col" class="ons-table__header" aria-sort="none">
+        <span class="ons-table__header-text">Last Commit</span>
+        <svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+			<th scope="col" class="ons-table__header" aria-sort="none">
+        <span class="ons-table__header-text">Avoid Archiving</span>
+				<svg id="sort-sprite-avoid-archiving" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+          focusable="false" fill="currentColor">
+          <path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+          <path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+        </svg>
+      </th>
+		</tr>
+  </thead>
+  <tbody class="ons-table__body">
+		{% for repo in repos %}
+			<tr class="ons-table__row">
+				<td class="ons-table__cell">{{ repo["name"] }}</td>
+				<td class="ons-table__cell">{{ repo["type"] }}</td>
+				<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
+					{% for contributor in repo["contributors"] %}
+						<span class="tt" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="<b>{{ contributor["login"] }}</b><br>{{ contributor["contributions"] }} contribution(s).">
+							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
+								<img class="rounded-circle" src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
+							</a>
+						</span>
+					{% endfor %}
+				</td>
+				<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}">{{ repo["dateAdded"] }}</td>
+				<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}">{{ repo["lastCommit"] }}</td>
+				<td class="ons-table__cell text-centre" data-sort-value="{% if repo["keep"] %} 1 {% else %} 0 {% endif %}">
+					<input type="checkbox" class="ons-checkbox__input ons-js-checkbox" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endif %}
+
+{% endblock %}
