@@ -305,9 +305,9 @@ def archiveRepos():
         with open("repositories.json", "w") as f:
             f.write(json.dumps(repos, indent=4))
 
-    return flask.redirect('/recentlyArchived')
+    return flask.redirect('/recently_archived')
 
-@app.route('/recentlyArchived')
+@app.route('/recently_archived')
 def recentlyArchived():
     """
         Returns a render of recentlyArchived.html.
@@ -334,11 +334,11 @@ def recentlyArchived():
         batchID = ""
 
     try:
-        return flask.render_template('recentlyArchived.html', pat=flask.session['pat'], archiveList=archiveList, batchID=batchID)
+        return flask.render_template('recentlyArchived.html', archiveList=archiveList, batchID=batchID)
     except KeyError:
-        return flask.render_template('recentlyArchived.html', pat='', archiveList=archiveList, batchID=batchID)
+        return flask.render_template('recentlyArchived.html', archiveList=archiveList, batchID=batchID)
 
-@app.route('/undoBatch')
+@app.route('/undo_batch')
 def undoBatch():
     """
         Unarchives a batch of archived repositories.
@@ -434,7 +434,7 @@ def undoBatch():
             with open("archived.json", "w") as f:
                 f.write(json.dumps(archiveList, indent=4))
 
-        return flask.redirect(f"/recentlyArchived?batchID={batchID}")
+        return flask.redirect(f"/recently_archived?batchID={batchID}")
 
     return flask.redirect("/")
 
