@@ -1,19 +1,27 @@
-{% extends 'base.html' %}
+{% extends 'baseNew.html' %}
 
-{% block head %}
-<title>Repository Archive Tool</title>
-{% endblock %}
+{% block pagetitle %}Repository Archive Tool - Error{% endblock %}
 
 {% block body %}
-<main>
-    <div class="container">
-        <div class="row border rounded shadow m-3 p-3">
-            <div class="alert alert-danger">
-                {{ error|safe }}
-            </div>
+	{% if "401" in error %}
+		<h1 class="ons-u-mt-l">Credentials Invalid</h1>
+		<p>Please double check your Personal Access Token and <a href="/logout">resubmit</a>.</p>
 
-            <a class="btn btn-danger" href="/">Return to Homepage</a>
-        </div>
-    </div>
-</main>
+	{% if "403" in error %}
+		<h1>Sorry, there is a problem</h1>
+		<p>To access this feature, you need to <a href="/personal_access_token">enter a Personal Access Token</a>.</p>
+
+	{% if "404" in error %}
+		<h1>Not Found</h1>
+		<p>Sorry, the information request could not be found.</p>
+		<p>Please double check the information and try again.</p>
+
+	{% else %}
+		<h1 class="ons-u-mt-l">Sorry, an error has occured</h1>
+		<p>Please try again.</p>
+
+	{% endif %}
+
+	<h2>Technical Error</h2>
+	<p>{{ error|safe }}</p>
 {% endblock %}
