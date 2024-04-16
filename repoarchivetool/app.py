@@ -77,7 +77,7 @@ def findRepos():
         error.html with an appropriate error message.
 
         If the function is successful with obtaining the information, it will return a redirect to
-        /manageRepositories with an in-URL arguement (reposAdded) which is used to display how many
+        /manage_repositories with an in-URL arguement (reposAdded) which is used to display how many
         repositories are added to JSON.
     """
     if flask.request.method == 'POST':
@@ -168,14 +168,14 @@ def manageRepos():
     else:
         reposAdded = int(reposAdded)
 
-    return flask.render_template("manageRepositoriesNew.html", repos=repos, reposAdded=reposAdded)
+    return flask.render_template("manageRepositories.html", repos=repos, reposAdded=reposAdded)
 
 @app.route('/clear_repositories')
 def clearRepos():
     """ 
         Removes all stored repositories by deleting repositories.json.
         
-        Returns a redirect to manageRepositories.
+        Returns a redirect to manage_repositories.
     """
     os.remove("repositories.json")
     return flask.redirect('/manage_repositories')
@@ -190,9 +190,9 @@ def changeFlag():
         The function loads all repositories from repositories.json, then, using the passed arguement repoName,
         toggles the keep attribute within the JSON from True to False or vice versa.
 
-        Returns a redirect to manageRepositories.
+        Returns a redirect to manage_repositories.
 
-        If no arguement is passed, it will return a redirect back to manageRepositories without making any changes.
+        If no arguement is passed, it will return a redirect back to manage_repositories without making any changes.
     """
     repoName = flask.request.args.get("repoName")
 

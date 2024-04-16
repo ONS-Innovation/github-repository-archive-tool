@@ -1,165 +1,183 @@
+{% extends 'baseNew.html' %}
 
-{% extends 'base.html' %}
+{% block pagetitle %}Repository Archive Tool - Manage Repositories{% endblock %}
 
 {% block head %}
-<title>Repository Archive Tool</title>
-
-<script src="{{ url_for('static', filename='js/tableFunctions.js') }}"></script>
-
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+	<script src="{{ url_for('static', filename='js/tableFunctions.js') }}"></script>
 {% endblock %}
 
 {% block body %}
 
-<main>
-    <div class="container">
-        <div class="row border rounded shadow m-3">
-            <div class="col p-3">
-                <ul class="nav nav-tabs nav-justified rounded m-3">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Find Repositories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/manageRepositories">Manage Repositories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/recentlyArchived">View Archive Batches</a>
-                    </li>
-                </ul>
+{% if reposAdded > 0 %}
 
-                {% if pat == '' %}
-                    <div class="alert alert-danger text-center">
-                        Please add a Personal Access Token before using this tool.
-                    </div>    
-                {% endif %} 
-                
-                {% if reposAdded > 0 %}
-                    <div class="alert alert-success text-center">
-                        {{ reposAdded }} Repositories Added.
-                    </div>    
-                {% endif %}  
+	<div aria-labelledby="alert" role="alert" tabindex="-1" class="ons-panel ons-panel--success ons-panel--no-title"
+		id="success-id">
+		<span id="alert" class="ons-panel__assistive-text ons-u-vh">Completed: </span>
+		<span class="ons-panel__icon ons-u-fs-r"><svg class="ons-icon" viewBox="0 0 13 10" xmlns="http://www.w3.org/2000/svg"
+			focusable="false" fill="currentColor">
+			<path
+				d="M14.35,3.9l-.71-.71a.5.5,0,0,0-.71,0h0L5.79,10.34,3.07,7.61a.51.51,0,0,0-.71,0l-.71.71a.51.51,0,0,0,0,.71l3.78,3.78a.5.5,0,0,0,.71,0h0L14.35,4.6A.5.5,0,0,0,14.35,3.9Z"
+				transform="translate(-1.51 -3.04)" />
+			</svg></span>
+		<div class="ons-panel__body">{{ reposAdded }} repositories added.</div>
+	</div>
 
-                <h2>Repositories to Archive:</h2>
+{% elif reposAdded == 0 %}
 
-                {% if repos|length < 1 %}
-                    <div class="alert alert-info text-center">
-                        <p>No Repositories Stored.</p>
-                        <a class="btn btn-primary" href="/">Find Repositories</a>
-                    </div>
+	<div class="ons-panel ons-panel--info ons-panel--no-title">
+		<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+		<div class="ons-panel__body">
+			<p>No new repositories to add.</p>
+		</div>
+	</div>
 
-                {% else %}
-                    <div class="row">
-                        <div class="col">
-                            <input type="text" id="repoSearch" class="form-control" onkeyup="searchTable('repoTable', 'repoSearch', 0)" placeholder="&#128269; Search Repositories...">
-                        </div>
+{% endif %}
 
-                        <div class="col">
-                            <input type="text" id="contribSearch" class="form-control" onkeyup="searchContributors('repoTable', 'contribSearch', 2)" placeholder="&#128269; Search Contributors...">
-                        </div>
-                    </div>
+<h1 class="ons-u-mt-l">Manage Repositories</h1>
 
-                    <div class="table-responsive">
-                        <table id="repoTable" class="table table-striped table-hover">
-                            <caption>Repositories to Archive</caption>
-                            <thead>
-                                <tr>
-                                    <th onclick="sortTable('repoTable', 0)">Name:</th>
-                                    <th onclick="sortTable('repoTable', 1)">Type:</th>
-                                    <th>Contributors:</th>
-                                    <th onclick="sortTable('repoTable', 3)" class="asc">Date Added:</th>
-                                    <th onclick="sortTable('repoTable', 4)">Last Commit:</th>
-                                    <th>Avoid Archiving?</th>
-                                </tr>
-                            </thead>
-    
-                            <tbody>
-                                {% for repo in repos %}
-                                    <tr>
-                                        <td>{{ repo["name"] }}</td>
-                                        <td>{{ repo["type"] }}</td>
-                                        <td style="max-width: 600px;">
-                                            {% for contributor in repo["contributors"] %}
-                                                <span class="tt" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="<b>{{ contributor["login"] }}</b><br>{{ contributor["contributions"] }} contribution(s).">
-                                                    <a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
-                                                        <img class="rounded-circle" src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
-                                                    </a>
-                                                </span>
-                                            {% endfor %}
-                                        </td>
-                                        <td style="min-width: 100px;">{{ repo["dateAdded"] }}</td>
-                                        <td style="min-width: 100px;">{{ repo["lastCommit"] }}</td>
-                                        <td class="text-center"><input class="form-check-input" type="checkbox" role="switch" onchange="window.location.replace(`/changeKeepFlag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}></td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+{% if repos|length < 1 %}
 
-                    <div class="row">
-                        <!-- Archive Repos Button -->
-                        <div class="col">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmArchive" {% if pat == '' %} disabled {% endif %}>Archive Repositories</button>
-                        </div>
-    
-                        <div class="modal fade" id="confirmArchive" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
+	<div class="ons-panel ons-panel--info ons-panel--no-title">
+		<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+		<div class="ons-panel__body">
+			<p>No Repositories Stored. Please <a href="/">find repositories</a> first.</p>
+		</div>
+	</div>
 
-                                    <form>
-                                        <div class="modal-body">
-                                            Are you sure you want to archive the repositories added over 30 days ago?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <a class="btn btn-primary" href="/archiveRepositories">Confirm</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-    
-                        <!-- Clear Repos Button -->
-                        <div class="col text-end">
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmRepoClear"><i class="fa fa-trash" style="font-size: 24px;"></i></button>
-                        </div>
-    
-                        <div class="modal fade" id="confirmRepoClear" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="confirmClearLabel">Are you sure?</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to clear all stored repository information? This cannot be undone.
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <a class="btn btn-danger" href="/clearRepositories">Confirm</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+{% else %}
 
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</main>
+	<div class="ons-grid ons-u-mb-s">
+		<div class="ons-grid__col ons-col-6@m ">
+			<div class="ons-field">
+				<span class="ons-grid--flex  ons-input_search-button">
+					<label class="ons-label ons-label--placeholder" for="repoSearch">Search Repositories...</label>
+					<input type="search" id="repoSearch"
+						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+						placeholder="Search Repositories..." />
+					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchTable('repoTable', 'repoSearch', 0)">
+						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true" fill="currentColor">
+								<path
+									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+						</span>
+					</button>
+				</span>
+			</div>
+		</div>
+		
+		<div class="ons-grid__col ons-col-6@m ">
+			<div class="ons-field">
+				<span class="ons-grid--flex  ons-input_search-button">
+					<label class="ons-label ons-label--placeholder" for="contribSearch">Search Contributors...</label>
+					<input type="search" id="contribSearch"
+						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+						placeholder="Search Contributors..."/>
+					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchContributors('repoTable', 'contribSearch', 2)">
+						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true" fill="currentColor">
+								<path
+									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+						</span>
+					</button>
+				</span>
+			</div>
+		</div>
+	</div>
 
-<!-- Javascript to sort the table on Date Added once the page is loaded -->
-<script>
-    sortTable('repoTable', 3)
+	<button type="button" class="ons-btn ons-btn--secondary ons-u-mb-s" onclick="window.location.reload();">
+		<span class="ons-btn__inner"><span class="ons-btn__text">Clear Filters</span>
+		</span>
+	</button>
 
-    // Enable Bootstrap Tooltips
-    const tooltips = document.querySelectorAll(".tt")
-    tooltips.forEach(t => {
-        new bootstrap.Tooltip(t)
-    })
-</script>
+	<table id="repoTable" class="ons-table ons-table--sortable ons-table--compact" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending">
+		<caption class="ons-table__caption">Repositories to Archive</caption>
+		<thead class="ons-table__head">
+			<tr class="ons-table__row">
+				<th scope="col" class="ons-table__header" aria-sort="ascending">
+					<span class="ons-table__header-text">Name</span>
+					<svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Type</span>
+					<svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Contributors</span>
+					<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Date Added</span>
+					<svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Last Commit</span>
+					<svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+				<th scope="col" class="ons-table__header" aria-sort="none">
+					<span class="ons-table__header-text">Avoid Archiving</span>
+					<svg id="sort-sprite-avoid-archiving" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
+						focusable="false" fill="currentColor">
+						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
+					</svg>
+				</th>
+			</tr>
+		</thead>
+		<tbody class="ons-table__body">
+			{% for repo in repos %}
+				<tr class="ons-table__row">
+					<td class="ons-table__cell">{{ repo["name"] }}</td>
+					<td class="ons-table__cell">{{ repo["type"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
+						{% for contributor in repo["contributors"] %}
+							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
+								<img src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
+							</a>
+						{% endfor %}
+					</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}">{{ repo["dateAdded"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}">{{ repo["lastCommit"] }}</td>
+					<td class="ons-table__cell text-centre" data-sort-value="{% if repo["keep"] %} 1 {% else %} 0 {% endif %}">
+						<input type="checkbox" class="ons-checkbox__input ons-js-checkbox" onchange="window.location.replace(`/change_keep_flag?repoName={{ repo['name'] }}`)" {% if repo["keep"] %} checked {% endif %}>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<button type="button" class="ons-btn" onclick="window.location.href = '/confirm?message=If%20you%20continue,%20any%20repositories%20added%20to%20the%20system%20more%20than%2030%20days%20ago,%20and%20not%20marked%20as%20kept,%20will%20be%20archived.%20Are%20you%20sure%20you%20want%20to%20continue?&confirmUrl=/archive_repositories&cancelUrl=/manage_repositories'">
+		<span class="ons-btn__inner"><span class="ons-btn__text">Archive Repositories</span>
+		</span>
+	</button>
+
+	<button type="button" class="ons-btn ons-btn--secondary" onclick="window.location.href = '/confirm?message=If%20you%20continue,%20all%20stored%20repositories%20will%20be%20removed.%20Are%20you%20sure%20you%20want%20to%20continue?&confirmUrl=/clear_repositories&cancelUrl=/manage_repositories'">
+		<span class="ons-btn__inner"><span class="ons-btn__text">Clear Repository List</span>
+		</span>
+	</button>
+
+{% endif %}
 
 {% endblock %}
