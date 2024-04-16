@@ -7,11 +7,11 @@
 		<h1 class="ons-u-mt-l">Credentials Invalid</h1>
 		<p>Please double check your Personal Access Token and <a href="/logout">resubmit</a>.</p>
 
-	{% if "403" in error %}
+	{% elif "403" in error %}
 		<h1>Sorry, there is a problem</h1>
 		<p>To access this feature, you need to <a href="/personal_access_token">enter a Personal Access Token</a>.</p>
 
-	{% if "404" in error %}
+	{% elif "404" in error %}
 		<h1>Not Found</h1>
 		<p>Sorry, the information request could not be found.</p>
 		<p>Please double check the information and try again.</p>
