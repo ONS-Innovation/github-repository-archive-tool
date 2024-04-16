@@ -6,7 +6,7 @@
 
 <h1 class="ons-u-mt-l">Find Repositories</h1>
 
-<form action="/FindRepositories" method="post" onsubmit="document.getElementById('loading').hidden = false;">
+<form action="/find_repositories" method="post" onsubmit="document.getElementById('loading').hidden = false;">
 	<fieldset class="ons-fieldset ons-u-mb-l">
 		<div class="ons-field">
 			<label class="ons-label ons-label--with-description" aria-describedby="organisation-hint"
@@ -35,7 +35,7 @@
 		</div>
 	</fieldset>
 
-	<button type="submit" class="ons-btn">
+	<button type="submit" class="ons-btn ons-btn--loader ons-btn--loader ons-js-loader ons-js-submit-btn">
 		<span class="ons-btn__inner"><span class="ons-btn__text">Find Repositories</span>
 		</span>
 	</button>

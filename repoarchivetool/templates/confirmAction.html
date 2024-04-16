@@ -1,0 +1,28 @@
+{% extends 'baseNew.html' %}
+
+{% block pagetitle %}Repository Archive Tool - Are you Sure?{% endblock %}
+
+{% block body %}
+
+<div class="ons-panel ons-panel--warn ons-panel--no-title">
+	<span class="ons-panel__icon" aria-hidden="true">!</span>
+	<span class="ons-panel__assistive-text ons-u-vh">Warning: </span>
+	<div class="ons-panel__body"> {{ message }} </div>
+</div>
+
+<div class="ons-btn-group">
+  <button type="submit" class="ons-btn" onclick="window.location.replace('{{ confirmUrl }}')">
+    <span class="ons-btn__inner"><span class="ons-btn__text">Continue</span><svg class="ons-icon ons-u-ml-xs"
+			viewBox="0 0 17 13" xmlns="http://www.w3.org/2000/svg" focusable="false" fill="currentColor">
+			<path
+				d="m10 .2-.9.9c-.1.1-.1.4 0 .5l4 4H.6c-.2 0-.4.2-.4.4v1.2c0 .2.2.4.4.4h12.5l-3.9 3.7c-.2.2-.2.4 0 .6l.8.9c.2.2.4.2.6 0L16.8 7c.2-.2.2-.4 0-.6L10.7.3c-.3-.2-.5-.2-.7-.1z" />
+		</svg></span>
+  </button>
+	
+  <button type="button" class="ons-btn ons-btn--secondary" onclick="window.location.replace('{{ cancelUrl }}')">
+    <span class="ons-btn__inner"><span class="ons-btn__text">Cancel</span>
+    </span>
+  </button>
+</div>
+
+{% endblock %}

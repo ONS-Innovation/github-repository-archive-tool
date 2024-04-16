@@ -8,22 +8,22 @@ import apiScript
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
+@app.before_request
+def checkPAT():
+    """
+        Before any request, check if Personal Access Token is defined.
+        If it's not, return a render of accessToken.html
+    """
+    if "pat" not in flask.session and flask.request.endpoint != "login":
+        return flask.render_template('accessToken.html')
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
     """
         Returns a render of index.html.
     """
 
-    try:
-        type(flask.session["pat"])
-    except KeyError:
-        return flask.redirect('/personal_access_token')
-
     return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
-
-@app.route('/personal_access_token')
-def pat():
-    return flask.render_template('accessToken.html')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -59,7 +59,7 @@ def logout():
     flask.session.pop('pat', None)
     return flask.redirect('/')
 
-@app.route('/FindRepositories', methods=['POST', 'GET'])
+@app.route('/find_repositories', methods=['POST', 'GET'])
 def findRepos():
     """
         Gets and stores any Github repositories, using apiScript.py, which fits the given parameters.
@@ -135,11 +135,11 @@ def findRepos():
             with open("repositories.json", "w") as f:
                 f.write(json.dumps(storedRepos, indent=4))
                 
-            return flask.redirect(f'/manageRepositories?reposAdded={reposAdded}')
+            return flask.redirect(f'/manage_repositories?reposAdded={reposAdded}')
     
     return flask.redirect('/')
-
-@app.route('/manageRepositories')
+    
+@app.route('/manage_repositories')
 def manageRepos():
     """
         Returns a render of manageRepositories.html.
@@ -151,6 +151,7 @@ def manageRepos():
         This function can also be passed an arguement called reposAdded, which is used to
         display a success message when being redirected from findRepos().
     """
+
     # Get repos from storage
     try:
         with open("repositories.json", "r") as f:
@@ -163,16 +164,13 @@ def manageRepos():
     reposAdded = flask.request.args.get("reposAdded")
 
     if reposAdded == None:
-        reposAdded = 0
+        reposAdded = -1
     else:
         reposAdded = int(reposAdded)
 
-    try:
-        return flask.render_template('manageRepositories.html', pat=flask.session['pat'], repos=repos, reposAdded=reposAdded)
-    except KeyError:
-        return flask.render_template('manageRepositories.html', pat='', repos=repos, reposAdded=reposAdded)
+    return flask.render_template("manageRepositoriesNew.html", repos=repos, reposAdded=reposAdded)
 
-@app.route('/clearRepositories')
+@app.route('/clear_repositories')
 def clearRepos():
     """ 
         Removes all stored repositories by deleting repositories.json.
@@ -180,9 +178,9 @@ def clearRepos():
         Returns a redirect to manageRepositories.
     """
     os.remove("repositories.json")
-    return flask.redirect('/manageRepositories')
+    return flask.redirect('/manage_repositories')
 
-@app.route('/changeKeepFlag')
+@app.route('/change_keep_flag')
 def changeFlag():
     """
         Inverts the keep flag which prevents repositories from being archived.
@@ -199,7 +197,7 @@ def changeFlag():
     repoName = flask.request.args.get("repoName")
 
     if repoName == None:
-        return flask.redirect('/manageRepositories')
+        return flask.redirect('/manage_repositories')
 
     with open("repositories.json", "r") as f:
         repos = json.load(f)
@@ -212,9 +210,9 @@ def changeFlag():
     with open("repositories.json", "w") as f:
         f.write(json.dumps(repos, indent=4))
         
-    return flask.redirect('/manageRepositories')
+    return flask.redirect('/manage_repositories')
 
-@app.route('/archiveRepositories', methods=['POST', 'GET'])
+@app.route('/archive_repositories', methods=['POST', 'GET'])
 def archiveRepos():
     """
         Archives any repositories which are:
@@ -440,25 +438,16 @@ def undoBatch():
 
     return flask.redirect("/")
 
-@app.route('/testpage')
-def testPage():
-    # Get repos from storage
-    try:
-        with open("repositories.json", "r") as f:
-            repos = json.load(f) 
-            repos.sort(key=lambda x: x["name"])
-    except FileNotFoundError:
-        # File doesn't exist therefore no repos stored
-        repos = []
+@app.route('/confirm')
+def confirmAction():
+    message = flask.request.args.get("message")
+    confirmUrl = flask.request.args.get("confirmUrl")
+    cancelUrl = flask.request.args.get("cancelUrl")
 
-    reposAdded = flask.request.args.get("reposAdded")
+    if message != None and confirmUrl != None and cancelUrl != None:
+        return flask.render_template("confirmAction.html", message=message, confirmUrl=confirmUrl, cancelUrl=cancelUrl)
 
-    if reposAdded == None:
-        reposAdded = -1
-    else:
-        reposAdded = int(reposAdded)
-
-    return flask.render_template("manageRepositoriesNew.html", repos=repos, reposAdded=reposAdded)
+    return flask.redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
