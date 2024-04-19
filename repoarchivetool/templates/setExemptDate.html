@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block pagetitle %}Repository Archive Tool - Set Exempt Date{% endblock %}
+
+{% block head %}
+	<script>
+		function checkSelectValue(){
+			select = document.getElementById("date");
+			selectValue = select.value;
+
+			html = `
+				<div id="monthInput">
+					<label class="ons-label ons-u-mt-s" for="months">Number of Months</label>
+					<input type="number" id="months" name="months" class="ons-input ons-input--text ons-input-type__input" min=13 required />
+				</div>
+			`
+
+			if(selectValue == -1){
+				select.insertAdjacentHTML("afterend", html);
+			}
+			else{
+				extraInput = document.getElementById("monthInput");
+
+				if(extraInput != null){
+					extraInput.remove();
+				}
+			}
+		}
+	</script>
+{% endblock %}
+
+{% block body %}
+
+  <h1 class="ons-u-mt-l">Set Exempt Date for {{ repoName }}</h1>
+
+	<form action="/set_exempt_date?repoName={{ repoName }}" method="post">
+		<div class="ons-panel ons-panel--info ons-panel--no-title ons-u-mb-s">
+			<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+			<div class="ons-panel__body">
+				<div class="ons-field ons-question__answer">
+					<div class="ons-field">
+						<label class="ons-label ons-label--with-description" aria-describedby="date-hint"
+							for="date">Exempt for</label>
+						<span id="date-hint" class="ons-label__description  ons-input--with-description">This repository will not be archived until <b>after</b> this amount of months.</span>
+
+						<select id="date" name="date" class="ons-input ons-input--select" aria-describedby="date-hint" onchange="checkSelectValue()" required>
+							<option value="" selected disabled>Select an option</option>
+							<option value="3">3 Months</option>
+							<option value="6">6 Months</option>
+							<option value="12">12 Months</option>
+							<option value="-1">More than 12 Months</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<button type="submit" class="ons-btn ons-u-mb-xl">
+			<span class="ons-btn__inner"><span class="ons-btn__text">Submit</span>
+			</span>
+		</button>
+		<button type="button" class="ons-btn ons-btn--secondary" onclick="window.location.replace('/manage_repositories')">
+			<span class="ons-btn__inner"><span class="ons-btn__text">Cancel</span>
+			</span>
+		  </button>
+	</form>
+
+{% endblock %}
