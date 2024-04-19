@@ -2,6 +2,7 @@ import flask
 from datetime import datetime, timedelta, date
 import os
 import json
+from dateutil.relativedelta import relativedelta
 
 import apiScript
 
@@ -127,7 +128,7 @@ def findRepos():
                         "apiUrl": repo["apiUrl"],
                         "lastCommit": repo["lastCommitDate"],
                         "dateAdded": currentDate,
-                        "keep": False
+                        "exemptUntil": "1900-01-01"
                     })
 
                     reposAdded += 1
@@ -168,6 +169,15 @@ def manageRepos():
     else:
         reposAdded = int(reposAdded)
 
+    # When loading repos, check each repo to see if its exempt date has passed
+    for i in range(0, len(repos)):
+        if repos[i]["exemptUntil"] != "1900-01-01" and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d") < datetime.today():
+            repos[i]["exemptUntil"] = "1900-01-01"
+            repos[i]["dateAdded"] = datetime.strftime(datetime.today(), "%Y-%m-%d")
+    
+    with open("repositories.json", "w") as f:
+        f.write(json.dumps(repos, indent=4))
+
     return flask.render_template("manageRepositories.html", repos=repos, reposAdded=reposAdded)
 
 @app.route('/clear_repositories')
@@ -180,37 +190,67 @@ def clearRepos():
     os.remove("repositories.json")
     return flask.redirect('/manage_repositories')
 
-@app.route('/change_keep_flag')
-def changeFlag():
-    """
-        Inverts the keep flag which prevents repositories from being archived.
+@app.route('/set_exempt_date', methods=['POST', 'GET'])
+def set_exempt_date():
+    repo_name = flask.request.args.get("repoName")
 
-        ==========
+    if repo_name == None:
+        return flask.redirect("/manage_repositories")
 
-        The function loads all repositories from repositories.json, then, using the passed arguement repoName,
-        toggles the keep attribute within the JSON from True to False or vice versa.
+    if flask.request.method == "POST":
+        months_select_value = flask.request.form['date']
 
-        Returns a redirect to manage_repositories.
+        if months_select_value == "-1":
+            months_select_value = flask.request.form['months']
+            
+        exempt_until = datetime.today() + relativedelta(months=int(months_select_value))
+        exempt_until = exempt_until.strftime("%Y-%m-%d")
 
-        If no arguement is passed, it will return a redirect back to manage_repositories without making any changes.
-    """
-    repoName = flask.request.args.get("repoName")
+        # Get repos from storage
+        try:
+            with open("repositories.json", "r") as f:
+                repos = json.load(f) 
+                repos.sort(key=lambda x: x["name"])
+        except FileNotFoundError:
+            # File doesn't exist therefore no repos stored
+            repos = []
 
-    if repoName == None:
-        return flask.redirect('/manage_repositories')
+        for i in range(0, len(repos)):
+            if repos[i]["name"] == repo_name:
+                repos[i]["exemptUntil"] = exempt_until
 
-    with open("repositories.json", "r") as f:
-        repos = json.load(f)
+        with open("repositories.json", "w") as f:
+                f.write(json.dumps(repos, indent=4))
+    
+    else:
+        return flask.render_template("setExemptDate.html", repoName=repo_name)
+    
+    return flask.redirect("/manage_repositories")
 
-    for i in range(0, len(repos)):
-        if repoName == repos[i]["name"]:
-            repos[i]["keep"] = not repos[i]["keep"]
-            break
+@app.route('/clear_exempt_date')
+def clear_exempt_date():
+    repo_name = flask.request.args.get("repoName")
 
-    with open("repositories.json", "w") as f:
-        f.write(json.dumps(repos, indent=4))
-        
-    return flask.redirect('/manage_repositories')
+    if repo_name != None:
+        # Get repos from storage
+        try:
+            with open("repositories.json", "r") as f:
+                repos = json.load(f) 
+                repos.sort(key=lambda x: x["name"])
+        except FileNotFoundError:
+            # File doesn't exist therefore no repos stored
+            repos = []
+
+        for i in range(0, len(repos)):
+            if repos[i]["name"] == repo_name:
+                repos[i]["dateAdded"] = datetime.now().strftime("%Y-%m-%d")
+                repos[i]["exemptUntil"] = "1900-01-01"
+
+        with open("repositories.json", "w") as f:
+                f.write(json.dumps(repos, indent=4))
+
+    return flask.redirect("/manage_repositories")
+    
 
 @app.route('/archive_repositories', methods=['POST', 'GET'])
 def archiveRepos():
@@ -262,11 +302,10 @@ def archiveRepos():
     with open("repositories.json", "r") as f:
         repos = json.load(f)
 
-
     # For each repo, if keep is false and it was added to storage over 30 days ago,
     # Archive them
     for i in range(0, len(repos)):
-        if not repos[i]["keep"]:
+        if repos[i]["exemptUntil"] == "1900-01-01":
             if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= 30:
                 response = gh.patch(repos[i]["apiUrl"], {"archived":True}, False)
 
@@ -421,7 +460,7 @@ def undoBatch():
                     "apiUrl": repoJson["url"],
                     "lastCommit": str(lastUpdate),
                     "dateAdded": currentDate,
-                    "keep": False
+                    "exemptUntil": "1900-01-01"
                 })
 
             with open("repositories.json", "w") as f:
