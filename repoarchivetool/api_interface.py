@@ -1,8 +1,8 @@
 import requests
 import datetime
 
-# APIHandler class to manage all API interactions
-class APIHandler():
+# api_controller class to manage all API interactions
+class api_controller():
     """
         A class used to interact with the Github API.
 
@@ -15,77 +15,77 @@ class APIHandler():
         """
         self.headers = {"Authorization": "token " + token}
 
-    def get(self, url: str, params: dict, addPrefix: bool = True) -> requests.Response:
+    def get(self, url: str, params: dict, add_prefix: bool = True) -> requests.Response:
         """
             Performs a get request using the passed url.
 
             Args:
                 url (str): The url endpoint of the request.
                 params (dict): A Dictionary containing any Query Parameters.
-                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                add_prefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
                 to the beginning of the passed url.
 
             Returns:
                 Response: The response from the API.
         """
-        if addPrefix:
+        if add_prefix:
             url = "https://api.github.com" + url
         return requests.get(url=url, headers=self.headers, params=params)
     
-    def patch(self, url, params, addPrefix: bool = True):
+    def patch(self, url, params, add_prefix: bool = True):
         """
             Performs a patch request using the passed url.
 
             Args:
                 url (str): The url endpoint of the request.
                 params (dict): A Dictionary containing any Query Parameters.
-                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                add_prefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
                 to the beginning of the passed url.
 
             Returns:
                 Response: The response from the API.
         """
-        if addPrefix:
+        if add_prefix:
             url = "https://api.github.com" + url
         return requests.patch(url=url, headers=self.headers, json=params)
     
-    def post(self, url, params, addPrefix: bool = True):
+    def post(self, url, params, add_prefix: bool = True):
         """
             Performs a post request using the passed url.
 
             Args:
                 url (str): The url endpoint of the request.
                 params (dict): A Dictionary containing any Query Parameters.
-                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                add_prefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
                 to the beginning of the passed url.
 
             Returns:
                 Response: The response from the API.
         """
-        if addPrefix:
+        if add_prefix:
             url = "https://api.github.com" + url
         return requests.post(url=url, headers=self.headers, json=params)
     
-    def delete(self, url, addPrefix: bool = True):
+    def delete(self, url, add_prefix: bool = True):
         """
             Performs a delete request using the passed url.
 
             Args:
                 url (str): The url endpoint of the request.
                 params (dict): A Dictionary containing any Query Parameters.
-                addPrefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
+                add_prefix (bool): A Boolean determining whether to add the "https://api.github.com" prefix
                 to the beginning of the passed url.
 
             Returns:
                 Response: The response from the API.
         """
-        if addPrefix:
+        if add_prefix:
             url = "https://api.github.com" + url
 
         return requests.delete(url=url, headers=self.headers)
 
 
-def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | list:
+def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controller) -> str | list:
     """ 
         Gets all repositories which fit the given parameters.
 
@@ -107,8 +107,8 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
         Args:
             org (str): The name of the organisation whose repositories are to be returned.
             date (str): The date which repositories that have been committed prior to will be archived.
-            repoType (str): The type of repository to be returned (public, private, internal or all).
-            gh (APIHandler): An instance of the APIHandler class to interact with the Github API.
+            repo_type (str): The type of repository to be returned (public, private, internal or all).
+            gh (api_controller): An instance of the APIHandler class to interact with the Github API.
 
         Returns:
             str: An error message.
@@ -118,7 +118,7 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
     """
 
     
-    def archiveFlag(repoUrl: str, compDate: date) -> bool | str:
+    def archive_flag(repo_url: str, comp_date: date) -> bool | str:
         """
             Calculates whether a given repo should be archived or not.
 
@@ -130,8 +130,8 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
             If lastUpdate is before compDate return True, otherwise False.
 
             Args:
-                repoUrl (str): The API URL of the repository.
-                compDate (date): The date which repositories that have been committed prior to should be archived.
+                repo_url (str): The API URL of the repository.
+                comp_date (date): The date which repositories that have been committed prior to should be archived.
 
             Returns:
                 str: An error message.
@@ -139,25 +139,25 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                 bool: Whether the repository should be archived or not.
         """
 
-        archiveFlag = False
-        repoResponse = gh.get(repoUrl, {}, False)
+        archive_flag = False
+        repo_response = gh.get(repo_url, {}, False)
                 
-        if repoResponse.status_code == 200:
-            repoJson = repoResponse.json()
-            lastUpdate = repoJson["pushed_at"]
-            lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-            lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+        if repo_response.status_code == 200:
+            repo_json = repo_response.json()
+            last_update = repo_json["pushed_at"]
+            last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+            last_update = datetime.date(last_update.year, last_update.month, last_update.day)
 
-            archiveFlag = True if lastUpdate < compDate else False
+            archive_flag = True if last_update < comp_date else False
         
         else:
-            return f"Error {repoResponse.status_code}: {repoResponse.json()["message"]} <br> Point of Failure: Getting Archive Flag."
+            return f"Error {repo_response.status_code}: {repo_response.json()["message"]} <br> Point of Failure: Getting Archive Flag."
 
-        return archiveFlag
+        return archive_flag
 
 
     # Test API Call
-    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": 1})
+    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": 1})
 
     if response.status_code == 200:
         # - Finds where the inputted date is in the list of repos (this position will be held in midpoint)
@@ -165,45 +165,45 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
 
         # Get Number of Pages 
         try:
-            lastPage = int(response.links["last"]["url"].split("=")[-1])
+            last_page = int(response.links["last"]["url"].split("=")[-1])
         except KeyError:
             # If Key Error, Last doesn't exist therefore 1 page
             lastPage = 1
 
-        upperPointer = lastPage
+        upper_pointer = last_page
         midpoint = 1
-        lowerPointer = 1
-        midpointFound = False
+        lower_pointer = 1
+        midpoint_found = False
 
         year, month, day = date.split("-")
-        xDate = datetime.date(int(year), int(month), int(day))
-        compDate = xDate
+        x_date = datetime.date(int(year), int(month), int(day))
+        comp_date = x_date
 
-        while not midpointFound:
-            if upperPointer - lowerPointer != 1 and upperPointer - lowerPointer != 0:
+        while not midpoint_found:
+            if upper_pointer - lower_pointer != 1 and upper_pointer - lower_pointer != 0:
 
-                midpoint = lowerPointer + round((upperPointer - lowerPointer) / 2)
+                midpoint = lower_pointer + round((upper_pointer - lower_pointer) / 2)
 
-                response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": midpoint})
+                response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": midpoint})
                 repos = response.json()
 
-                minRepoFlag = archiveFlag(repos[0]["url"], compDate)
-                maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
+                min_repo_flag = archive_flag(repos[0]["url"], comp_date)
+                max_repo_flag = archive_flag(repos[-1]["url"], comp_date)
 
                 # If min or max flags are of type string, an error has occured
-                if type(minRepoFlag) == str:
-                    return minRepoFlag
+                if type(min_repo_flag) == str:
+                    return min_repo_flag
                 
-                if type(maxRepoFlag) == str:
-                    return maxRepoFlag
+                if type(max_repo_flag) == str:
+                    return max_repo_flag
 
             
-                if not minRepoFlag and maxRepoFlag:
-                    midpointFound = True
-                elif minRepoFlag and maxRepoFlag:
-                    upperPointer = midpoint
+                if not min_repo_flag and max_repo_flag:
+                    midpoint_found = True
+                elif min_repo_flag and max_repo_flag:
+                    upper_pointer = midpoint
                 else:
-                    lowerPointer = midpoint
+                    lower_pointer = midpoint
             
             else:
                 # If upper - lower = 1, pointers are next to eachother
@@ -213,63 +213,63 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
                 # Check if min and max flags exist, if they don't, only 2 pages.
                 # Need to then calculate midpoint
                 try:
-                    print(minRepoFlag)
+                    print(min_repo_flag)
                 except UnboundLocalError:
-                    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": midpoint})
+                    response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": midpoint})
                     repos = response.json()
 
-                    minRepoFlag = archiveFlag(repos[0]["url"], compDate)
-                    maxRepoFlag = archiveFlag(repos[-1]["url"], compDate)
+                    min_repo_flag = archive_flag(repos[0]["url"], comp_date)
+                    max_repo_flag = archive_flag(repos[-1]["url"], comp_date)
 
-                if minRepoFlag and maxRepoFlag:
-                    midpoint = lowerPointer
-                if not minRepoFlag and not maxRepoFlag:
-                    midpoint = upperPointer
+                if min_repo_flag and max_repo_flag:
+                    midpoint = lower_pointer
+                if not min_repo_flag and not max_repo_flag:
+                    midpoint = upper_pointer
 
-                midpointFound = True
+                midpoint_found = True
         
         # Now midpoint is found, iterate through each repo between midpoint page and last page
         # only need to check dates for midpoint page
         # everything after midpoint can be archived
                 
         # List to hold Repos
-        reposToArchive = []
+        repos_to_archive = []
 
         # For each repo between the midpoint and last page
-        for i in range(midpoint, lastPage+1):
+        for i in range(midpoint, last_page+1):
             # Get the page
-            response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repoType, "per_page": 2, "page": i})
+            response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": i})
 
             if response.status_code == 200:
-                pageRepos = response.json()
+                page_repos = response.json()
 
                 # For each repo in the page
-                for repo in pageRepos:
+                for repo in page_repos:
                     # Get that repo
-                    repoResponse = gh.get(repo["url"], {}, False)
+                    repo_response = gh.get(repo["url"], {}, False)
                     
-                    if repoResponse.status_code == 200:
-                        repoJson = repoResponse.json()
+                    if repo_response.status_code == 200:
+                        repo_json = repo_response.json()
 
-                        lastUpdate = repoJson["pushed_at"]
-                        lastUpdate = datetime.datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                        lastUpdate = datetime.date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+                        last_update = repo_json["pushed_at"]
+                        last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+                        last_update = datetime.date(last_update.year, last_update.month, last_update.day)
 
                         # If not on the midpoint page, archive
                         if i != midpoint:
-                            archiveFlag = "True"
+                            archive_flag = "True"
 
                         # If on the midpoint page, need to check repo date
                         else:                           
-                            archiveFlag = True if lastUpdate < compDate else False
+                            archive_flag = True if last_update < comp_date else False
                         
                         # If needs archiving and hasn't already been archived, add it to the archive list
-                        if not repo["archived"] and archiveFlag:
-                            reposToArchive.append({
+                        if not repo["archived"] and archive_flag:
+                            repos_to_archive.append({
                                 "name": repo["name"],
                                 "type": repo["visibility"],
                                 "apiUrl": repo["url"],
-                                "lastCommitDate": str(lastUpdate),
+                                "lastCommitDate": str(last_update),
                                 "contributorsUrl": repo["contributors_url"]
                             })
                     else:
@@ -277,20 +277,20 @@ def GetOrgRepos(org: str, date: str, repoType: str, gh: APIHandler) -> str | lis
             else: 
                 return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Page of Repositories."
         
-        return reposToArchive
+        return repos_to_archive
     else:
         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Test API Call."
     
 
-def getRepoContributors(gh: APIHandler, contributorsUrl: str) -> str | list:
+def get_repo_contributors(gh: api_controller, contributors_url: str) -> str | list:
     """
         Gets the list of contributors for a given repository.
 
         ==========
 
         Args:
-            gh (APIHandler): An instance of the APIHandler class.
-            contributorsUrl (str): The Github API endpoint URL for the repository's contributors.
+            gh (api_controller): An instance of the APIHandler class.
+            contributors_url (str): The Github API endpoint URL for the repository's contributors.
 
         Returns:
             str: An error message.
@@ -300,22 +300,22 @@ def getRepoContributors(gh: APIHandler, contributorsUrl: str) -> str | list:
     """
 
     # Get contributors information
-    response = gh.get(contributorsUrl, {}, False)
+    response = gh.get(contributors_url, {}, False)
 
     if response.status_code not in (200, 204):
         return f"Error {response.status_code}: {response.json()["message"]}"
 
-    contributorList = []
+    contributor_list = []
 
     if response.status_code == 200:
         contributors = response.json()
         
         for contributor in contributors:
-            contributorList.append({
+            contributor_list.append({
                 "avatar": contributor["avatar_url"],
                 "login": contributor["login"],
                 "url": contributor["html_url"],
                 "contributions": contributor["contributions"]
             })
 
-    return contributorList
+    return contributor_list

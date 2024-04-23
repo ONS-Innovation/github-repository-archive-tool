@@ -4,8 +4,12 @@ function searchTable(tableID, searchbarID, columnIndex) {
     table = document.getElementById(tableID);
     rows = table.getElementsByTagName("tr");
 
+    // Used to show or hide no results message. Removed 2 from length for heading row and message row.
+    noOfResults = rows.length - 2;
+    rowsHidden = 0;
+
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 0; i < rows.length; i++){
+    for(i = 0; i < rows.length - 1; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
         if(rowData){
             rowValue = rowData.textContent || rowData.innerText;
@@ -15,9 +19,12 @@ function searchTable(tableID, searchbarID, columnIndex) {
             }
             else{
                 rows[i].style.display = "none";
+                rowsHidden++;
             }
         }
     }
+
+    document.getElementById("noResultsMessage").style.display = noOfResults == rowsHidden ? "" : "none";
 }
 
 function searchContributors(tableID, searchbarID, columnIndex) {
@@ -25,6 +32,10 @@ function searchContributors(tableID, searchbarID, columnIndex) {
     searchValue = searchBar.value.toUpperCase();
     table = document.getElementById(tableID);
     rows = table.getElementsByTagName("tr");
+
+    // Used to show or hide no results message. Removed 2 from length for heading row and message row.
+    noOfResults = rows.length - 2;
+    rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
     for(i = 0; i < rows.length; i++){
@@ -34,8 +45,6 @@ function searchContributors(tableID, searchbarID, columnIndex) {
             rowChildren = rowData.children;
 
             found = false;
-
-            console.log(rowChildren)
 
             for(const child of rowChildren){
                 contributorElement = child;
@@ -64,9 +73,12 @@ function searchContributors(tableID, searchbarID, columnIndex) {
             }
             else{
                 rows[i].style.display = "none";
+                rowsHidden++;
             }
         }
     }
+
+    document.getElementById("noResultsMessage").style.display = noOfResults == rowsHidden ? "" : "none";
 }
 
 function searchBatches(searchbarID){
