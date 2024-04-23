@@ -226,52 +226,36 @@ def clear_exempt_date():
         storage_interface.write_file("repositories.json", repos)
 
     return flask.redirect("/manage_repositories")
-    
 
-@app.route('/archive_repositories', methods=['POST', 'GET'])
-def archive_repos():
+
+# Functions used within archive_repos()
+def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     """
-        Archives any repositories which are:
-            - older than archive_threshold_days days within the system
-            - have not been marked to be kept using the keep attribute in repositories.json
-        
+        Archives any repositories older than archive_threshold_days and are not exempt, then logs them in repos_to_remove and archive_instance which get returned.
+
         ==========
+
+        Args: 
+            batch_id (int): the id of the batch within archive_instance.
+            repos (list): a list of repositories stored within the system.
         
-        Creates an instance of the APIHandler class from api_controller.py.
-        Loads any archive batches from archived.json into archiveList.
-        Loads all stored repositories from repositories.json into repos.
-        Adds any repositories older than archive_threshold_days days which do not have a keep attribute of True
-        to the reposToRemove array.
-        If there are repositories which need archiving, archive them using a patch request from the
-        APIHandler class instance.
-        Store the status of the archive attempt in archiveInstance["repos"].
-        Add the new archiveInstance to archiveList and write it to archived.json.
-        Remove any archived repositories from repos and write it to repositories.json.
-
-        Returns a redirect to recentlyArchived.
-
-        If the function fails to create an APIHandler instance, it will return a render of error.html
-        with an appropriate error message.
-
+        Returns:
+            repos_to_remove (list)
+            archive_instance (list)
     """
+
     try:
         gh = api_interface.api_controller(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
-    # Get archive batches from storage
-    archive_list = storage_interface.read_file("archived.json")
-
     archive_instance = {
-        "batchID": len(archive_list)+1,
+        "batchID": batch_id,
         "date": datetime.now().strftime("%Y-%m-%d"),
         "repos": []
     }
 
     repos_to_remove = []
-
-    # Get repos from storage
-    repos = storage_interface.read_file("repositories.txt")
 
     # For each repo, if keep is false and it was added to storage over archive_threshold_days days ago,
     # Archive them
@@ -298,6 +282,40 @@ def archive_repos():
                         "status": "Failed",
                         "message": f"Error {response.status_code}: {response.json()["message"]}"
                     })
+
+    return repos_to_remove, archive_instance
+
+@app.route('/archive_repositories', methods=['POST', 'GET'])
+def archive_repos():
+    """
+        Archives any repositories which are:
+            - older than archive_threshold_days days within the system
+            - have not been marked to be kept using the keep attribute in repositories.json
+        
+        ==========
+        
+        Loads any archive batches from archived.json into archiveList.
+        Executes get_archive_lists to:
+            - Get a list of repos which need removing from storage (repos_to_remove)
+            - Archive any repositories older than archive_threshold_days
+            - Get a list of repos which have been archived (archive_instance)
+        Add the new archiveInstance to archiveList and write it to archived.json.
+        Remove any archived repositories from repos and write it to repositories.json.
+
+        Returns a redirect to recentlyArchived.
+
+        If the function fails to create an APIHandler instance, it will return a render of error.html
+        with an appropriate error message.
+
+    """
+
+    # Get archive batches from storage
+    archive_list = storage_interface.read_file("archived.json")
+
+    # Get repos from storage
+    repos = storage_interface.read_file("repositories.json")
+
+    repos_to_remove, archive_instance = get_archive_lists(len(archive_list)+1, repos)
 
     # If repos have been archived, log changes in storage 
     if len(archive_instance["repos"]) > 0:
@@ -341,6 +359,50 @@ def recently_archived():
     except KeyError:
         return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id)
 
+
+# Functions used within undo_batch()
+def get_repository_information(gh: api_interface.api_controller, repo_to_undo: dict, batch_id: int) -> dict:
+    """
+        Gets information for a given repo_to_undo as part of the unarchive process.
+
+        ==========
+
+        Args:
+            gh (api_controller): An instance of the api_controller class from api_interface.py.
+            repo_to_undo (dict): The repository to get the information of.
+            batch_id (int): The id of the batch which the repository belongs to.
+
+        Returns:
+            A dictionary of the repo_to_undo's information.
+    """
+
+    response = gh.get(repo_to_undo["apiurl"], {}, False)
+
+    if response.status_code != 200:
+        return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories")
+
+    repo_json = response.json()
+
+    current_date = datetime.now().strftime("%Y-%m-%d")
+
+    last_update = repo_json["pushed_at"]
+    last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+    last_update = date(last_update.year, last_update.month, last_update.day)
+
+    contributor_list = api_interface.get_repo_contributors(gh, repo_json["contributors_url"])
+
+    repository_information = {
+        "name": repo_json["name"],
+        "type": repo_json["visibility"],
+        "contributors": contributor_list,
+        "apiUrl": repo_json["url"],
+        "lastCommit": str(last_update),
+        "dateAdded": current_date,
+        "exemptUntil": "1900-01-01"
+    }
+
+    return repository_information
+
 @app.route('/undo_batch')
 def undo_batch():
     """
@@ -351,13 +413,15 @@ def undo_batch():
         Creates an instance of the APIHandler class from api_controller.py.
         Gets the passed batchID arguement.
         Loads any archive batches from archived.json into archiveList.
+        Loads all stored repositories from repositories.json into storedRepos.
         Gets the batch that needs undoing from archiveList using the given batchID.
         Unarchives all repositories within the batch using a patch request from the APIHandler class instance.
-        Loads all stored repositories from repositories.json into storedRepos.
         If any now unarchived repositories are not already stored, fetch their information from Github using a get request
         from the APIHandler class instance and add it to storedRepos.
+        Remove any now archived repositories from the batch in archiveList.
+        
         Write storedRepos back to repositories.json.
-        Remove any now archived repositories from the batch in archiveList and write it back to archived.json.
+        Write archive_list back to archived.json.
 
         Returns a redirect to recentlyArchived with a passed arguement, batchID, which is used to show a success message.
 
@@ -377,7 +441,9 @@ def undo_batch():
     if batch_id != None:
         batch_id = int(batch_id)
 
-        archive_list = storage_interface.read_file("archived.json")
+        # Get archive list and stored repos from storage
+        archive_list = storage_interface.read_file("archived.json")        
+        stored_repos = storage_interface.read_file("repositories.json")
 
         batch_to_undo = archive_list[batch_id - 1]
 
@@ -390,44 +456,17 @@ def undo_batch():
             if response.status_code != 200:
                 return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]}")
 
-            # Add the repo to repositories.json
-            # Get repos from storage
-            stored_repos = storage_interface.read_file("repositories.json")
-            
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
-
-                response = gh.get(batch_to_undo["repos"][i - pop_count]["apiurl"], {}, False)
-
-                if response.status_code != 200:
-                    return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]} to stored repositories")
-
-                repo_json = response.json()
-
-                current_date = datetime.now().strftime("%Y-%m-%d")
-
-                last_update = repo_json["pushed_at"]
-                last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
-                last_update = date(last_update.year, last_update.month, last_update.day)
-
-                contributor_list = api_interface.get_repo_contributors(gh, repo_json["contributors_url"])
-
-                stored_repos.append({
-                    "name": repo_json["name"],
-                    "type": repo_json["visibility"],
-                    "contributors": contributor_list,
-                    "apiUrl": repo_json["url"],
-                    "lastCommit": str(last_update),
-                    "dateAdded": current_date,
-                    "exemptUntil": "1900-01-01"
-                })
-
-            storage_interface.write_file("repositories.json", stored_repos)
+                # Add the repo to repositories.json
+                stored_repos.append(get_repository_information(gh, batch_to_undo["repos"][i - pop_count], batch_id))
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
             pop_count += 1
 
-            storage_interface.write_file("archived.json", archive_list)
+        # Write changes to storage
+        storage_interface.write_file("repositories.json", stored_repos)
+        storage_interface.write_file("archived.json", archive_list)
 
         return flask.redirect(f"/recently_archived?batchID={batch_id}")
 
