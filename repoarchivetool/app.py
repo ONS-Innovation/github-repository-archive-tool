@@ -4,7 +4,7 @@ import os
 import json
 from dateutil.relativedelta import relativedelta
 
-import apiScript
+import api_controller
 
 archive_threshold_days = 30
 
@@ -12,7 +12,7 @@ app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
 @app.before_request
-def checkPAT():
+def check_pat():
     """
         Before any request, check if Personal Access Token is defined.
         If it's not, return a render of accessToken.html
@@ -63,20 +63,20 @@ def logout():
     return flask.redirect('/')
 
 @app.route('/find_repositories', methods=['POST', 'GET'])
-def findRepos():
+def find_repos():
     """
-        Gets and stores any Github repositories, using apiScript.py, which fits the given parameters.
+        Gets and stores any Github repositories, using api_controller.py, which fits the given parameters.
         
         ==========
         
         When posted to, the function will use the inputted values from the homepage to make
-        a request to the Github API using apiScript.py and its APIHandler class.
+        a request to the Github API using api_controller.py and its APIHandler class.
         The request will return any repositories which fit the inputted parameters, in which
         this function will store ANY NEW repositories in JSON (repositories.json).
 
         If this function is not posted to, it will return a redirect to the homepage.
 
-        If the function receives an error after using apiScript.py, it will return a render of
+        If the function receives an error after using api_controller.py, it will return a render of
         error.html with an appropriate error message.
 
         If the function is successful with obtaining the information, it will return a redirect to
@@ -86,7 +86,7 @@ def findRepos():
     if flask.request.method == 'POST':
         try:
             # Create APIHandler instance
-            gh = apiScript.APIHandler(flask.session['pat'])
+            gh = api_controller.api_handler(flask.session['pat'])
         
         except KeyError:
             return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
@@ -95,55 +95,55 @@ def findRepos():
             # Get form values
             org = flask.request.form['org']
             date = flask.request.form['date']
-            repoType = flask.request.form['repoType']
+            repo_type = flask.request.form['repoType']
 
-            newRepos = apiScript.GetOrgRepos(org, date, repoType, gh)
+            new_repos = api_controller.get_organisation_repos(org, date, repo_type, gh)
 
-            if type(newRepos) == str:
+            if type(new_repos) == str:
                 # Error Message Returned                
                 try:
-                    return flask.render_template('error.html', pat=flask.session['pat'], error=newRepos)
+                    return flask.render_template('error.html', pat=flask.session['pat'], error=new_repos)
                 except KeyError:
-                    return flask.render_template('error.html', pat='', error=newRepos)
+                    return flask.render_template('error.html', pat='', error=new_repos)
 
             # Get current date for logging purposes
-            currentDate = datetime.today().strftime("%Y-%m-%d")
+            current_date = datetime.today().strftime("%Y-%m-%d")
 
-            reposAdded = 0
+            repos_added = 0
 
             # Get repos from storage
             try:
                 with open("repositories.json", "r") as f:
-                    storedRepos = json.load(f) 
+                    stored_repos = json.load(f) 
             except FileNotFoundError:
                 # File doesn't exist therefore no repos stored
-                storedRepos = []
+                stored_repos = []
 
-            for repo in newRepos:
-                if not any(d["name"] == repo["name"] for d in storedRepos):
-                    contributorList = apiScript.getRepoContributors(gh, repo["contributorsUrl"])
+            for repo in new_repos:
+                if not any(d["name"] == repo["name"] for d in stored_repos):
+                    contributor_list = api_controller.get_repo_contributors(gh, repo["contributorsUrl"])
 
-                    storedRepos.append({
+                    stored_repos.append({
                         "name": repo["name"],
                         "type": repo["type"],
-                        "contributors": contributorList,
+                        "contributors": contributor_list,
                         "apiUrl": repo["apiUrl"],
                         "lastCommit": repo["lastCommitDate"],
-                        "dateAdded": currentDate,
+                        "dateAdded": current_date,
                         "exemptUntil": "1900-01-01"
                     })
 
-                    reposAdded += 1
+                    repos_added += 1
 
             with open("repositories.json", "w") as f:
-                f.write(json.dumps(storedRepos, indent=4))
+                f.write(json.dumps(stored_repos, indent=4))
                 
-            return flask.redirect(f'/manage_repositories?reposAdded={reposAdded}')
+            return flask.redirect(f'/manage_repositories?reposAdded={repos_added}')
     
     return flask.redirect('/')
     
 @app.route('/manage_repositories')
-def manageRepos():
+def manage_repos():
     """
         Returns a render of manageRepositories.html.
 
@@ -164,12 +164,12 @@ def manageRepos():
         # File doesn't exist therefore no repos stored
         repos = []
 
-    reposAdded = flask.request.args.get("reposAdded")
+    repos_added = flask.request.args.get("reposAdded")
 
-    if reposAdded == None:
-        reposAdded = -1
+    if repos_added == None:
+        repos_added = -1
     else:
-        reposAdded = int(reposAdded)
+        repos_added = int(repos_added)
 
     # When loading repos, check each repo to see if its exempt date has passed
     for i in range(0, len(repos)):
@@ -180,10 +180,10 @@ def manageRepos():
     with open("repositories.json", "w") as f:
         f.write(json.dumps(repos, indent=4))
 
-    return flask.render_template("manageRepositories.html", repos=repos, reposAdded=reposAdded)
+    return flask.render_template("manageRepositories.html", repos=repos, reposAdded=repos_added)
 
 @app.route('/clear_repositories')
-def clearRepos():
+def clear_repos():
     """ 
         Removes all stored repositories by deleting repositories.json.
         
@@ -255,7 +255,7 @@ def clear_exempt_date():
     
 
 @app.route('/archive_repositories', methods=['POST', 'GET'])
-def archiveRepos():
+def archive_repos():
     """
         Archives any repositories which are:
             - older than archive_threshold_days days within the system
@@ -263,7 +263,7 @@ def archiveRepos():
         
         ==========
         
-        Creates an instance of the APIHandler class from apiScript.py.
+        Creates an instance of the APIHandler class from api_controller.py.
         Loads any archive batches from archived.json into archiveList.
         Loads all stored repositories from repositories.json into repos.
         Adds any repositories older than archive_threshold_days days which do not have a keep attribute of True
@@ -281,24 +281,24 @@ def archiveRepos():
 
     """
     try:
-        gh = apiScript.APIHandler(flask.session['pat'])
+        gh = api_controller.api_handler(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
     # Get archive batches from storage
     try:
         with open("archived.json", "r") as f:
-            archiveList = json.load(f)
+            archive_list = json.load(f)
     except FileNotFoundError:
-        archiveList = []
+        archive_list = []
 
-    archiveInstance = {
-        "batchID": len(archiveList)+1,
+    archive_instance = {
+        "batchID": len(archive_list)+1,
         "date": datetime.now().strftime("%Y-%m-%d"),
         "repos": []
     }
 
-    reposToRemove = []
+    repos_to_remove = []
 
     # Get repos from storage
     with open("repositories.json", "r") as f:
@@ -313,17 +313,17 @@ def archiveRepos():
 
                 if response.status_code == 200:
 
-                    archiveInstance["repos"].append({
+                    archive_instance["repos"].append({
                         "name": repos[i]["name"],
                         "apiurl": repos[i]["apiUrl"],
                         "status": "Success",
                         "message": "Repository Archived Successfully."
                     })
 
-                    reposToRemove.append(i)
+                    repos_to_remove.append(i)
 
                 else:
-                    archiveInstance["repos"].append({
+                    archive_instance["repos"].append({
                         "name": repos[i]["name"],
                         "apiurl": repos[i]["apiUrl"],
                         "status": "Failed",
@@ -331,17 +331,17 @@ def archiveRepos():
                     })
 
     # If repos have been archived, log changes in storage 
-    if len(archiveInstance["repos"]) > 0:
+    if len(archive_instance["repos"]) > 0:
         
-        archiveList.append(archiveInstance)
+        archive_list.append(archive_instance)
 
         with open("archived.json", "w") as f:
-            f.write(json.dumps(archiveList, indent=4))
+            f.write(json.dumps(archive_list, indent=4))
 
-        popCount = 0
-        for i in reposToRemove:
-            repos.pop(i - popCount)
-            popCount += 1
+        pop_count = 0
+        for i in repos_to_remove:
+            repos.pop(i - pop_count)
+            pop_count += 1
 
         with open("repositories.json", "w") as f:
             f.write(json.dumps(repos, indent=4))
@@ -349,7 +349,7 @@ def archiveRepos():
     return flask.redirect('/recently_archived')
 
 @app.route('/recently_archived')
-def recentlyArchived():
+def recently_archived():
     """
         Returns a render of recentlyArchived.html.
 
@@ -364,29 +364,29 @@ def recentlyArchived():
     # Get archive batches from storage
     try:
         with open("archived.json", "r") as f:
-            archiveList = json.load(f)
-            archiveList.reverse()
+            archive_list = json.load(f)
+            archive_list.reverse()
     except FileNotFoundError:
-        archiveList = []
+        archive_list = []
 
-    batchID = flask.request.args.get("batchID")
+    batch_id = flask.request.args.get("batchID")
 
-    if batchID == None:
-        batchID = ""
+    if batch_id == None:
+        batch_id = ""
 
     try:
-        return flask.render_template('recentlyArchived.html', archiveList=archiveList, batchID=batchID)
+        return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id)
     except KeyError:
-        return flask.render_template('recentlyArchived.html', archiveList=archiveList, batchID=batchID)
+        return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id)
 
 @app.route('/undo_batch')
-def undoBatch():
+def undo_batch():
     """
         Unarchives a batch of archived repositories.
 
         ==========
 
-        Creates an instance of the APIHandler class from apiScript.py.
+        Creates an instance of the APIHandler class from api_controller.py.
         Gets the passed batchID arguement.
         Loads any archive batches from archived.json into archiveList.
         Gets the batch that needs undoing from archiveList using the given batchID.
@@ -406,87 +406,87 @@ def undoBatch():
         with an appropriate error message.
     """
     try:
-        gh = apiScript.APIHandler(flask.session['pat'])
+        gh = api_controller.api_handler(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
-    batchID = flask.request.args.get("batchID")
+    batch_id = flask.request.args.get("batchID")
 
-    if batchID != None:
-        batchID = int(batchID)
+    if batch_id != None:
+        batch_id = int(batch_id)
 
         with open("archived.json", "r") as f:
-            archiveList = json.load(f)
+            archive_list = json.load(f)
 
-        batchToUndo = archiveList[batchID - 1]
+        batch_to_undo = archive_list[batch_id - 1]
 
-        popCount = 0
+        pop_count = 0
 
-        for i in range(0, len(batchToUndo["repos"])):
+        for i in range(0, len(batch_to_undo["repos"])):
             # Unarchive the repo
-            response = gh.patch(batchToUndo["repos"][i - popCount]["apiurl"], {"archived": False}, False)
+            response = gh.patch(batch_to_undo["repos"][i - pop_count]["apiurl"], {"archived": False}, False)
 
             if response.status_code != 200:
-                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]}")
+                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]}")
 
             # Add the repo to repositories.json
             # Get repos from storage
             try:
                 with open("repositories.json", "r") as f:
-                    storedRepos = json.load(f) 
+                    stored_repos = json.load(f) 
             except FileNotFoundError:
                 # File doesn't exist therefore no repos stored
-                storedRepos = []
+                stored_repos = []
             
-            if not any(d["name"] == batchToUndo["repos"][i - popCount]["name"] for d in storedRepos):
+            if not any(d["name"] == batch_to_undo["repos"][i - popCount]["name"] for d in stored_repos):
 
-                response = gh.get(batchToUndo["repos"][i - popCount]["apiurl"], {}, False)
+                response = gh.get(batch_to_undo["repos"][i - pop_count]["apiurl"], {}, False)
 
                 if response.status_code != 200:
-                    return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batchID}, {batchToUndo["repos"][i - popCount]["name"]} to stored repositories")
+                    return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]} to stored repositories")
 
-                repoJson = response.json()
+                repo_json = response.json()
 
-                currentDate = datetime.now().strftime("%Y-%m-%d")
+                current_date = datetime.now().strftime("%Y-%m-%d")
 
-                lastUpdate = repoJson["pushed_at"]
-                lastUpdate = datetime.strptime(lastUpdate, "%Y-%m-%dT%H:%M:%SZ")
-                lastUpdate = date(lastUpdate.year, lastUpdate.month, lastUpdate.day)
+                last_update = repo_json["pushed_at"]
+                last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+                last_update = date(last_update.year, last_update.month, last_update.day)
 
-                contributorList = apiScript.getRepoContributors(gh, repoJson["contributors_url"])
+                contributor_list = api_controller.get_repo_contributors(gh, repo_json["contributors_url"])
 
-                storedRepos.append({
-                    "name": repoJson["name"],
-                    "type": repoJson["visibility"],
-                    "contributors": contributorList,
-                    "apiUrl": repoJson["url"],
-                    "lastCommit": str(lastUpdate),
-                    "dateAdded": currentDate,
+                stored_repos.append({
+                    "name": repo_json["name"],
+                    "type": repo_json["visibility"],
+                    "contributors": contributor_list,
+                    "apiUrl": repo_json["url"],
+                    "lastCommit": str(last_update),
+                    "dateAdded": current_date,
                     "exemptUntil": "1900-01-01"
                 })
 
             with open("repositories.json", "w") as f:
-                f.write(json.dumps(storedRepos, indent=4))
+                f.write(json.dumps(stored_repos, indent=4))
 
             # Remove the repo from archived.json
-            archiveList[batchID - 1]["repos"].pop(i - popCount)
+            archive_list[batch_id - 1]["repos"].pop(i - pop_count)
             popCount += 1
 
             with open("archived.json", "w") as f:
-                f.write(json.dumps(archiveList, indent=4))
+                f.write(json.dumps(archive_list, indent=4))
 
-        return flask.redirect(f"/recently_archived?batchID={batchID}")
+        return flask.redirect(f"/recently_archived?batchID={batch_id}")
 
     return flask.redirect("/")
 
 @app.route('/confirm')
-def confirmAction():
+def confirm_action():
     message = flask.request.args.get("message")
-    confirmUrl = flask.request.args.get("confirmUrl")
-    cancelUrl = flask.request.args.get("cancelUrl")
+    confirm_url = flask.request.args.get("confirmUrl")
+    cancel_url = flask.request.args.get("cancelUrl")
 
-    if message != None and confirmUrl != None and cancelUrl != None:
-        return flask.render_template("confirmAction.html", message=message, confirmUrl=confirmUrl, cancelUrl=cancelUrl)
+    if message != None and confirm_url != None and cancel_url != None:
+        return flask.render_template("confirmAction.html", message=message, confirmUrl=confirm_url, cancelUrl=cancel_url)
 
     return flask.redirect("/")
 
