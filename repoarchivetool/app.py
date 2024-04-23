@@ -6,6 +6,8 @@ from dateutil.relativedelta import relativedelta
 
 import apiScript
 
+archive_threshold_days = 30
+
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
@@ -256,7 +258,7 @@ def clear_exempt_date():
 def archiveRepos():
     """
         Archives any repositories which are:
-            - older than 30 days within the system
+            - older than archive_threshold_days days within the system
             - have not been marked to be kept using the keep attribute in repositories.json
         
         ==========
@@ -264,7 +266,7 @@ def archiveRepos():
         Creates an instance of the APIHandler class from apiScript.py.
         Loads any archive batches from archived.json into archiveList.
         Loads all stored repositories from repositories.json into repos.
-        Adds any repositories older than 30 days which do not have a keep attribute of True
+        Adds any repositories older than archive_threshold_days days which do not have a keep attribute of True
         to the reposToRemove array.
         If there are repositories which need archiving, archive them using a patch request from the
         APIHandler class instance.
@@ -302,11 +304,11 @@ def archiveRepos():
     with open("repositories.json", "r") as f:
         repos = json.load(f)
 
-    # For each repo, if keep is false and it was added to storage over 30 days ago,
+    # For each repo, if keep is false and it was added to storage over archive_threshold_days days ago,
     # Archive them
     for i in range(0, len(repos)):
         if repos[i]["exemptUntil"] == "1900-01-01":
-            if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= 30:
+            if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= archive_threshold_days:
                 response = gh.patch(repos[i]["apiUrl"], {"archived":True}, False)
 
                 if response.status_code == 200:
