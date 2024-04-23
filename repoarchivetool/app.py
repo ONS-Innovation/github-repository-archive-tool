@@ -1,10 +1,11 @@
 import flask
 from datetime import datetime, timedelta, date
 import os
-import json
+# import json
 from dateutil.relativedelta import relativedelta
 
 import api_interface
+import storage_interface
 
 archive_threshold_days = 30
 
@@ -112,12 +113,7 @@ def find_repos():
             repos_added = 0
 
             # Get repos from storage
-            try:
-                with open("repositories.json", "r") as f:
-                    stored_repos = json.load(f) 
-            except FileNotFoundError:
-                # File doesn't exist therefore no repos stored
-                stored_repos = []
+            stored_repos = storage_interface.read_file("repositories.json")
 
             for repo in new_repos:
                 if not any(d["name"] == repo["name"] for d in stored_repos):
@@ -135,8 +131,7 @@ def find_repos():
 
                     repos_added += 1
 
-            with open("repositories.json", "w") as f:
-                f.write(json.dumps(stored_repos, indent=4))
+            storage_interface.write_file("repositories.json", stored_repos)
                 
             return flask.redirect(f'/manage_repositories?reposAdded={repos_added}')
     
@@ -156,13 +151,7 @@ def manage_repos():
     """
 
     # Get repos from storage
-    try:
-        with open("repositories.json", "r") as f:
-            repos = json.load(f) 
-            repos.sort(key=lambda x: x["name"])
-    except FileNotFoundError:
-        # File doesn't exist therefore no repos stored
-        repos = []
+    repos = storage_interface.read_file("repositories.json", "name")
 
     repos_added = flask.request.args.get("reposAdded")
 
@@ -177,8 +166,7 @@ def manage_repos():
             repos[i]["exemptUntil"] = "1900-01-01"
             repos[i]["dateAdded"] = datetime.strftime(datetime.today(), "%Y-%m-%d")
     
-    with open("repositories.json", "w") as f:
-        f.write(json.dumps(repos, indent=4))
+    storage_interface.write_file("repositories.json", repos)
 
     return flask.render_template("manageRepositories.html", repos=repos, reposAdded=repos_added)
 
@@ -209,20 +197,13 @@ def set_exempt_date():
         exempt_until = exempt_until.strftime("%Y-%m-%d")
 
         # Get repos from storage
-        try:
-            with open("repositories.json", "r") as f:
-                repos = json.load(f) 
-                repos.sort(key=lambda x: x["name"])
-        except FileNotFoundError:
-            # File doesn't exist therefore no repos stored
-            repos = []
+        repos = storage_interface.read_file("repositories.json")
 
         for i in range(0, len(repos)):
             if repos[i]["name"] == repo_name:
                 repos[i]["exemptUntil"] = exempt_until
 
-        with open("repositories.json", "w") as f:
-                f.write(json.dumps(repos, indent=4))
+        storage_interface.write_file("repositories.json", repos)
     
     else:
         return flask.render_template("setExemptDate.html", repoName=repo_name)
@@ -235,21 +216,14 @@ def clear_exempt_date():
 
     if repo_name != None:
         # Get repos from storage
-        try:
-            with open("repositories.json", "r") as f:
-                repos = json.load(f) 
-                repos.sort(key=lambda x: x["name"])
-        except FileNotFoundError:
-            # File doesn't exist therefore no repos stored
-            repos = []
+        repos = storage_interface.read_file("repositories.json")
 
         for i in range(0, len(repos)):
             if repos[i]["name"] == repo_name:
                 repos[i]["dateAdded"] = datetime.now().strftime("%Y-%m-%d")
                 repos[i]["exemptUntil"] = "1900-01-01"
 
-        with open("repositories.json", "w") as f:
-                f.write(json.dumps(repos, indent=4))
+        storage_interface.write_file("repositories.json", repos)
 
     return flask.redirect("/manage_repositories")
     
@@ -286,11 +260,7 @@ def archive_repos():
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
     # Get archive batches from storage
-    try:
-        with open("archived.json", "r") as f:
-            archive_list = json.load(f)
-    except FileNotFoundError:
-        archive_list = []
+    archive_list = storage_interface.read_file("archived.json")
 
     archive_instance = {
         "batchID": len(archive_list)+1,
@@ -301,8 +271,7 @@ def archive_repos():
     repos_to_remove = []
 
     # Get repos from storage
-    with open("repositories.json", "r") as f:
-        repos = json.load(f)
+    repos = storage_interface.read_file("repositories.txt")
 
     # For each repo, if keep is false and it was added to storage over archive_threshold_days days ago,
     # Archive them
@@ -335,16 +304,14 @@ def archive_repos():
         
         archive_list.append(archive_instance)
 
-        with open("archived.json", "w") as f:
-            f.write(json.dumps(archive_list, indent=4))
+        storage_interface.write_file("archived.json", archive_list)
 
         pop_count = 0
         for i in repos_to_remove:
             repos.pop(i - pop_count)
             pop_count += 1
 
-        with open("repositories.json", "w") as f:
-            f.write(json.dumps(repos, indent=4))
+        storage_interface.write_file("repositories.json", repos)
 
     return flask.redirect('/recently_archived')
 
@@ -362,12 +329,7 @@ def recently_archived():
     """
 
     # Get archive batches from storage
-    try:
-        with open("archived.json", "r") as f:
-            archive_list = json.load(f)
-            archive_list.reverse()
-    except FileNotFoundError:
-        archive_list = []
+    archive_list = storage_interface.read_file("archived.json", reverse=True)
 
     batch_id = flask.request.args.get("batchID")
 
@@ -415,8 +377,7 @@ def undo_batch():
     if batch_id != None:
         batch_id = int(batch_id)
 
-        with open("archived.json", "r") as f:
-            archive_list = json.load(f)
+        archive_list = storage_interface.read_file("archived.json")
 
         batch_to_undo = archive_list[batch_id - 1]
 
@@ -431,12 +392,7 @@ def undo_batch():
 
             # Add the repo to repositories.json
             # Get repos from storage
-            try:
-                with open("repositories.json", "r") as f:
-                    stored_repos = json.load(f) 
-            except FileNotFoundError:
-                # File doesn't exist therefore no repos stored
-                stored_repos = []
+            stored_repos = storage_interface.read_file("repositories.json")
             
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
 
@@ -465,15 +421,13 @@ def undo_batch():
                     "exemptUntil": "1900-01-01"
                 })
 
-            with open("repositories.json", "w") as f:
-                f.write(json.dumps(stored_repos, indent=4))
+            storage_interface.write_file("repositories.json", stored_repos)
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
             pop_count += 1
 
-            with open("archived.json", "w") as f:
-                f.write(json.dumps(archive_list, indent=4))
+            storage_interface.write_file("archived.json", archive_list)
 
         return flask.redirect(f"/recently_archived?batchID={batch_id}")
 
