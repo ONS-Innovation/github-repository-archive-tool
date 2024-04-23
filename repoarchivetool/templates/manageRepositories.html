@@ -165,6 +165,7 @@
 							<a href="/set_exempt_date?repoName={{ repo["name"] }}">Set Date</a>
 						{% else %}
 							<i>Until {{ repo["exemptUntil"] }}</i>
+							<br>
 							<a href="/confirm?message=Are%20you%20sure%20you%20want%20to%20remove%20the%20archive%20excemption%20date%20for%20{{ repo["name"] }}?&cancelUrl=/manage_repositories&confirmUrl=/clear_exempt_date?repoName={{ repo["name"] }}">Clear</a>
 						{% endif %}
 					</td>

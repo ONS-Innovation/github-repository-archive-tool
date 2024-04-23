@@ -4,7 +4,7 @@ import os
 import json
 from dateutil.relativedelta import relativedelta
 
-import api_controller
+import api_interface
 
 archive_threshold_days = 30
 
@@ -86,7 +86,7 @@ def find_repos():
     if flask.request.method == 'POST':
         try:
             # Create APIHandler instance
-            gh = api_controller.api_handler(flask.session['pat'])
+            gh = api_interface.api_controller(flask.session['pat'])
         
         except KeyError:
             return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
@@ -97,7 +97,7 @@ def find_repos():
             date = flask.request.form['date']
             repo_type = flask.request.form['repoType']
 
-            new_repos = api_controller.get_organisation_repos(org, date, repo_type, gh)
+            new_repos = api_interface.get_organisation_repos(org, date, repo_type, gh)
 
             if type(new_repos) == str:
                 # Error Message Returned                
@@ -121,7 +121,7 @@ def find_repos():
 
             for repo in new_repos:
                 if not any(d["name"] == repo["name"] for d in stored_repos):
-                    contributor_list = api_controller.get_repo_contributors(gh, repo["contributorsUrl"])
+                    contributor_list = api_interface.get_repo_contributors(gh, repo["contributorsUrl"])
 
                     stored_repos.append({
                         "name": repo["name"],
@@ -281,7 +281,7 @@ def archive_repos():
 
     """
     try:
-        gh = api_controller.api_handler(flask.session['pat'])
+        gh = api_interface.api_controller(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
@@ -406,7 +406,7 @@ def undo_batch():
         with an appropriate error message.
     """
     try:
-        gh = api_controller.api_handler(flask.session['pat'])
+        gh = api_interface.api_controller(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
 
@@ -438,7 +438,7 @@ def undo_batch():
                 # File doesn't exist therefore no repos stored
                 stored_repos = []
             
-            if not any(d["name"] == batch_to_undo["repos"][i - popCount]["name"] for d in stored_repos):
+            if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
 
                 response = gh.get(batch_to_undo["repos"][i - pop_count]["apiurl"], {}, False)
 
@@ -453,7 +453,7 @@ def undo_batch():
                 last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
                 last_update = date(last_update.year, last_update.month, last_update.day)
 
-                contributor_list = api_controller.get_repo_contributors(gh, repo_json["contributors_url"])
+                contributor_list = api_interface.get_repo_contributors(gh, repo_json["contributors_url"])
 
                 stored_repos.append({
                     "name": repo_json["name"],
@@ -470,7 +470,7 @@ def undo_batch():
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
-            popCount += 1
+            pop_count += 1
 
             with open("archived.json", "w") as f:
                 f.write(json.dumps(archive_list, indent=4))

@@ -1,8 +1,8 @@
 import requests
 import datetime
 
-# APIHandler class to manage all API interactions
-class api_handler():
+# api_controller class to manage all API interactions
+class api_controller():
     """
         A class used to interact with the Github API.
 
@@ -85,7 +85,7 @@ class api_handler():
         return requests.delete(url=url, headers=self.headers)
 
 
-def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_handler) -> str | list:
+def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controller) -> str | list:
     """ 
         Gets all repositories which fit the given parameters.
 
@@ -108,7 +108,7 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_handler)
             org (str): The name of the organisation whose repositories are to be returned.
             date (str): The date which repositories that have been committed prior to will be archived.
             repo_type (str): The type of repository to be returned (public, private, internal or all).
-            gh (api_andler): An instance of the APIHandler class to interact with the Github API.
+            gh (api_controller): An instance of the APIHandler class to interact with the Github API.
 
         Returns:
             str: An error message.
@@ -282,14 +282,14 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_handler)
         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Test API Call."
     
 
-def get_repo_contributors(gh: api_handler, contributors_url: str) -> str | list:
+def get_repo_contributors(gh: api_controller, contributors_url: str) -> str | list:
     """
         Gets the list of contributors for a given repository.
 
         ==========
 
         Args:
-            gh (api_handler): An instance of the APIHandler class.
+            gh (api_controller): An instance of the APIHandler class.
             contributors_url (str): The Github API endpoint URL for the repository's contributors.
 
         Returns:
