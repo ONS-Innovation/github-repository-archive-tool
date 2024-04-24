@@ -1,15 +1,36 @@
+function insertNoResults(table){
+    messageRow = table.insertRow(1);
+    messageRow.id = "noResults";
+    messageRow.classList.add("ons-table__row");
+    
+    messageCell = messageRow.insertCell(0);
+    messageCell.innerHTML = "No results.";
+    messageCell.classList.add("ons-table__cell");
+    messageCell.colSpan = "6";
+    messageCell.style.textAlign = "center";
+}
+
+function deleteNoResults(table){
+    messageRow = document.getElementById("noResults");
+    
+    if(messageRow != null){
+        rowIndex = messageRow.rowIndex;
+        table.deleteRow(rowIndex);
+    }
+}
+
 function searchTable(tableID, searchbarID, columnIndex) {
     searchBar = document.getElementById(searchbarID);
     searchValue = searchBar.value.toUpperCase();
     table = document.getElementById(tableID);
     rows = table.getElementsByTagName("tr");
 
-    // Used to show or hide no results message. Removed 2 from length for heading row and message row.
-    noOfResults = rows.length - 2;
+    // Used to show or hide no results message. Removed 1 from length for heading row.
+    noOfResults = rows.length - 1;
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 0; i < rows.length - 1; i++){
+    for(i = 0; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
         if(rowData){
             rowValue = rowData.textContent || rowData.innerText;
@@ -23,8 +44,13 @@ function searchTable(tableID, searchbarID, columnIndex) {
             }
         }
     }
-
-    document.getElementById("noResultsMessage").style.display = noOfResults == rowsHidden ? "" : "none";
+    
+    if(noOfResults == rowsHidden){
+        insertNoResults(table);
+    }
+    else {
+        deleteNoResults(table);
+    }
 }
 
 function searchContributors(tableID, searchbarID, columnIndex) {
@@ -33,8 +59,8 @@ function searchContributors(tableID, searchbarID, columnIndex) {
     table = document.getElementById(tableID);
     rows = table.getElementsByTagName("tr");
 
-    // Used to show or hide no results message. Removed 2 from length for heading row and message row.
-    noOfResults = rows.length - 2;
+    // Used to show or hide no results message. Removed 1 from length for heading row.
+    noOfResults = rows.length - 1;
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
@@ -78,7 +104,12 @@ function searchContributors(tableID, searchbarID, columnIndex) {
         }
     }
 
-    document.getElementById("noResultsMessage").style.display = noOfResults == rowsHidden ? "" : "none";
+    if(noOfResults == rowsHidden){
+        insertNoResults(table);
+    }
+    else {
+        deleteNoResults(table);
+    }
 }
 
 function searchBatches(searchbarID){
