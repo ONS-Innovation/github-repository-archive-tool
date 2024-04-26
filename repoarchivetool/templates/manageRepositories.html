@@ -96,7 +96,7 @@
 		<caption class="ons-table__caption">Repositories to Archive</caption>
 		<thead class="ons-table__head">
 			<tr class="ons-table__row">
-				<th scope="col" class="ons-table__header" aria-sort="ascending">
+				<th scope="col" class="ons-table__header" aria-sort="ascending" rowspan="2">
 					<span class="ons-table__header-text">Name</span>
 					<svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -104,7 +104,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none">
+				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
 					<span class="ons-table__header-text">Type</span>
 					<svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -112,7 +112,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none">
+				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
 					<span class="ons-table__header-text">Contributors</span>
 					<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -120,7 +120,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none">
+				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
 					<span class="ons-table__header-text">Date Added</span>
 					<svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -128,7 +128,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none">
+				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
 					<span class="ons-table__header-text">Last Commit</span>
 					<svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -136,40 +136,57 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none">
+				<th scope="col" class="ons-table__header text-centre" colspan="2">
 					<span class="ons-table__header-text">Avoid Archiving</span>
-					<svg id="sort-sprite-avoid-archiving" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-						focusable="false" fill="currentColor">
-						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-					</svg>
+				</th>
+			</tr>
+
+			<tr class="ons-table__row">
+				<th scope="col" class="ons-table__header">
+					<span class="ons-table__header-text">Exempt Until</span>
+				</th>
+
+				<th scope="col" class="ons-table__header">
+					<span class="ons-table__header-text">Exempt Reason</span>
 				</th>
 			</tr>
 		</thead>
 		<tbody class="ons-table__body">
 			{% for repo in repos %}
 				<tr class="ons-table__row">
-					<td class="ons-table__cell">{{ repo["name"] }}</td>
-					<td class="ons-table__cell">{{ repo["type"] }}</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
+					<td class="ons-table__cell"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["name"] }}</td>
+					<td class="ons-table__cell"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["type"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>
 						{% for contributor in repo["contributors"] %}
 							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
 								<img src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
 							</a>
 						{% endfor %}
 					</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}">{{ repo["dateAdded"] }}</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}">{{ repo["lastCommit"] }}</td>
-					<td class="ons-table__cell text-centre" data-sort-value="{% if repo["exemptUntil"] != "1900-01-01" %} 1 {% else %} 0 {% endif %}">
-						{% if repo["exemptUntil"] == "1900-01-01" %}
+					<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}" {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["dateAdded"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["lastCommit"] }}</td>
+
+					{% if repo["exemptUntil"] == "1900-01-01" %}
+						<td class="ons-table__cell text-centre" colspan="2">
 							<a href="/set_exempt_date?repoName={{ repo["name"] }}">Set Date</a>
-						{% else %}
-							<i>Until {{ repo["exemptUntil"] }}</i>
-							<br>
-							<a href="/confirm?message=Are%20you%20sure%20you%20want%20to%20remove%20the%20archive%20excemption%20date%20for%20{{ repo["name"] }}?&cancelUrl=/manage_repositories&confirmUrl=/clear_exempt_date?repoName={{ repo["name"] }}">Clear</a>
-						{% endif %}
-					</td>
+						</td>
+					{% else %}
+						<td class="ons-table__cell">
+							{{ repo["exemptUntil"] }}
+						</td>
+						<td class="ons-table__cell">
+							{{ repo["exemptReason"] }}
+						</td>
+					{% endif %}
 				</tr>
+
+				{% if repo["exemptUntil"] != "1900-01-01" %}
+					<tr class="ons-table__row">
+						<td class="ons-table__cell text-centre" colspan="2">
+							<a href="/confirm?message=Are%20you%20sure%20you%20want%20to%20remove%20the%20archive%20excemption%20date%20for%20{{ repo["name"] }}?&cancelUrl=/manage_repositories&confirmUrl=/clear_exempt_date?repoName={{ repo["name"] }}">Clear</a>
+						</td>
+					</tr>
+				{% endif %}
 			{% endfor %}
 		</tbody>
 	</table>

@@ -126,7 +126,8 @@ def find_repos():
                         "apiUrl": repo["apiUrl"],
                         "lastCommit": repo["lastCommitDate"],
                         "dateAdded": current_date,
-                        "exemptUntil": "1900-01-01"
+                        "exemptUntil": "1900-01-01",
+                        "exemptReason": ""
                     })
 
                     repos_added += 1
@@ -163,8 +164,9 @@ def manage_repos():
     # When loading repos, check each repo to see if its exempt date has passed
     for i in range(0, len(repos)):
         if repos[i]["exemptUntil"] != "1900-01-01" and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d") < datetime.today():
-            repos[i]["exemptUntil"] = "1900-01-01"
             repos[i]["dateAdded"] = datetime.strftime(datetime.today(), "%Y-%m-%d")
+            repos[i]["exemptUntil"] = "1900-01-01"
+            repos[i]["exemptReason"] = ""
     
     storage_interface.write_file("repositories.json", repos)
 
@@ -192,9 +194,11 @@ def set_exempt_date():
 
         if months_select_value == "-1":
             months_select_value = flask.request.form['months']
-            
+
         exempt_until = datetime.today() + relativedelta(months=int(months_select_value))
         exempt_until = exempt_until.strftime("%Y-%m-%d")
+            
+        exempt_reason = flask.request.form["reason"]
 
         # Get repos from storage
         repos = storage_interface.read_file("repositories.json")
@@ -202,6 +206,7 @@ def set_exempt_date():
         for i in range(0, len(repos)):
             if repos[i]["name"] == repo_name:
                 repos[i]["exemptUntil"] = exempt_until
+                repos[i]["exemptReason"] = exempt_reason
 
         storage_interface.write_file("repositories.json", repos)
     
@@ -222,6 +227,7 @@ def clear_exempt_date():
             if repos[i]["name"] == repo_name:
                 repos[i]["dateAdded"] = datetime.now().strftime("%Y-%m-%d")
                 repos[i]["exemptUntil"] = "1900-01-01"
+                repos[i]["exemptReason"] = ""
 
         storage_interface.write_file("repositories.json", repos)
 
@@ -398,7 +404,8 @@ def get_repository_information(gh: api_interface.api_controller, repo_to_undo: d
         "apiUrl": repo_json["url"],
         "lastCommit": str(last_update),
         "dateAdded": current_date,
-        "exemptUntil": "1900-01-01"
+        "exemptUntil": "1900-01-01",
+        "exemptReason": ""
     }
 
     return repository_information
