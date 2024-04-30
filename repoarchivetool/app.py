@@ -1,13 +1,13 @@
 import flask
 from datetime import datetime, timedelta, date
 import os
-# import json
 from dateutil.relativedelta import relativedelta
 
 import api_interface
 import storage_interface
 
 archive_threshold_days = 30
+domain = "http://localhost:5000"
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -18,7 +18,7 @@ def check_pat():
         Before any request, check if Personal Access Token is defined.
         If it's not, return a render of accessToken.html
     """
-    if "pat" not in flask.session and flask.request.endpoint != "login":
+    if "pat" not in flask.session and flask.request.endpoint not in ("login", "set_exempt_date", "success"):
         return flask.render_template('accessToken.html')
 
 @app.route('/', methods=['POST', 'GET'])
@@ -62,6 +62,10 @@ def logout():
     # remove the username from the session if it's there
     flask.session.pop('pat', None)
     return flask.redirect('/')
+
+@app.route('/success')
+def success():
+    return flask.render_template("success.html")
 
 @app.route('/find_repositories', methods=['POST', 'GET'])
 def find_repos():
@@ -115,6 +119,8 @@ def find_repos():
             # Get repos from storage
             stored_repos = storage_interface.read_file("repositories.json")
 
+            new_repos_to_archive = []
+
             for repo in new_repos:
                 if not any(d["name"] == repo["name"] for d in stored_repos):
                     contributor_list = api_interface.get_repo_contributors(gh, repo["contributorsUrl"])
@@ -130,10 +136,22 @@ def find_repos():
                         "exemptReason": ""
                     })
 
+                    new_repos_to_archive.append({
+                        "name": repo["name"],
+                        "url": repo["htmlUrl"]
+                    })
+
                     repos_added += 1
 
             storage_interface.write_file("repositories.json", stored_repos)
-                
+
+            # Create html file to display which NEW repos will be archived
+            with open("recentlyAdded.html", "w") as f:
+                f.write("<h1>Repositories to be Archived</h1><ul>")
+                for repo in new_repos_to_archive:
+                    f.write(f"<li>{repo['name']} (<a href='{repo['url']}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repo['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")    
+                f.write(f"</ul><p>Total Repositories: {len(new_repos_to_archive)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
+
             return flask.redirect(f'/manage_repositories?reposAdded={repos_added}')
     
     return flask.redirect('/')
@@ -213,7 +231,12 @@ def set_exempt_date():
     else:
         return flask.render_template("setExemptDate.html", repoName=repo_name)
     
-    return flask.redirect("/manage_repositories")
+    try:
+        type(flask.session["pat"])
+    except KeyError:
+        return flask.redirect("/success")
+    else:
+        return flask.redirect("/manage_repositories")
 
 @app.route('/clear_exempt_date')
 def clear_exempt_date():
@@ -232,6 +255,10 @@ def clear_exempt_date():
         storage_interface.write_file("repositories.json", repos)
 
     return flask.redirect("/manage_repositories")
+
+@app.route('/download_recently_added')
+def download_recently_added():
+    return flask.send_file("recentlyAdded.html", as_attachment=True)
 
 
 # Functions used within archive_repos()
