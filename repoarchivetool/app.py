@@ -179,6 +179,11 @@ def manage_repos():
     else:
         repos_added = int(repos_added)
 
+    status_message = flask.request.args.get("msg")
+
+    if status_message == None:
+        status_message = ""
+
     # When loading repos, check each repo to see if its exempt date has passed
     for i in range(0, len(repos)):
         if repos[i]["exemptUntil"] != "1900-01-01" and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d") < datetime.today():
@@ -188,7 +193,7 @@ def manage_repos():
     
     storage_interface.write_file("repositories.json", repos)
 
-    return flask.render_template("manageRepositories.html", repos=repos, reposAdded=repos_added)
+    return flask.render_template("manageRepositories.html", repos=repos, reposAdded=repos_added, statusMessage=status_message)
 
 @app.route('/clear_repositories')
 def clear_repos():
@@ -236,7 +241,7 @@ def set_exempt_date():
     except KeyError:
         return flask.redirect("/success")
     else:
-        return flask.redirect("/manage_repositories")
+        return flask.redirect(f"/manage_repositories?msg={repo_name}%20exempt%20date%20has%20been%20set")
 
 @app.route('/clear_exempt_date')
 def clear_exempt_date():
@@ -254,7 +259,7 @@ def clear_exempt_date():
 
         storage_interface.write_file("repositories.json", repos)
 
-    return flask.redirect("/manage_repositories")
+    return flask.redirect(f"/manage_repositories?msg={ repo_name }%20exempt%20date%20has%20been%20cleared")
 
 @app.route('/download_recently_added')
 def download_recently_added():
@@ -363,8 +368,11 @@ def archive_repos():
             pop_count += 1
 
         storage_interface.write_file("repositories.json", repos)
-
-    return flask.redirect('/recently_archived')
+        
+        return flask.redirect(f'/recently_archived?msg=Batch%20{archive_instance["batchID"]}%20created')
+    
+    else:
+        return flask.redirect('/manage_repositories?msg=No%20repositories%20eligable%20for%20archive')
 
 @app.route('/recently_archived')
 def recently_archived():
@@ -387,10 +395,12 @@ def recently_archived():
     if batch_id == None:
         batch_id = ""
 
-    try:
-        return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id)
-    except KeyError:
-        return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id)
+    status_message = flask.request.args.get("msg")
+
+    if status_message == None:
+        status_message = ""
+
+    return flask.render_template('recentlyArchived.html', archiveList=archive_list, batchID=batch_id, statusMessage=status_message)
 
 
 # Functions used within undo_batch()
