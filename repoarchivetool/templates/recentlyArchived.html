@@ -22,6 +22,15 @@
 	</div>
 {% endif %}
 
+{% if statusMessage != "" %}
+	<div class="ons-panel ons-panel--info ons-panel--no-title">
+		<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
+		<div class="ons-panel__body">
+			<p>{{ statusMessage }}.</p>
+		</div>
+	</div>
+{% endif %}
+
 <h1 class="ons-u-mt-l">View Archive Batches</h1>
 
 {% if archiveList|length > 0 %}

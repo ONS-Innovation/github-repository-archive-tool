@@ -270,7 +270,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controll
                                 "type": repo["visibility"],
                                 "apiUrl": repo["url"],
                                 "lastCommitDate": str(last_update),
-                                "contributorsUrl": repo["contributors_url"]
+                                "contributorsUrl": repo["contributors_url"],
+                                "htmlUrl": repo["html_url"]
                             })
                     else:
                         return f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Getting Individual Repositories."
