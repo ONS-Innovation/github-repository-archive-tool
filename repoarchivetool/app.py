@@ -5,21 +5,30 @@ from dateutil.relativedelta import relativedelta
 
 import api_interface
 import storage_interface
+import authentication_interface
 
 archive_threshold_days = 30
 domain = "http://localhost:5000"
+organisation = "ONS-Innovation"
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
+def update_token():
+    token, expiration = authentication_interface.get_access_token(organisation)
+
+    flask.session["pat"] = token
+
+    expiration = datetime.strptime(expiration, "%Y-%m-%dT%H:%M:%SZ")
+    flask.session["token_expiration"] = expiration + timedelta(minutes=45)
+
 @app.before_request
-def check_pat():
-    """
-        Before any request, check if Personal Access Token is defined.
-        If it's not, return a render of accessToken.html
-    """
-    if "pat" not in flask.session and flask.request.endpoint not in ("login", "set_exempt_date", "success"):
-        return flask.render_template('accessToken.html')
+def check_token():
+    try:
+        if flask.session["token_expiration"] < datetime.now().astimezone():
+            update_token()
+    except KeyError:
+        update_token()
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -27,41 +36,7 @@ def index():
         Returns a render of index.html.
     """
 
-    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
-
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    """
-        Registers the user's inputted personal access token for Github Authentication.
-
-        ==========
-
-        When posted to, the function will set the session variable, pat, to the posted value.
-        The session variable is intended to hold the user's personal access token for Github API authentication.
-
-        Returns a redirect back to the homepage.
-    """
-    if flask.request.method == 'POST':
-        flask.session['pat'] = flask.request.form['pat']
-
-        # No need to test token here as tested when getting repos
-
-    return flask.redirect('/')
-
-@app.route('/logout')
-def logout():
-    """
-        Removes the user's personal access token.
-        
-        ==========
-        
-        Unsets the session variable, pat, which holds the user's personal access token.
-
-        Returns a redirect back to the homepage.
-    """
-    # remove the username from the session if it's there
-    flask.session.pop('pat', None)
-    return flask.redirect('/')
+    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), organisation=organisation)
 
 @app.route('/success')
 def success():
@@ -98,9 +73,12 @@ def find_repos():
         
         else:
             # Get form values
-            org = flask.request.form['org']
+            # org = flask.request.form['org']
+            org = organisation
             date = flask.request.form['date']
             repo_type = flask.request.form['repoType']
+
+            print(repo_type)
 
             new_repos = api_interface.get_organisation_repos(org, date, repo_type, gh)
 

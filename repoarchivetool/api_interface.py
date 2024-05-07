@@ -168,7 +168,7 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controll
             last_page = int(response.links["last"]["url"].split("=")[-1])
         except KeyError:
             # If Key Error, Last doesn't exist therefore 1 page
-            lastPage = 1
+            last_page = 1
 
         upper_pointer = last_page
         midpoint = 1
