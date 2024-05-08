@@ -3,6 +3,25 @@ import time
 import requests
 
 def get_access_token(org: str) -> tuple | str:
+    """
+        Generates an Installation Access Token to make Authorised Github API Requests.
+
+        Generates a JSON Web Token
+        Gets the Installation ID from the JWT
+        Generates an Installation Access Token with the ID
+
+        ==========
+
+        Args:
+            org (str):  the name of the organisation to be accessed. This should match the .pem file.
+                        This variable is dealt with in code.
+
+        Returns:
+            tuple: contains the token and its expiration time
+            or
+            str: an error message
+    """
+
     # Generate JSON Web Token
     client_id = "Iv23lifHcR6yRDTxa7nk"
     issue_time = time.time()
@@ -39,7 +58,17 @@ def get_access_token(org: str) -> tuple | str:
         return (access_token["token"], access_token["expires_at"])
     else:
         return "The pem file used does not support that organisation."
-    
+
+
+## Type = internal Testing
+##
+## I think the endpoint is slightly different so I can no longer get only internal repos
+## Not a permission problem as they're included when all is selected
+## No documentation for type = internal for the endpoint
+##
+## Might have to write a manual filter by getting all repos and removing those with a visiblity
+## that isnt internal
+
 # token, expiration = get_access_token("ONS-Innovation")
 
 # # header = {"Authorization": f"Bearer {token}"}
