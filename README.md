@@ -6,27 +6,21 @@ A Python application to archive outdated organisation repositories.
 2. Navigate into the project's folder and create a virtual environement using `python3 -m venv <environment_name>`.
 3. Activate the environment using `source <environment_name>/bin/activate`.
 4. Run `Poetry install` to install all the required dependencies.
-5. Navigate into the repoarchivetool directory.
-6. Run the project using `poetry run python3 app.py`.
+5. Insert the .pem file for the Github App into /repoarchivetool (see below).
+6. Navigate into the repoarchivetool directory.
+7. Run the project using `poetry run python3 app.py`.
 
-## Getting a Personal Access Token (PAT)
-Before you can use the application, you will need a Personal Access Token (PAT).
+## Getting a .pem file for the Github App
+A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
+The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
 
-1. Go to Settings > Developer Settings > Personal Access Tokens > Fine-grained Tokens.
-2. Next, Click **Generate new token**
-![New Fine-grained token UI](/assets/readme/PAT2.png)
+In order to get a .pem file, a Github App must be created an installed into the organisation of which the app will be managing.
+This app should have **Read and Write Administration** permission and **read-only Metadata** permission.
 
-3. Create a new token by filling in the fields appropriately. **Make sure to select the organisation as the Resource Owner.**
-![Resource Owner Field](/assets/readme/PAT3.png)
-4. Give the token access to **All Repositories** and, under Repository Permissions, **Administration (Read and Write)** and **Metadata (Read-only)** access.
-![Repository Access](/assets/readme/PAT4.png)
-![Administration Permission](/assets/readme/PAT5.png)
-![Metadata Permission](/assets/readme/PAT6.png)
+Once created and installed, you need to generate a Private Key for that Github App. This will download a .pem file to your pc.
+This file needs to be called .pem ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps)). If it isn't named .pem, please rename it.
 
-5. Generate the token and make a note of it.
-6. An owner of the Organisation will then need to approve the token before use.
-
-You can now input this into the app and use it.
+If you do not have access to organisation settings, you need to request a .pem file for the app.
 
 ## Future Developments
 - Email Notification to Repo Owner at time of storage
