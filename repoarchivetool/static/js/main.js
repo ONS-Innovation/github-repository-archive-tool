@@ -6,7 +6,7 @@ function insertNoResults(table){
     messageCell = messageRow.insertCell(0);
     messageCell.innerHTML = "No results.";
     messageCell.classList.add("ons-table__cell");
-    messageCell.colSpan = "7";
+    messageCell.colSpan = "8";
     messageCell.style.textAlign = "center";
 }
 
@@ -26,11 +26,11 @@ function searchTable(tableID, searchbarID, columnIndex) {
     rows = table.getElementsByTagName("tr");
 
     // Used to show or hide no results message. Removed 1 from length for heading row.
-    noOfResults = rows.length - 2;
+    noOfResults = rows.length - 1;
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 2; i < rows.length; i++){
+    for(i = 1; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
 
         if(rowData){
@@ -42,17 +42,6 @@ function searchTable(tableID, searchbarID, columnIndex) {
             else{
                 rows[i].style.display = "none";
                 rowsHidden++;
-            }
-        }
-        else{   
-            // if rowData is undefined, it is on the extra row when an exempt date is set.
-            // In this scenario, check if the previous row is shown or hidden and apply that style.         
-            if(rows[i-1].style.display == "none"){
-                rows[i].style.display = "none";
-                rowsHidden++;
-            }
-            else{
-                rows[i].style.display = "";
             }
         }
     }
@@ -72,11 +61,11 @@ function searchContributors(tableID, searchbarID, columnIndex) {
     rows = table.getElementsByTagName("tr");
 
     // Used to show or hide no results message. Removed 1 from length for heading row.
-    noOfResults = rows.length - 2;
+    noOfResults = rows.length - 1;
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 2; i < rows.length; i++){
+    for(i = 1; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
 
         if(rowData){
@@ -112,17 +101,6 @@ function searchContributors(tableID, searchbarID, columnIndex) {
             else{
                 rows[i].style.display = "none";
                 rowsHidden++;
-            }
-        }
-        else{    
-            // if rowData is undefined, it is on the extra row when an exempt date is set.
-            // In this scenario, check if the previous row is shown or hidden and apply that style.
-            if(rows[i-1].style.display == "none"){
-                rows[i].style.display = "none";
-                rowsHidden++;
-            }
-            else{
-                rows[i].style.display = "";
             }
         }
     }
