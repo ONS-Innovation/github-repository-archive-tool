@@ -94,6 +94,25 @@
 				</span>
 			</div>
 		</div>
+
+		<div class="ons-grid__col ons-col-6@m ons-u-mt-s">
+			<div class="ons-field">
+				<span class="ons-grid--flex  ons-input_search-button">
+					<label class="ons-label ons-label--placeholder" for="typeSearch">Search Repository Type...</label>
+					<input type="search" id="typeSearch"
+						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+						placeholder="Search Repository Type..."/>
+					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchTable('repoTable', 'typeSearch', 1)">
+						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true" fill="currentColor">
+								<path
+									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+						</span>
+					</button>
+				</span>
+			</div>
+		</div>
 	</div>
 
 	<button type="button" class="ons-btn ons-btn--secondary ons-u-mb-s" onclick="window.location.reload();">
@@ -101,11 +120,11 @@
 		</span>
 	</button>
 
-	<table id="repoTable" class="ons-table ons-table--sortable ons-table--compact" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending">
+	<table id="repoTable" class="ons-table ons-table--sortable ons-table--compact" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending" style="display: block; overflow-x: auto;">
 		<caption class="ons-table__caption">Repositories to Archive</caption>
 		<thead class="ons-table__head">
 			<tr class="ons-table__row">
-				<th scope="col" class="ons-table__header" aria-sort="ascending" rowspan="2">
+				<th scope="col" class="ons-table__header" aria-sort="ascending">
 					<span class="ons-table__header-text">Name</span>
 					<svg id="sort-sprite-name" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -113,7 +132,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
+				<th scope="col" class="ons-table__header" aria-sort="none">
 					<span class="ons-table__header-text">Type</span>
 					<svg id="sort-sprite-type" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -121,7 +140,7 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
+				<th scope="col" class="ons-table__header" aria-sort="none">
 					<span class="ons-table__header-text">Contributors</span>
 					<svg id="sort-sprite-contributors" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
 						focusable="false" fill="currentColor">
@@ -129,54 +148,42 @@
 						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
 					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
+				<th scope="col" class="ons-table__header">
 					<span class="ons-table__header-text">Date Added</span>
-					<svg id="sort-sprite-date-added" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-						focusable="false" fill="currentColor">
-						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-					</svg>
 				</th>
-				<th scope="col" class="ons-table__header" aria-sort="none" rowspan="2">
+				<th scope="col" class="ons-table__header">
 					<span class="ons-table__header-text">Last Commit</span>
-					<svg id="sort-sprite-last-commit" class="ons-icon ons-u-d-no" viewBox="0 0 12 19" xmlns="http://www.w3.org/2000/svg"
-						focusable="false" fill="currentColor">
-						<path class="ons-topTriangle" d="M6 0l6 7.2H0L6 0zm0 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-						<path class="ons-bottomTriangle" d="M6 18.6l6-7.2H0l6 7.2zm0 3.6l6 7.2H0l6-7.2z" />
-					</svg>
 				</th>
-				<th scope="col" class="ons-table__header text-centre" colspan="2">
-					<span class="ons-table__header-text">Avoid Archiving</span>
-				</th>
-			</tr>
-
-			<tr class="ons-table__row">
 				<th scope="col" class="ons-table__header text-centre">
 					<span class="ons-table__header-text">Exempt Until</span>
 				</th>
-
+	
 				<th scope="col" class="ons-table__header text-centre">
 					<span class="ons-table__header-text">Exempt Reason</span>
+				</th>
+
+				<th scope="col" class="ons-table__header text-centre">
+					<!-- Empty column as a placeholder for the clear button -->
 				</th>
 			</tr>
 		</thead>
 		<tbody class="ons-table__body">
 			{% for repo in repos %}
 				<tr class="ons-table__row">
-					<td class="ons-table__cell"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["name"] }}</td>
-					<td class="ons-table__cell"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["type"] }}</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>
+					<td class="ons-table__cell">{{ repo["name"] }}</td>
+					<td class="ons-table__cell">{{ repo["type"] }}</td>
+					<td class="ons-table__cell" data-sort-value="{{ repo["contributors"]|length }}">
 						{% for contributor in repo["contributors"] %}
 							<a href="{{ contributor["url"] }}" target="_blank" class="text-decoration-none" aria-label="{{ contributor["login"] }}">
 								<img src="{{contributor["avatar"]}}" alt="User Avatar" width="32px" height="32px">
 							</a>
 						{% endfor %}
 					</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["dateAdded"] }}" {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["dateAdded"] }}</td>
-					<td class="ons-table__cell" data-sort-value="{{ repo["lastCommit"] }}"  {% if repo["exemptUntil"] != "1900-01-01" %}rowspan="2"{% endif %}>{{ repo["lastCommit"] }}</td>
+					<td class="ons-table__cell">{{ repo["dateAdded"] }}</td>
+					<td class="ons-table__cell">{{ repo["lastCommit"] }}</td>
 
 					{% if repo["exemptUntil"] == "1900-01-01" %}
-						<td class="ons-table__cell text-centre" colspan="2">
+						<td class="ons-table__cell text-centre" colspan="3">
 							<a href="/set_exempt_date?repoName={{ repo["name"] }}">Set Date</a>
 						</td>
 					{% else %}
@@ -186,16 +193,11 @@
 						<td class="ons-table__cell">
 							{{ repo["exemptReason"] }}
 						</td>
-					{% endif %}
-				</tr>
-
-				{% if repo["exemptUntil"] != "1900-01-01" %}
-					<tr class="ons-table__row">
-						<td class="ons-table__cell text-centre" colspan="2">
+						<td class="ons-table__cell">
 							<a href="/confirm?message=Are%20you%20sure%20you%20want%20to%20remove%20the%20archive%20excemption%20date%20for%20{{ repo["name"] }}?&cancelUrl=/manage_repositories&confirmUrl=/clear_exempt_date?repoName={{ repo["name"] }}">Clear</a>
 						</td>
-					</tr>
-				{% endif %}
+					{% endif %}
+				</tr>
 			{% endfor %}
 		</tbody>
 	</table>

@@ -1,12 +1,12 @@
 function insertNoResults(table){
-    messageRow = table.insertRow(1);
+    messageRow = table.insertRow(2);
     messageRow.id = "noResults";
     messageRow.classList.add("ons-table__row");
     
     messageCell = messageRow.insertCell(0);
     messageCell.innerHTML = "No results.";
     messageCell.classList.add("ons-table__cell");
-    messageCell.colSpan = "6";
+    messageCell.colSpan = "8";
     messageCell.style.textAlign = "center";
 }
 
@@ -30,8 +30,9 @@ function searchTable(tableID, searchbarID, columnIndex) {
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 0; i < rows.length; i++){
+    for(i = 1; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
+
         if(rowData){
             rowValue = rowData.textContent || rowData.innerText;
 
@@ -64,7 +65,7 @@ function searchContributors(tableID, searchbarID, columnIndex) {
     rowsHidden = 0;
 
     // Loop through all table rows, and hide those who don't match the search query
-    for(i = 0; i < rows.length; i++){
+    for(i = 1; i < rows.length; i++){
         rowData = rows[i].getElementsByTagName("td")[columnIndex];
 
         if(rowData){

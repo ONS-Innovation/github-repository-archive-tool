@@ -168,7 +168,7 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controll
             last_page = int(response.links["last"]["url"].split("=")[-1])
         except KeyError:
             # If Key Error, Last doesn't exist therefore 1 page
-            lastPage = 1
+            last_page = 1
 
         upper_pointer = last_page
         midpoint = 1
@@ -217,6 +217,10 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: api_controll
                 except UnboundLocalError:
                     response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": midpoint})
                     repos = response.json()
+
+                    # If no repositories are found, return an error
+                    if len(repos) == 0:
+                        return "No repositories found"
 
                     min_repo_flag = archive_flag(repos[0]["url"], comp_date)
                     max_repo_flag = archive_flag(repos[-1]["url"], comp_date)

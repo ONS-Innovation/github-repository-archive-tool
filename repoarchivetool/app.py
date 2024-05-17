@@ -5,21 +5,49 @@ from dateutil.relativedelta import relativedelta
 
 import api_interface
 import storage_interface
+import authentication_interface
 
 archive_threshold_days = 30
 domain = "http://localhost:5000"
+organisation = "ONS-Innovation"
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
+def update_token():
+    """
+        Updates the pat and token_expiration session variables with the new token information.
+    """
+    response = authentication_interface.get_access_token(organisation)
+
+    if type(response) == tuple:
+        token = response[0]
+        expiration = response[1]
+
+        flask.session["pat"] = token
+
+        expiration = datetime.strptime(expiration, "%Y-%m-%dT%H:%M:%SZ")
+        flask.session["token_expiration"] = expiration + timedelta(minutes=60)
+
+    else:
+        # If type is not tuple, it is string
+        # This means there is an error with the .pem file
+
+        return flask.render_template('error.html', error='There is an error with the .pem file.')
+
 @app.before_request
-def check_pat():
+def check_token():
     """
-        Before any request, check if Personal Access Token is defined.
-        If it's not, return a render of accessToken.html
+        Checks if the token stored in the session has expired. If it has, run update_token to get a new one.
+
+        This check doesn't run for /set_exempt_date or /success as these pages may be used by external users
     """
-    if "pat" not in flask.session and flask.request.endpoint not in ("login", "set_exempt_date", "success"):
-        return flask.render_template('accessToken.html')
+    if flask.request.endpoint not in ("set_exempt_date", "success"):
+        try:
+            if flask.session["token_expiration"] < datetime.now().astimezone():
+                update_token()
+        except KeyError:
+            update_token()
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -27,41 +55,7 @@ def index():
         Returns a render of index.html.
     """
 
-    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"))
-
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    """
-        Registers the user's inputted personal access token for Github Authentication.
-
-        ==========
-
-        When posted to, the function will set the session variable, pat, to the posted value.
-        The session variable is intended to hold the user's personal access token for Github API authentication.
-
-        Returns a redirect back to the homepage.
-    """
-    if flask.request.method == 'POST':
-        flask.session['pat'] = flask.request.form['pat']
-
-        # No need to test token here as tested when getting repos
-
-    return flask.redirect('/')
-
-@app.route('/logout')
-def logout():
-    """
-        Removes the user's personal access token.
-        
-        ==========
-        
-        Unsets the session variable, pat, which holds the user's personal access token.
-
-        Returns a redirect back to the homepage.
-    """
-    # remove the username from the session if it's there
-    flask.session.pop('pat', None)
-    return flask.redirect('/')
+    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), organisation=organisation)
 
 @app.route('/success')
 def success():
@@ -94,11 +88,12 @@ def find_repos():
             gh = api_interface.api_controller(flask.session['pat'])
         
         except KeyError:
-            return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+            return flask.render_template('error.html', error='Personal Access Token Undefined.')
         
         else:
             # Get form values
-            org = flask.request.form['org']
+            # org = flask.request.form['org']
+            org = organisation
             date = flask.request.form['date']
             repo_type = flask.request.form['repoType']
 
@@ -106,10 +101,7 @@ def find_repos():
 
             if type(new_repos) == str:
                 # Error Message Returned                
-                try:
-                    return flask.render_template('error.html', pat=flask.session['pat'], error=new_repos)
-                except KeyError:
-                    return flask.render_template('error.html', pat='', error=new_repos)
+                return flask.render_template('error.html', error=new_repos)
 
             # Get current date for logging purposes
             current_date = datetime.today().strftime("%Y-%m-%d")
@@ -285,7 +277,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     try:
         gh = api_interface.api_controller(flask.session['pat'])
     except KeyError:
-        return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+        return flask.render_template('error.html', error='Personal Access Token Undefined.')
 
     archive_instance = {
         "batchID": batch_id,
@@ -422,7 +414,7 @@ def get_repository_information(gh: api_interface.api_controller, repo_to_undo: d
     response = gh.get(repo_to_undo["apiurl"], {}, False)
 
     if response.status_code != 200:
-        return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories")
+        return flask.render_template('error.html', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories")
 
     repo_json = response.json()
 
@@ -478,7 +470,7 @@ def undo_batch():
     try:
         gh = api_interface.api_controller(flask.session['pat'])
     except KeyError:
-        return flask.render_template('error.html', pat='', error='Personal Access Token Undefined.')
+        return flask.render_template('error.html', error='Personal Access Token Undefined.')
 
     batch_id = flask.request.args.get("batchID")
 
@@ -498,7 +490,7 @@ def undo_batch():
             response = gh.patch(batch_to_undo["repos"][i - pop_count]["apiurl"], {"archived": False}, False)
 
             if response.status_code != 200:
-                return flask.render_template('error.html', pat=flask.session['pat'], error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]}")
+                return flask.render_template('error.html', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]}")
 
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
                 # Add the repo to repositories.json
@@ -518,6 +510,12 @@ def undo_batch():
 
 @app.route('/confirm')
 def confirm_action():
+    """
+        If given message, confirmUrl and cancelUrl arguements, return a render of confirmAction.html
+        If not passed either of the arguements, return redirect to /
+
+        Used to confirm user actions (i.e deleting stored repository information)
+    """
     message = flask.request.args.get("message")
     confirm_url = flask.request.args.get("confirmUrl")
     cancel_url = flask.request.args.get("cancelUrl")
