@@ -2,6 +2,7 @@ import flask
 from datetime import datetime, timedelta, date
 import os
 from dateutil.relativedelta import relativedelta
+from dotenv import dotenv_values
 
 import api_interface
 import storage_interface
@@ -9,16 +10,48 @@ import authentication_interface
 
 archive_threshold_days = 30
 domain = "http://localhost:5000"
-organisation = "ONS-Innovation"
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
+
+@app.before_request
+def check_env_and_pem():
+    if flask.request.endpoint not in ("setup", "setup_installation"):
+        if not os.path.exists(".env") or not os.path.exists(".pem"):
+            return flask.redirect("/setup")            
+
+@app.route('/setup', methods=['POST', 'GET'])
+def setup():
+    """
+        Returns a render of firstTimeSetup.html if the .env file doesn't exist.
+
+        The .env file contains the organisation the app installation is for.
+    """
+    return flask.render_template("firstTimeSetup.html")
+
+@app.route('/setup_installation', methods=['POST', 'GET'])
+def setup_installation():
+    """
+    
+    """
+
+    if flask.request.method == "POST":
+        org = flask.request.form["org"]
+        pem = flask.request.files["pem"]
+
+        with open(".env", "w") as f:
+            f.write(f"ORG={org}")
+        
+        if pem:
+            pem.save(".pem")
+
+    return flask.redirect("/")
 
 def update_token():
     """
         Updates the pat and token_expiration session variables with the new token information.
     """
-    response = authentication_interface.get_access_token(organisation)
+    response = authentication_interface.get_access_token(dotenv_values()["ORG"])
 
     if type(response) == tuple:
         token = response[0]
@@ -42,7 +75,7 @@ def check_token():
 
         This check doesn't run for /set_exempt_date or /success as these pages may be used by external users
     """
-    if flask.request.endpoint not in ("set_exempt_date", "success"):
+    if flask.request.endpoint not in ("set_exempt_date", "success", "setup", "setup_installation"):
         try:
             if flask.session["token_expiration"] < datetime.now().astimezone():
                 update_token()
@@ -55,7 +88,7 @@ def index():
         Returns a render of index.html.
     """
 
-    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), organisation=organisation)
+    return flask.render_template('findRepositories.html', date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), organisation=dotenv_values()["ORG"])
 
 @app.route('/success')
 def success():
@@ -93,7 +126,7 @@ def find_repos():
         else:
             # Get form values
             # org = flask.request.form['org']
-            org = organisation
+            org = dotenv_values()["ORG"]
             date = flask.request.form['date']
             repo_type = flask.request.form['repoType']
 

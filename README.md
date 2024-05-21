@@ -24,4 +24,3 @@ If you do not have access to organisation settings, you need to request a .pem f
 
 ## Future Developments
 - Email Notification to Repo Owner at time of storage
-- Add front end filter for repo type
