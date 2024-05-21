@@ -16,6 +16,9 @@ app.config['SECRET_KEY'] = os.urandom(24)
 
 @app.before_request
 def check_env_and_pem():
+    """
+        Checks if .env and .pem exists. If either does not exist, run the setup process.
+    """
     if flask.request.endpoint not in ("setup", "setup_installation"):
         if not os.path.exists(".env") or not os.path.exists(".pem"):
             return flask.redirect("/setup")            
@@ -23,16 +26,17 @@ def check_env_and_pem():
 @app.route('/setup', methods=['POST', 'GET'])
 def setup():
     """
-        Returns a render of firstTimeSetup.html if the .env file doesn't exist.
-
-        The .env file contains the organisation the app installation is for.
+        Returns a render of firstTimeSetup.html.
     """
     return flask.render_template("firstTimeSetup.html")
 
 @app.route('/setup_installation', methods=['POST', 'GET'])
 def setup_installation():
     """
-    
+        Gets the posted organisation name and pem file from /setup.
+        Saves the organisation name in a .env file.
+        Saves the uploaded pem file as .pem.
+        Redirects to /.
     """
 
     if flask.request.method == "POST":
