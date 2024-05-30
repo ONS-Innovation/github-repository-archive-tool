@@ -6,4 +6,6 @@ archive.txt
 repositories.json
 archived.json
 recentlyAdded.html
-.pem
+
+# ignore repo-archive-github.pem
+repo-archive-github.pem
