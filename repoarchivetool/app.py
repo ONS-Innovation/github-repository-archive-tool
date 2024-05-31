@@ -526,4 +526,6 @@ def confirm_action():
     return flask.redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # When running as a container the host must be set
+    # to listen on all interfaces
+    app.run(host="0.0.0.0", port=5000, debug=True)

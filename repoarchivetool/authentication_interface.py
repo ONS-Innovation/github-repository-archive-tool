@@ -27,7 +27,7 @@ def get_access_token(org: str) -> tuple | str:
     issue_time = time.time()
     expiration_time = issue_time + 600
 
-    with open(".pem", "rb") as pem:
+    with open("repo-archive-github.pem", "rb") as pem:
         signing_key = jwt.jwk_from_pem(pem.read())
 
     payload = {
