@@ -8,7 +8,6 @@ import storage_interface
 import authentication_interface
 
 archive_threshold_days = 30
-domain = "http://localhost:5000"
 organisation = "ONS-Innovation"
 
 app = flask.Flask(__name__)
@@ -137,8 +136,10 @@ def find_repos():
 
             storage_interface.write_file("repositories.json", stored_repos)
 
+            domain = flask.request.url_root
+
             # Create html file to display which NEW repos will be archived
-            with open("recentlyAdded.html", "w") as f:
+            with open("./repoarchivetool/recentlyAdded.html", "w") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
                 for repo in new_repos_to_archive:
                     f.write(f"<li>{repo['name']} (<a href='{repo['url']}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repo['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")    
