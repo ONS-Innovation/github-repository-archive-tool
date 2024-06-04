@@ -13,6 +13,30 @@ organisation = "ONS-Innovation"
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
+
+def check_file_integrity(files_to_check: list):
+    """
+        Checks if storage files exist locally. 
+        If any files do not exist, try and download them from s3 bucket.
+
+        If they don't exist in either location, the application will make them as needed.
+
+        ==========
+
+        Args:
+            files_to_check (list): the list of files to check. This prevents unneeded calls to S3.
+    """
+
+    if ("recently_added.html" in files_to_check) and not (os.path.isfile("./recently_added.html")):
+        storage_interface.get_bucket_content("recently_added.html")
+
+    if ("repositories.json" in files_to_check) and not (os.path.isfile("./repositories.json")):
+        storage_interface.get_bucket_content("repositories.json")
+
+    if "archived.json" in files_to_check and not os.path.isfile("./archived.json"):
+        storage_interface.get_bucket_content("archived.json")
+
+
 def update_token():
     """
         Updates the pat and token_expiration session variables with the new token information.
@@ -107,6 +131,9 @@ def find_repos():
 
             repos_added = 0
 
+            # Check storage files exist and are up to date with S3
+            check_file_integrity(["repositories.json"])
+
             # Get repos from storage
             stored_repos = storage_interface.read_file("repositories.json")
 
@@ -139,11 +166,13 @@ def find_repos():
             domain = flask.request.url_root
 
             # Create html file to display which NEW repos will be archived
-            with open("./repoarchivetool/recentlyAdded.html", "w") as f:
+            with open("./recently_added.html", "w") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
                 for repo in new_repos_to_archive:
                     f.write(f"<li>{repo['name']} (<a href='{repo['url']}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repo['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")    
                 f.write(f"</ul><p>Total Repositories: {len(new_repos_to_archive)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
+
+            storage_interface.update_bucket_content("recently_added.html")
 
             return flask.redirect(f'/manage_repositories?reposAdded={repos_added}')
     
@@ -161,6 +190,9 @@ def manage_repos():
         This function can also be passed an arguement called reposAdded, which is used to
         display a success message when being redirected from findRepos().
     """
+
+    # Check storage files exist and are up to date with S3
+    check_file_integrity(["repositories.json"])
 
     # Get repos from storage
     repos = storage_interface.read_file("repositories.json", "name")
@@ -191,11 +223,11 @@ def manage_repos():
 @app.route('/clear_repositories')
 def clear_repos():
     """ 
-        Removes all stored repositories by deleting repositories.json.
+        Removes all stored repositories by writing an empty list to repositories.json.
         
         Returns a redirect to manage_repositories.
     """
-    os.remove("repositories.json")
+    storage_interface.write_file("repositories.json", [])
     return flask.redirect('/manage_repositories')
 
 @app.route('/set_exempt_date', methods=['POST', 'GET'])
@@ -215,6 +247,9 @@ def set_exempt_date():
         exempt_until = exempt_until.strftime("%Y-%m-%d")
             
         exempt_reason = flask.request.form["reason"]
+
+        # Check storage files exist and are up to date with S3
+        check_file_integrity(["repositories.json"])
 
         # Get repos from storage
         repos = storage_interface.read_file("repositories.json")
@@ -241,6 +276,9 @@ def clear_exempt_date():
     repo_name = flask.request.args.get("repoName")
 
     if repo_name != None:
+        # Check storage files exist and are up to date with S3
+        check_file_integrity(["repositories.json"])
+
         # Get repos from storage
         repos = storage_interface.read_file("repositories.json")
 
@@ -256,7 +294,10 @@ def clear_exempt_date():
 
 @app.route('/download_recently_added')
 def download_recently_added():
-    return flask.send_file("recentlyAdded.html", as_attachment=True)
+    # Check storage files exist and are up to date with S3
+    check_file_integrity(["recently_added.html"])
+
+    return flask.send_file("../recently_added.html", as_attachment=True)
 
 
 # Functions used within archive_repos()
@@ -340,6 +381,9 @@ def archive_repos():
 
     """
 
+    # Check storage files exist and are up to date with S3
+    check_file_integrity(["archived.json", "repositories.json"])
+
     # Get archive batches from storage
     archive_list = storage_interface.read_file("archived.json")
 
@@ -379,6 +423,9 @@ def recently_archived():
         This function can also be passed an arguement called batchID, which is used to 
         display a success message when redirected from undoBatch().
     """
+
+    # Check storage files exist and are up to date with S3
+    check_file_integrity(["archived.json"])
 
     # Get archive batches from storage
     archive_list = storage_interface.read_file("archived.json", reverse=True)
@@ -477,6 +524,9 @@ def undo_batch():
 
     if batch_id != None:
         batch_id = int(batch_id)
+
+        # Check storage files exist and are up to date with S3
+        check_file_integrity(["archived.json", "repositories.json"])
 
         # Get archive list and stored repos from storage
         archive_list = storage_interface.read_file("archived.json")        

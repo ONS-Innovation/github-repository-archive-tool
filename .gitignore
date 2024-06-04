@@ -5,7 +5,7 @@ archive.txt
 **/__pycache__/
 repositories.json
 archived.json
-recentlyAdded.html
+recently_added.html
 
 # ignore repo-archive-github.pem
 repo-archive-github.pem
