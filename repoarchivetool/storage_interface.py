@@ -15,7 +15,10 @@ def get_bucket_content(filename: str) -> bool | ClientError:
             Bool or ClientError
     """
 
+    # Use this for running locally. Replace <profile_name> with a profile from ~/.aws/credentials
     # session = boto3.Session(profile_name="<profile_name>")
+
+    # Use this for container running (uses environment credentials instead)
     session = boto3.Session()
     s3 = session.client("s3")
 
@@ -38,7 +41,10 @@ def update_bucket_content(filename: str) -> bool | ClientError:
             Bool or ClientError
     """
 
+    # Use this for running locally. Replace <profile_name> with a profile from ~/.aws/credentials
     # session = boto3.Session(profile_name="<profile_name>")
+
+    # Use this for container running (uses environment credentials instead)
     session = boto3.Session()
     s3 = session.client("s3")
 
