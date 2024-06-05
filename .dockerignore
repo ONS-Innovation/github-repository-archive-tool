@@ -1,0 +1,7 @@
+# Files for docker to ignore when building images
+
+venv
+repositories.json
+archived.json
+recently_added.html
+repo-archive-github.pem
