@@ -2,6 +2,7 @@ import flask
 from datetime import datetime, timedelta, date
 import os
 from dateutil.relativedelta import relativedelta
+from typing import List
 
 import api_interface
 import storage_interface
@@ -14,7 +15,7 @@ app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
 
-def check_file_integrity(files_to_check: list):
+def check_file_integrity(files: List[str], directory: str = "./"):
     """
         Checks if storage files exist locally. 
         If any files do not exist, try and download them from s3 bucket.
@@ -27,14 +28,11 @@ def check_file_integrity(files_to_check: list):
             files_to_check (list): the list of files to check. This prevents unneeded calls to S3.
     """
 
-    if ("recently_added.html" in files_to_check) and not (os.path.isfile("./recently_added.html")):
-        storage_interface.get_bucket_content("recently_added.html")
+    for file in files:
+        file_path = os.path.join(directory, file)
 
-    if ("repositories.json" in files_to_check) and not (os.path.isfile("./repositories.json")):
-        storage_interface.get_bucket_content("repositories.json")
-
-    if "archived.json" in files_to_check and not os.path.isfile("./archived.json"):
-        storage_interface.get_bucket_content("archived.json")
+        if not os.path.isfile(file_path):
+            storage_interface.get_bucket_content(file)
 
 
 def update_token():
