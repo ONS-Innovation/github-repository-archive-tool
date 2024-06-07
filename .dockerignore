@@ -1,11 +1,7 @@
+# Files for docker to ignore when building images
+
 venv
-.env
-archive.txt
-**/instance/
-**/__pycache__/
 repositories.json
 archived.json
 recently_added.html
-
-# ignore repo-archive-github.pem
 repo-archive-github.pem
