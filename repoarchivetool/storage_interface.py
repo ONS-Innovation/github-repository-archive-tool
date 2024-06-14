@@ -35,12 +35,17 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
     
     s3 = get_s3_client()
 
-    obj = s3.get_object(Bucket=bucket, Key=key)
+    try:
+        obj = s3.get_object(Bucket=bucket, Key=key)
+    except ClientError as e:
+        # ClientError is raised when the key does not exist in the bucket
+        # Therefore we need to return True to indicate that the file should be created
+        return True
+    else:
+        last_modified = int(obj["LastModified"].strftime("%s"))
+        content_length = obj["ContentLength"]
 
-    last_modified = int(obj["LastModified"].strftime("%s"))
-    content_length = obj["ContentLength"]
-
-    return last_modified != os.path.getmtime(filename) or content_length != os.path.getsize(filename)
+        return last_modified != os.path.getmtime(filename) or content_length != os.path.getsize(filename)
 
 def get_bucket_content(filename: str) -> bool | ClientError:
     """
