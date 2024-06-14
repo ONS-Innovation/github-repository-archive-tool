@@ -36,7 +36,7 @@ It is expected you have these tools installed before progressing further.
 
 4. Get the repo-archive-github.pem file and copy to the source code root directory (see "Getting a .pem file" below).
 
-5. When running the project locally, you need to edit `get_bucket_content()` and `update_bucket_content()` within `storage_interface.py`.
+5. When running the project locally, you need to edit `get_s3_client()` within `storage_interface.py`.
 
 When creating an instance of `boto3.session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
 

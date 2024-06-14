@@ -1,6 +1,46 @@
 import json
 import boto3
 from botocore.exceptions import ClientError
+import os
+import pprint
+
+def get_s3_client():
+    """
+        Returns an S3 Client
+
+        ==========
+
+        Returns:
+            S3 Client
+    """
+    session = boto3.Session()
+    s3 = session.client("s3")
+
+    return s3
+
+def has_file_changed(bucket: str, key: str, filename: str) -> bool:
+    """
+        Checks if a file in an S3 Bucket has changed
+
+        ==========
+
+        Args:
+            bucket (str): The name of the bucket
+            key (str): The key of the file
+            filename (str): The name of the file to compare
+
+        Returns:
+            bool
+    """
+    
+    s3 = get_s3_client()
+
+    obj = s3.get_object(Bucket=bucket, Key=key)
+
+    last_modified = int(obj["LastModified"].strftime("%s"))
+    content_length = obj["ContentLength"]
+
+    return last_modified != os.path.getmtime(filename) or content_length != os.path.getsize(filename)
 
 def get_bucket_content(filename: str) -> bool | ClientError:
     """
@@ -15,8 +55,7 @@ def get_bucket_content(filename: str) -> bool | ClientError:
             Bool or ClientError
     """
 
-    session = boto3.Session()
-    s3 = session.client("s3")
+    s3 = get_s3_client()
 
     try:
         s3.download_file("github-audit-tool", f"repo-archive/{filename}", filename)
@@ -37,8 +76,7 @@ def update_bucket_content(filename: str) -> bool | ClientError:
             Bool or ClientError
     """
 
-    session = boto3.Session()
-    s3 = session.client("s3")
+    s3 = get_s3_client()
 
     try:
         response = s3.upload_file(filename, "github-audit-tool", f"repo-archive/{filename}")
