@@ -9,10 +9,16 @@ import storage_interface
 import authentication_interface
 
 archive_threshold_days = 30
-organisation = "ONS-Innovation"
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
+
+# Set variables from the environment
+account = os.getenv("AWS_ACCOUNT_NAME")
+organisation = os.getenv("GITHUB_ORG") # "ONS-Innovation"
+
+# Global bucket name
+bucket_name = f"{account}-github-audit-tool"
 
 
 def check_file_integrity(files: List[str], directory: str = "./"):
@@ -32,7 +38,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
         file_path = os.path.join(directory, file)
 
         if not os.path.isfile(file_path):
-            storage_interface.get_bucket_content(file)
+            storage_interface.get_bucket_content(bucket_name, file)
 
 
 def update_token():
@@ -159,7 +165,7 @@ def find_repos():
 
                     repos_added += 1
 
-            storage_interface.write_file("repositories.json", stored_repos)
+            storage_interface.write_file(bucket_name, "repositories.json", stored_repos)
 
             domain = flask.request.url_root
 
@@ -170,7 +176,7 @@ def find_repos():
                     f.write(f"<li>{repo['name']} (<a href='{repo['url']}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repo['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")    
                 f.write(f"</ul><p>Total Repositories: {len(new_repos_to_archive)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
 
-            storage_interface.update_bucket_content("recently_added.html")
+            storage_interface.update_bucket_content(bucket_name, "recently_added.html")
 
             return flask.redirect(f'/manage_repositories?reposAdded={repos_added}')
     
@@ -214,7 +220,7 @@ def manage_repos():
             repos[i]["exemptUntil"] = "1900-01-01"
             repos[i]["exemptReason"] = ""
     
-    storage_interface.write_file("repositories.json", repos)
+    storage_interface.write_file(bucket_name, "repositories.json", repos)
 
     return flask.render_template("manageRepositories.html", repos=repos, reposAdded=repos_added, statusMessage=status_message)
 
@@ -225,7 +231,7 @@ def clear_repos():
         
         Returns a redirect to manage_repositories.
     """
-    storage_interface.write_file("repositories.json", [])
+    storage_interface.write_file(bucket_name, "repositories.json", [])
     return flask.redirect('/manage_repositories')
 
 @app.route('/set_exempt_date', methods=['POST', 'GET'])
@@ -257,7 +263,7 @@ def set_exempt_date():
                 repos[i]["exemptUntil"] = exempt_until
                 repos[i]["exemptReason"] = exempt_reason
 
-        storage_interface.write_file("repositories.json", repos)
+        storage_interface.write_file(bucket_name, "repositories.json", repos)
     
     else:
         return flask.render_template("setExemptDate.html", repoName=repo_name)
@@ -286,7 +292,7 @@ def clear_exempt_date():
                 repos[i]["exemptUntil"] = "1900-01-01"
                 repos[i]["exemptReason"] = ""
 
-        storage_interface.write_file("repositories.json", repos)
+        storage_interface.write_file(bucket_name, "repositories.json", repos)
 
     return flask.redirect(f"/manage_repositories?msg={ repo_name }%20exempt%20date%20has%20been%20cleared")
 
@@ -395,7 +401,7 @@ def archive_repos():
         
         archive_list.append(archive_instance)
 
-        storage_interface.write_file("archived.json", archive_list)
+        storage_interface.write_file(bucket_name, "archived.json", archive_list)
 
         pop_count = 0
         for i in repos_to_remove:
@@ -550,8 +556,8 @@ def undo_batch():
             pop_count += 1
 
         # Write changes to storage
-        storage_interface.write_file("repositories.json", stored_repos)
-        storage_interface.write_file("archived.json", archive_list)
+        storage_interface.write_file(bucket_name, "repositories.json", stored_repos)
+        storage_interface.write_file(bucket_name, "archived.json", archive_list)
 
         return flask.redirect(f"/recently_archived?batchID={batch_id}")
 
