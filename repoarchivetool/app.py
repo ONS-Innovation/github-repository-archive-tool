@@ -31,9 +31,8 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     for file in files:
         file_path = os.path.join(directory, file)
 
-        if not os.path.isfile(file_path):
+        if (not os.path.isfile(file_path)) or storage_interface.has_file_changed("github-audit-tool", f"repo-archive/{file}", file):
             storage_interface.get_bucket_content(file)
-
 
 def update_token():
     """
