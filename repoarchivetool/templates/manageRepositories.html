@@ -163,6 +163,10 @@
 				</th>
 
 				<th scope="col" class="ons-table__header text-centre">
+					<span class="ons-table__header-text">Exempt By</span>
+				</th>
+
+				<th scope="col" class="ons-table__header text-centre">
 					<!-- Empty column as a placeholder for the clear button -->
 				</th>
 			</tr>
@@ -183,7 +187,7 @@
 					<td class="ons-table__cell">{{ repo["lastCommit"] }}</td>
 
 					{% if repo["exemptUntil"] == "1900-01-01" %}
-						<td class="ons-table__cell text-centre" colspan="3">
+						<td class="ons-table__cell text-centre" colspan="4">
 							<a href="/set_exempt_date?repoName={{ repo["name"] }}">Set Date</a>
 						</td>
 					{% else %}
@@ -192,6 +196,9 @@
 						</td>
 						<td class="ons-table__cell">
 							{{ repo["exemptReason"] }}
+						</td>
+						<td class="ons-table__cell">
+							<a href="mailto:{{ repo["exemptBy"]["email"] }}">{{ repo["exemptBy"]["name"] }}</a>
 						</td>
 						<td class="ons-table__cell">
 							<a href="/confirm?message=Are%20you%20sure%20you%20want%20to%20remove%20the%20archive%20excemption%20date%20for%20{{ repo["name"] }}?&cancelUrl=/manage_repositories&confirmUrl=/clear_exempt_date?repoName={{ repo["name"] }}">Clear</a>

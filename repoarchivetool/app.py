@@ -37,9 +37,8 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     for file in files:
         file_path = os.path.join(directory, file)
 
-        if not os.path.isfile(file_path):
+        if not os.path.isfile(file_path) or storage_interface.has_file_changed("github-audit-tool", f"repo-archive/{file}", file):
             storage_interface.get_bucket_content(bucket_name, file)
-
 
 def update_token():
     """
@@ -155,7 +154,11 @@ def find_repos():
                         "lastCommit": repo["lastCommitDate"],
                         "dateAdded": current_date,
                         "exemptUntil": "1900-01-01",
-                        "exemptReason": ""
+                        "exemptReason": "",
+                        "exemptBy": {
+                            "name": "",
+                            "email": ""
+                        }
                     })
 
                     new_repos_to_archive.append({
@@ -218,7 +221,11 @@ def manage_repos():
         if repos[i]["exemptUntil"] != "1900-01-01" and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d") < datetime.today():
             repos[i]["dateAdded"] = datetime.strftime(datetime.today(), "%Y-%m-%d")
             repos[i]["exemptUntil"] = "1900-01-01"
-            repos[i]["exemptReason"] = ""
+            repos[i]["exemptReason"] = "",
+            repos[i]["exemptBy"] = {
+                    "name": "",
+                    "email": ""
+                }
     
     storage_interface.write_file(bucket_name, "repositories.json", repos)
 
@@ -252,6 +259,12 @@ def set_exempt_date():
             
         exempt_reason = flask.request.form["reason"]
 
+        exempt_by_index = int(flask.request.form["select-user"]) - 1
+
+        userlist = storage_interface.read_file("userlist.json")
+
+        user = userlist[exempt_by_index]
+
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
 
@@ -262,11 +275,19 @@ def set_exempt_date():
             if repos[i]["name"] == repo_name:
                 repos[i]["exemptUntil"] = exempt_until
                 repos[i]["exemptReason"] = exempt_reason
+                repos[i]["exemptBy"] = {
+                    "name": user["name"],
+                    "email": user["email"]
+                }
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
     
     else:
-        return flask.render_template("setExemptDate.html", repoName=repo_name)
+        storage_interface.get_bucket_content("userlist.json")
+
+        users = storage_interface.read_file("userlist.json")
+
+        return flask.render_template("setExemptDate.html", repoName=repo_name, users=users)
     
     try:
         type(flask.session["pat"])
@@ -291,6 +312,10 @@ def clear_exempt_date():
                 repos[i]["dateAdded"] = datetime.now().strftime("%Y-%m-%d")
                 repos[i]["exemptUntil"] = "1900-01-01"
                 repos[i]["exemptReason"] = ""
+                repos[i]["exemptBy"] = {
+                    "name": "",
+                    "email": ""
+                }
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
@@ -486,7 +511,11 @@ def get_repository_information(gh: api_interface.api_controller, repo_to_undo: d
         "lastCommit": str(last_update),
         "dateAdded": current_date,
         "exemptUntil": "1900-01-01",
-        "exemptReason": ""
+        "exemptReason": "",
+        "exemptBy": {
+            "name": "",
+            "email": ""
+        }
     }
 
     return repository_information
