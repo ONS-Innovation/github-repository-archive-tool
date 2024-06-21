@@ -39,6 +39,17 @@
 			<div class="ons-panel__body">
 				<div class="ons-field ons-question__answer">
 					<div class="ons-field">
+						<label class="ons-label" for="select-user">User</label>
+						<select id="select-user" name="select-user" class="ons-input ons-input--select">
+							<option value="" selected disabled>Select an option</option>
+							
+							{% for user in users %}
+								<option value="{{ loop.index }}">{{ user["name"] }} ({{ user["email"] }})</option>
+							{% endfor %}
+						</select>
+					</div>
+					
+					<div class="ons-field">
 						<label class="ons-label ons-label--with-description" aria-describedby="date-hint"
 							for="date">Exempt for</label>
 						<span id="date-hint" class="ons-label__description  ons-input--with-description">This repository will not be archived until <b>after</b> this amount of months.</span>
