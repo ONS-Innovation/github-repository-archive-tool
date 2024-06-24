@@ -253,15 +253,12 @@ def set_exempt_date():
             
         exempt_reason = flask.request.form["reason"]
 
-        # exempt_by_index = int(flask.request.form["select-user"]) - 1
-
-        # userlist = storage_interface.read_file("userlist.json")
-
-        # user = userlist[exempt_by_index]
-
         exempt_name = flask.request.form["name"]
 
         exempt_email = flask.request.form["email"]
+
+        if "@ons.gov.uk" not in exempt_email and "@ext.ons.gov.uk" not in exempt_email:
+            return flask.render_template("setExemptDate.html", repoName=repo_name, message=f"Please enter a valid ONS email address. {exempt_email} is not valid.")
 
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
@@ -281,11 +278,7 @@ def set_exempt_date():
         storage_interface.write_file("repositories.json", repos)
     
     else:
-        storage_interface.get_bucket_content("userlist.json")
-
-        users = storage_interface.read_file("userlist.json")
-
-        return flask.render_template("setExemptDate.html", repoName=repo_name, users=users)
+        return flask.render_template("setExemptDate.html", repoName=repo_name, message="")
     
     try:
         type(flask.session["pat"])
