@@ -38,7 +38,7 @@
 			<span class="ons-panel__assistive-text ons-u-vh">Important information: </span>
 			<div class="ons-panel__body">
 				<div class="ons-field ons-question__answer">
-					<div class="ons-field">
+					<!-- <div class="ons-field">
 						<label class="ons-label" for="select-user">User</label>
 						<select id="select-user" name="select-user" class="ons-input ons-input--select">
 							<option value="" selected disabled>Select an option</option>
@@ -47,6 +47,19 @@
 								<option value="{{ loop.index }}">{{ user["name"] }} ({{ user["email"] }})</option>
 							{% endfor %}
 						</select>
+					</div> -->
+					<div class="ons-field">
+						<label class="ons-label ons-label--with-description" aria-describedby="name-hint"
+							for="name">Name</label>
+						<span id="name-hint" class="ons-label__description  ons-input--with-description">Your first and last name.</span>
+						<input type="text" id="name" name="name" class="ons-input ons-input--text ons-input-type__input" required />
+					</div>
+
+					<div class="ons-field">
+						<label class="ons-label ons-label--with-description" aria-describedby="email-hint"
+							for="email">Email</label>
+						<span id="email-hint" class="ons-label__description  ons-input--with-description">Your ONS email.</span>
+						<input type="email" id="email" name="email" class="ons-input ons-input--text ons-input-type__input" required />
 					</div>
 					
 					<div class="ons-field">

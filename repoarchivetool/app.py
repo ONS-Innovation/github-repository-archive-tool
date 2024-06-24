@@ -253,11 +253,15 @@ def set_exempt_date():
             
         exempt_reason = flask.request.form["reason"]
 
-        exempt_by_index = int(flask.request.form["select-user"]) - 1
+        # exempt_by_index = int(flask.request.form["select-user"]) - 1
 
-        userlist = storage_interface.read_file("userlist.json")
+        # userlist = storage_interface.read_file("userlist.json")
 
-        user = userlist[exempt_by_index]
+        # user = userlist[exempt_by_index]
+
+        exempt_name = flask.request.form["name"]
+
+        exempt_email = flask.request.form["email"]
 
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
@@ -270,8 +274,8 @@ def set_exempt_date():
                 repos[i]["exemptUntil"] = exempt_until
                 repos[i]["exemptReason"] = exempt_reason
                 repos[i]["exemptBy"] = {
-                    "name": user["name"],
-                    "email": user["email"]
+                    "name": exempt_name,
+                    "email": exempt_email
                 }
 
         storage_interface.write_file("repositories.json", repos)
