@@ -37,7 +37,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     for file in files:
         file_path = os.path.join(directory, file)
 
-        if not os.path.isfile(file_path) or storage_interface.has_file_changed("github-audit-tool", f"repo-archive/{file}", file):
+        if not os.path.isfile(file_path) or storage_interface.has_file_changed(bucket_name, f"repo-archive/{file}", file):
             storage_interface.get_bucket_content(bucket_name, file)
 
 def update_token():
@@ -283,7 +283,7 @@ def set_exempt_date():
         storage_interface.write_file(bucket_name, "repositories.json", repos)
     
     else:
-        storage_interface.get_bucket_content("userlist.json")
+        storage_interface.get_bucket_content(bucket_name, "userlist.json")
 
         users = storage_interface.read_file("userlist.json")
 
