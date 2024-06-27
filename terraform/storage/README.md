@@ -15,9 +15,15 @@ The store is bootstrapped with a separate terraform state key so that S3 and Ser
 The S3 bucket must exist before a user tries to use the service. Ideally this terraform would be run first, ahead of the service terraform.
 
 ```bash
-terraform init
-terraform plan
-terraform apply
+cd terraform/storage 
+
+terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+
+terraform validate
+
+terraform plan -var-file=env/prod/prod.tfvars
+
+terraform apply -var-file=env/prod/prod.tfvars
 ```
 
 ## Resources

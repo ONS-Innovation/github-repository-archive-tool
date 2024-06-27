@@ -4,7 +4,7 @@ A Python application to archive outdated organisation repositories.
 
 ## Prerequisites
 
-This project uses poetry for package management, colima a license free tool for containerisation and the AWS cli commands for deploying changes.
+This project uses poetry for package management, colima a license free tool for containerisation, the AWS cli commands for interacting with cloud services and Terraform for deploying changes.
 
 It is expected you have these tools installed before progressing further.
 
@@ -13,6 +13,10 @@ It is expected you have these tools installed before progressing further.
 [Instructions to install Colima](https://github.com/abiosoft/colima/blob/main/README.md)
 
 [Instructions to install AWS cli tool](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+[Terraform to configure AWS](https://developer.hashicorp.com/terraform/install)
+
+See the section on deployment for specific requirements and prerequisites to deploy to AWS.
 
 ## Setup - Run outside of Docker
 
@@ -38,27 +42,27 @@ It is expected you have these tools installed before progressing further.
 
 5. When running the project locally, you need to edit `get_s3_client()` within `storage_interface.py`.
 
-When creating an instance of `boto3.session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
+    When creating an instance of `boto3.session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
 
-When running locally:
+    When running locally:
 
-```
-session = boto3.Session(profile_name="<profile_name>")
-s3 = session.client("s3")
-```
+    ```python
+    session = boto3.Session(profile_name="<profile_name>")
+    s3 = session.client("s3")
+    ```
 
-When running from a container:
+    When running from a container:
 
-```
-session = boto3.Session()
-s3 = session.client("s3")
-```
+    ```python
+    session = boto3.Session()
+    s3 = session.client("s3")
+    ```
 
 6. Run the project
 
-```bash
-poetry run python3 repoarchivetool/app.py
-```
+    ```bash
+    poetry run python3 repoarchivetool/app.py
+    ```
 
 ## Building a docker image
 
@@ -155,30 +159,140 @@ You can find the AWS repo push commands under your repository in ECR by selectin
     docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/sdp-repo-archive:<version>
     ```
 
-## Updating the running application to use the new image
+## Deployment to AWS
 
-Update via IaC or CLI is **TBD**.
+The deployment of the service is defined in Infrastructure as Code (IaC) using Terraform.  The service is deployed as a container on an AWS Fargate Service Cluster.
 
-To run the newly pushed container image you must currently use the AWS
-Management Console.
+### Deployment Prerequisites
 
-1. Login to the relevant AWS Account in a browser
-2. Navigate to Elastic Container Service and find the Service Cluster (service-cluster) and find the related Task Definition (under the Tasks tab), this will show the latest revision of the task definition (e.g ecs-service-sdp-application:4)
-3. Navigate to the Task Definition, select the appropriate task definition name and create a new **_revision_** (note: **_not_** a new task definition)
-4. Find the Container Section and update the <version\> of the image to your new image version. No other values need to change.
-5. After saving the task definition, select the Task Definition name and choose Deploy->Update Service
-6. In the Update Service configuration select Force New Deployment and ensure the following are set:
+When first deploying the service to AWS the following prerequisites are expected to be in place or added.
 
-    - Revision : matches the task definition revision you just created
-    - Desired Tasks : 1
-    - Min Running Tasks: 100%
-    - Max Running Tasks: 200%
+#### Underlying AWS Infrastructure
 
-    Click on Update to trigger the deployment.
+The Terraform in this repository expects that underlying AWS infrastructure is present in AWS to deploy on top of, i.e:
 
-The deployment will take a couple of minutes, you should see two tasks running temporarily (the new one and the existing running task). Once the new task is deployed the original task container will drain and stop.
+- Route53 DNS Records
+- Web Application Firewall and appropriate Rules and Rule Groups
+- Virtual Private Cloud with Private and Public Subnets
+- Security Groups
+- Application Load Balancer
+- ECS Service Cluster
 
-Your service should now be running the new image.
+That infrastructure is defined in the repository [TODO update with repo](https://github.com)
+
+#### Bootstrap IAM User Groups, Users and an ECSTaskExecutionRole
+
+The following users must be provisioned in AWS IAM:
+
+- ecr-user
+  - Used for interaction with the Elastic Container Registry from AWS cli
+- ecs-app-user
+  - Used for terraform staging of the resources required to deploy the service
+
+The following groups and permissions must be defined and applied to the above users:
+
+- ecr-user-group
+  - EC2 Container Registry Access
+- ecs-application-user-group
+  - Cognito Power User
+  - Dynamo DB Access
+  - EC2 Access
+  - ECS Access
+  - ECS Task Execution Role Policy
+  - Route53 Access
+  - S3 Access
+  - Cloudwatch Logs All Access (Custom Policy)
+  - IAM Access
+  - Secrets Manager Access
+
+Further to the above an IAM Role must be defined to allow ECS tasks to be executed:
+
+- ecsTaskExecutionRole
+  - See the [AWS guide to create the task execution role policy](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+
+#### Bootstrap for Terraform
+
+To store the state and implement a state locking mechanism for the service resources a Terraform backend is deployed in AWS (an S3 object and DynamoDbTable).  Details can be found in the infrastructure repository above.
+
+#### Bootstrap for Secrets Manager
+
+The Github Audit and Repo service requires access to an associated Github App secret, this secret is created when the Github App is installed in the appropriate Github Organisation.  The contents of the generated pem file is stored in the AWS Secret Manager and retrieved by this service to interact with Github securely.
+
+AWS Secret Manager must be set up with a secret:
+
+- /sdp/tools/repoarchive/repo-archive-github.pem
+  - A plaintext secret, containing the contents of the .pem file created when a Github App was installed.
+
+#### Running the Terraform
+
+There are associated README files in each of the Terraform modules in this repository.  When first staging the service Terraform must be run in the following order:
+
+- terraform/storage/main.tf
+  - This provisions the persistent storage used by the service.
+- terraform/authentication/main.tf
+  - This provisions the Cognito authentication used by the service.
+- terraform/service/main.tf
+  - This provisions the resources required to launch the service.
+
+The reasoning behind splitting the terraform into separate areas is to allow a more flexible update of the application without the need to re-stage authentication or persistent storage.
+
+#### Provision Users
+
+When the service is first deployed an admin user must be created in the Cognito User Pool that was created when the authentication terraform was applied.
+
+New users are manually provisioned in the AWS Console:
+
+- Navigate to Cognito->User Pools and select the pool created for the service
+- Under the Users section select _Create User_ and choose the following:
+  - _Send an email invitation_
+  - Enter the _ONS email address_ for the user to be added
+  - Select _Mark email address as verified_
+  - Under _Temporary password_ choose:
+    - Generate a password
+  - Select _Create User_
+
+An email invite will be sent to the selected email address along with a one-time password which is valid for 10 days.
+
+### Updating the running service using Terraform
+
+If the application has been modified and the changes do not require the Cognito authentication or S3 store to be removed and re-staged (i.e _most_ application level changes) then the following can be performed:
+
+- Build a new version of the container image and upload to ECR as per the instructions earlier in this guide.
+- Change directory to the **service terraform**
+
+  ```bash
+  cd terraform/service
+  ```
+
+- In the appropriate environment variable file env/dev/dev.tfvars or env/prod/prod.tfvars
+  - Change the _container_ver_ variable to the new version of your container.
+  - Change the _force_deployment_ variable to _true_.
+
+- Initialise terraform for the appropriate environment config file _backend-dev.tfbackend_ or _backend-prod.tfbackend_ run:
+
+  ```bash
+  terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+  ```
+
+  The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
+
+- Plan the changes, ensuring you use the correct environment config (depending upon which env you are configuring):
+
+  E.g. for the prod environment run
+
+  ```bash
+  terraform plan -var-file=env/prod/prod.tfvars
+  ```
+
+- Apply the changes, ensuring you use the correct environment config (depending upon which env you are configuring):
+
+  E.g. for the prod environment run
+
+  ```bash
+  terraform apply -var-file=env/prod/prod.tfvars
+  ```
+
+- When the terraform has applied successfully the running task will have been replaced by a task running the container version you specified in the tfvars file
 
 ## Getting a .pem file for the Github App
 

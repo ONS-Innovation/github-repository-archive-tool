@@ -8,7 +8,7 @@ It also acts as a nice fire break between someone accidentally destroying the us
 
 Once the terraform is applied then a user must be manually provisioned using the AWS console.
 
-## PreRequisites
+## Prerequisites
 
 The authentication resource is bootstrapped with a separate terraform state key so that authentication, S3 and Service state files are separated.
 
@@ -17,9 +17,15 @@ The authentication resource is bootstrapped with a separate terraform state key 
 The Cognito user resources must exist before a user tries to use the service. Ideally this terraform would be run ahead of the service terraform.
 
 ```bash
-terraform init
-terraform plan
-terraform apply
+cd terraform/authentication 
+
+terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+
+terraform validate
+
+terraform plan -var-file=env/prod/prod.tfvars
+
+terraform apply -var-file=env/prod/prod.tfvars
 ```
 
 ## Resources
@@ -32,4 +38,4 @@ The IaC creates the following resources:
 
 ## Additional setup
 
-This terraform only create the Cognito resources, the **provisioning (and deprovisioning) of users is handled manually in the AWS console**.
+This terraform only create the Cognito resources, the **provisioning (and deprovisioning) of users is handled manually in the AWS console**, see the top level README for details.
