@@ -6,7 +6,7 @@ The IaC is separated from the service terraform so that the file store can persi
 
 It also acts as a nice fire break between someone accidentally destroying the S3 buckets.
 
-## PreRequisites
+## Prerequisites
 
 The store is bootstrapped with a separate terraform state key so that S3 and Service state files are separated.
 
