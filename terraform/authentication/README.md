@@ -21,6 +21,8 @@ cd terraform/authentication
 
 terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
 
+terraform refresh -var-file=env/prod/prod.tfvars
+
 terraform validate
 
 terraform plan -var-file=env/prod/prod.tfvars

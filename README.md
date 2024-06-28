@@ -276,6 +276,12 @@ If the application has been modified and the changes do not require the Cognito 
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
 
+- Refresh the local state to ensure it is in sync with the backend
+
+  ```bash
+  terraform refresh -var-file=env/prod/prod.tfvars
+  ```
+
 - Plan the changes, ensuring you use the correct environment config (depending upon which env you are configuring):
 
   E.g. for the prod environment run
@@ -306,6 +312,70 @@ Once created and installed, you need to generate a Private Key for that Github A
 This file needs to be renamed **repo-archive-tool.pem** ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps)).
 
 If you do not have access to organisation settings, you need to request a .pem file for the app.
+
+## Destroying Service Resources
+
+The resources for the service are applied using separate terraform for the main service, storage and authentication.  
+
+### Destroy Only the Main Service Resources
+
+The separation of the terraform enables the main service to be destroyed independent of the storage and authentication.  This allows any data to persist and means the user list for the application does not have to be reconstructed.
+
+- Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
+
+  ```bash
+  cd terraform/service
+
+  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
+
+  terraform refresh -var-file=env/dev/dev.tfvars
+
+  terraform destroy -var-file=env/dev/dev.tfvars
+  ```
+
+### Destroy All of the Service Resources
+
+To destroy all resources the destroy **must happen in the following order, storage, service and finally authentication** :
+
+- Ensure that all data can be deleted in S3 and if so, _manually delete any objects_ and the _versioned objects_ in S3.
+
+- Update the lifecycle rule in the storage.tf to prevent_destroy=false.  This is a temporary change whilst resources are destroyed and must be reverted once complete.
+
+- Delete the storage resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
+  
+  ```bash
+  cd terraform/storage
+
+  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
+
+  terraform refresh -var-file=env/dev/dev.tfvars
+
+  terraform destroy -var-file=env/dev/dev.tfvars
+  ```
+
+- Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
+
+  ```bash
+  cd terraform/service
+
+  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
+
+  terraform refresh -var-file=env/dev/dev.tfvars
+
+  terraform destroy -var-file=env/dev/dev.tfvars
+  ```
+
+- Delete the authentication resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
+
+  ```bash
+  cd terraform/authentication
+
+  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
+
+  terraform refresh -var-file=env/dev/dev.tfvars
+
+  terraform destroy -var-file=env/dev/dev.tfvars
+  ```
 
 ## Future Developments
 

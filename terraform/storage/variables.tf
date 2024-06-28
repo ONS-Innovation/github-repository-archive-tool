@@ -24,6 +24,7 @@ variable "domain" {
   type        = string
   default     = "sdp-sandbox"
 }
+
 variable "region" {
   description = "AWS region"
   type        = string
