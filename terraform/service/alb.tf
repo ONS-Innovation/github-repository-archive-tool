@@ -9,10 +9,34 @@ resource "aws_lb_target_group" "github_audit_fargate_tg" {
   vpc_id      = data.terraform_remote_state.ecs_infrastructure.outputs.vpc_id
 }
 
-# Create a listener rule to forward requests to the target group
+# Get the highest priority of the existing listener rules
+resource "null_resource" "get_highest_priority" {
+  provisioner "local-exec" {
+    command = <<EOT
+aws elbv2 describe-rules --region ${var.region} --listener-arn ${data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn} --query 'Rules[*].Priority' --output json | jq '[.[] | select(test("^[0-9]+$")) | tonumber] | max' > highest_alb_listener_priority.txt
+EOT
+  }
+
+  # Ensure the highest priority is retrieved on each apply
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+data "local_file" "highest_priority" {
+  depends_on = [null_resource.get_highest_priority]
+  filename   = "highest_alb_listener_priority.txt"
+}
+
+locals {
+  highest_priority = jsondecode(data.local_file.highest_priority.content)
+}
+
+# Create a listener rule to forward requests to the target group ensuring the 
+# priority takes into account the existing rules 
 resource "aws_lb_listener_rule" "github_audit_listener_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = 10
+  priority = local.highest_priority + 1
 
   condition {
     host_header {
@@ -39,7 +63,7 @@ resource "aws_lb_listener_rule" "github_audit_listener_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "success_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = 3
+  priority     = local.highest_priority + 2
 
   condition {
     host_header {
@@ -62,7 +86,7 @@ resource "aws_lb_listener_rule" "success_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "exempt_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = 4
+  priority     = local.highest_priority + 3
 
   condition {
     host_header {
