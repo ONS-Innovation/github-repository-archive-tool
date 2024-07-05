@@ -10,33 +10,45 @@ resource "aws_lb_target_group" "github_audit_fargate_tg" {
 }
 
 # Get the highest priority of the existing listener rules
-resource "null_resource" "get_highest_priority" {
-  provisioner "local-exec" {
-    command = <<EOT
-aws elbv2 describe-rules --region ${var.region} --listener-arn ${data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn} --query 'Rules[*].Priority' --output json | jq '[.[] | select(test("^[0-9]+$")) | tonumber] | max' > highest_alb_listener_priority.txt
-EOT
-  }
+# resource "null_resource" "get_highest_priority" {
+#   provisioner "local-exec" {
+#     command = "${path.module}/get_listener_priority.sh ${data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn}"
+#     environment = {
+#       AWS_ACCESS_KEY_ID     = var.aws_access_key_id
+#       AWS_SECRET_ACCESS_KEY = var.aws_secret_access_key
+#       AWS_DEFAULT_REGION    = var.region
+#     }
+#   }
 
-  # Ensure the highest priority is retrieved on each apply
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+  # Ensure the highest priority is retrieved when the listener changes
+#   triggers = {
+#     listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
+#   }
+# }
 
-data "local_file" "highest_priority" {
-  depends_on = [null_resource.get_highest_priority]
-  filename   = "highest_alb_listener_priority.txt"
-}
+# data "local_file" "highest_priority" {
+#   depends_on = [null_resource.get_highest_priority]
+#   filename   = "${path.module}/highest_alb_listener_priority.txt"
+# }
 
-locals {
-  highest_priority = jsondecode(data.local_file.highest_priority.content)
+# locals {
+#   highest_priority = jsondecode(data.local_file.highest_priority.content)
+# }
+
+# Use the module to get highest current priority
+module "alb_listener_priority" {
+  source                = "git::https://github.com/ONS-Innovation/keh-alb-listener-tf-module.git?ref=v1.0.0"
+  aws_access_key_id     = var.aws_access_key_id
+  aws_secret_access_key = var.aws_secret_access_key
+  region                = var.region
+  listener_arn          = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
 }
 
 # Create a listener rule to forward requests to the target group ensuring the 
 # priority takes into account the existing rules 
 resource "aws_lb_listener_rule" "github_audit_listener_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority = local.highest_priority + 1
+  priority     = module.alb_listener_priority.highest_priority + 1
 
   condition {
     host_header {
@@ -63,7 +75,7 @@ resource "aws_lb_listener_rule" "github_audit_listener_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "success_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = local.highest_priority + 2
+  priority     = module.alb_listener_priority.highest_priority + 2
 
   condition {
     host_header {
@@ -86,7 +98,7 @@ resource "aws_lb_listener_rule" "success_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "exempt_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = local.highest_priority + 3
+  priority     = module.alb_listener_priority.highest_priority + 3
 
   condition {
     host_header {

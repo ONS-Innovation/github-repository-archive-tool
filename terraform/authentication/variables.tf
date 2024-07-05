@@ -19,6 +19,12 @@ variable "service_subdomain" {
   default     = "github-audit"
 }
 
+variable "service_title" {
+  description = "Service name used in auth emails"
+  type        = string
+  default     = "ONS Github Audit"
+}
+
 variable "domain" {
   description = "Domain"
   type        = string

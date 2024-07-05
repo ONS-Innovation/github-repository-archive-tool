@@ -1,25 +1,25 @@
 output "github_audit_user_pool" {
-  value = aws_cognito_user_pool.github_audit_user_pool.name
+  value = module.cognito.user_pool
 }
 
 output "github_audit_user_pool_id" {
-  value = aws_cognito_user_pool.github_audit_user_pool.id
+  value = module.cognito.user_pool_id
 }
 
 output "github_audit_user_pool_arn" {
 
-  value = aws_cognito_user_pool.github_audit_user_pool.arn
+  value = module.cognito.user_pool_arn
 
 }
 
 output "github_audit_user_pool_domain" {
-  value = aws_cognito_user_pool_domain.main.domain
+  value = module.cognito.user_pool_domain
 }
 
 output "github_audit_user_pool_client" {
-  value = aws_cognito_user_pool_client.userpool_client.name
+  value = module.cognito.user_pool_client
 }
 
 output "github_audit_user_pool_client_id" {
-  value = aws_cognito_user_pool_client.userpool_client.id
+  value = module.cognito.user_pool_client_id
 }
