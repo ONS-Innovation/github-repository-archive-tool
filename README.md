@@ -178,7 +178,7 @@ The Terraform in this repository expects that underlying AWS infrastructure is p
 - Application Load Balancer
 - ECS Service Cluster
 
-That infrastructure is defined in the repository [TODO update with repo](https://github.com)
+That infrastructure is defined in the repository [sdp-infrastructure](https://github.com/ONS-Innovation/sdp-infrastructure)
 
 #### Bootstrap IAM User Groups, Users and an ECSTaskExecutionRole
 
@@ -236,6 +236,17 @@ There are associated README files in each of the Terraform modules in this repos
 
 The reasoning behind splitting the terraform into separate areas is to allow a more flexible update of the application without the need to re-stage authentication or persistent storage.
 
+Depending upon which environment you are deploying to you will want to run your terraform by pointing at an appropriate environment tfvars file.  
+
+Example service tfvars file:
+[service/env/sandbox/example_tfvars.txt](https://github.com/ONS-Innovation/code-repo-archive-tool/terraform/service/env/sandbox/example_tfvars.txt)
+
+Example authentication tfvars file:
+[authentication/env/sandbox/example_tfvars.txt](https://github.com/ONS-Innovation/code-repo-archive-tool/terraform/authentication/env/sandbox/example_tfvars.txt)
+
+Example storage tfvars file:
+[storage/env/sandbox/example_tfvars.txt](https://github.com/ONS-Innovation/code-repo-archive-tool/terraform/storage/env/sandbox/example_tfvars.txt)
+
 #### Provision Users
 
 When the service is first deployed an admin user must be created in the Cognito User Pool that was created when the authentication terraform was applied.
@@ -264,14 +275,14 @@ If the application has been modified and the changes do not require the Cognito 
   cd terraform/service
   ```
 
-- In the appropriate environment variable file env/dev/dev.tfvars or env/prod/prod.tfvars
+- In the appropriate environment variable file env/sandbox/sandbox.tfvars, env/dev/dev.tfvars or env/prod/prod.tfvars
   - Change the _container_ver_ variable to the new version of your container.
   - Change the _force_deployment_ variable to _true_.
 
 - Initialise terraform for the appropriate environment config file _backend-dev.tfbackend_ or _backend-prod.tfbackend_ run:
 
   ```bash
-  terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
   ```
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
@@ -279,23 +290,23 @@ If the application has been modified and the changes do not require the Cognito 
 - Refresh the local state to ensure it is in sync with the backend
 
   ```bash
-  terraform refresh -var-file=env/prod/prod.tfvars
+  terraform refresh -var-file=env/dev/dev.tfvars
   ```
 
 - Plan the changes, ensuring you use the correct environment config (depending upon which env you are configuring):
 
-  E.g. for the prod environment run
+  E.g. for the dev environment run
 
   ```bash
-  terraform plan -var-file=env/prod/prod.tfvars
+  terraform plan -var-file=env/dev/dev.tfvars
   ```
 
 - Apply the changes, ensuring you use the correct environment config (depending upon which env you are configuring):
 
-  E.g. for the prod environment run
+  E.g. for the dev environment run
 
   ```bash
-  terraform apply -var-file=env/prod/prod.tfvars
+  terraform apply -var-file=env/dev/dev.tfvars
   ```
 
 - When the terraform has applied successfully the running task will have been replaced by a task running the container version you specified in the tfvars file
