@@ -48,7 +48,7 @@ module "alb_listener_priority" {
 # priority takes into account the existing rules 
 resource "aws_lb_listener_rule" "github_audit_listener_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = module.alb_listener_priority.highest_priority + 1
+  priority     = module.alb_listener_priority.highest_priority + 3
 
   condition {
     host_header {
@@ -75,7 +75,7 @@ resource "aws_lb_listener_rule" "github_audit_listener_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "success_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = module.alb_listener_priority.highest_priority + 2
+  priority     = module.alb_listener_priority.highest_priority + 1
 
   condition {
     host_header {
@@ -98,7 +98,7 @@ resource "aws_lb_listener_rule" "success_rule" {
 # Create a listener rule to forward requests to the target group
 resource "aws_lb_listener_rule" "exempt_rule" {
   listener_arn = data.terraform_remote_state.ecs_infrastructure.outputs.application_lb_https_listener_arn
-  priority     = module.alb_listener_priority.highest_priority + 3
+  priority     = module.alb_listener_priority.highest_priority + 2
 
   condition {
     host_header {
