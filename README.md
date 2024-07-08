@@ -388,7 +388,3 @@ To destroy all resources the destroy **must happen in the following order, stora
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
 
-## Future Developments
-
-- Email Notification to Repo Owner at time of storage
-- Add front end filter for repo type
