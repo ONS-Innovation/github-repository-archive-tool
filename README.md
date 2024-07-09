@@ -311,19 +311,6 @@ If the application has been modified and the changes do not require the Cognito 
 
 - When the terraform has applied successfully the running task will have been replaced by a task running the container version you specified in the tfvars file
 
-## Getting a .pem file for the Github App
-
-A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
-The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
-
-In order to get a .pem file, a Github App must be created an installed into the organisation of which the app will be managing.
-This app should have **Read and Write Administration** permission and **read-only Metadata** permission.
-
-Once created and installed, you need to generate a Private Key for that Github App. This will download a .pem file to your pc.
-This file needs to be renamed **repo-archive-tool.pem** ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps)).
-
-If you do not have access to organisation settings, you need to request a .pem file for the app.
-
 ## Destroying Service Resources
 
 The resources for the service are applied using separate terraform for the main service, storage and authentication.  

@@ -3,7 +3,6 @@
 venv
 repositories.json
 archived.json
-userlist.json
 recently_added.html
 repo-archive-github.pem
 terraform/
