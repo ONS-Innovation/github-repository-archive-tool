@@ -3,6 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 
+
 def get_s3_client():
     """
         Returns an S3 Client
@@ -16,6 +17,7 @@ def get_s3_client():
     s3 = session.client("s3")
 
     return s3
+
 
 def has_file_changed(bucket: str, key: str, filename: str) -> bool:
     """
@@ -31,12 +33,12 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
         Returns:
             bool
     """
-    
+
     s3 = get_s3_client()
 
     try:
         obj = s3.get_object(Bucket=bucket, Key=key)
-    except ClientError as e:
+    except ClientError as e: # noqa F841
         # ClientError is raised when the key does not exist in the bucket
         # Therefore we need to return True to indicate that the file should be created
         return True
@@ -46,7 +48,8 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
 
         return last_modified != os.path.getmtime(filename) or content_length != os.path.getsize(filename)
 
-def get_bucket_content(filename: str) -> bool | ClientError:
+
+def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     """
         Downloads a given file from an S3 Bucket
 
@@ -62,12 +65,13 @@ def get_bucket_content(filename: str) -> bool | ClientError:
     s3 = get_s3_client()
 
     try:
-        s3.download_file("github-audit-tool", f"repo-archive/{filename}", filename)
+        s3.download_file(bucket, f"repo-archive/{filename}", filename)
     except ClientError as e:
         return e
     return True
 
-def update_bucket_content(filename: str) -> bool | ClientError:
+
+def update_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     """
         Uploads a given file to an S3 Bucket
 
@@ -83,12 +87,13 @@ def update_bucket_content(filename: str) -> bool | ClientError:
     s3 = get_s3_client()
 
     try:
-        response = s3.upload_file(filename, "github-audit-tool", f"repo-archive/{filename}")
+        response = s3.upload_file(filename, bucket, f"repo-archive/{filename}")
     except ClientError as e:
         return e
     return True
 
-def write_file(filename: str, content: list):
+
+def write_file(bucket: str, filename: str, content: list):
     """
         Writes to a given file in JSON
 
@@ -104,7 +109,8 @@ def write_file(filename: str, content: list):
     with open(filename, "w") as f:
         f.write(json.dumps(content, indent=4))
 
-    update_bucket_content(filename)
+    update_bucket_content(bucket, filename)
+
 
 def read_file(filename: str, sort_field: str | None = None, reverse: bool = False) -> list:
     """
