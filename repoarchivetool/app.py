@@ -631,45 +631,54 @@ def confirm_action():
 @app.route('/insert_test_data', methods=['POST', 'GET'])
 def insert_test_data():
 
-    # Create test_recently_added.html for test repositories
-    repos = storage_interface.read_file("./repoarchivetool/test_data/test_repositories.json")
+    if flask.request.method == "POST":
+        if flask.request.form["confirm_radio"] == "True":
 
-    domain = flask.request.url_root
+            # Create test_recently_added.html for test repositories
+            repos = storage_interface.read_file("./repoarchivetool/test_data/test_repositories.json")
 
-    gh = api_interface.api_controller(flask.session['pat'])
+            domain = flask.request.url_root
 
-    with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
-        f.write("<h1>Repositories to be Archived</h1><ul>")
+            gh = api_interface.api_controller(flask.session['pat'])
 
-        for i in range(0, len(repos)):
-            # Update test_repositories.json dates
-            
-            # I know this isn't ideal but I need to make certain changes depending on each repo
-            if repos[i]["name"] == "KPArchiveTest":
-                # Make eligable for archive
-                repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
-            elif repos[i]["name"] == "KPArchiveTest2":
-                # Make non-eligable for archive
-                repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days - 1)).strftime("%Y-%m-%d")
-            elif repos[i]["name"] == "KPInternalArchiveTest":
-                # Make exempt from archive
-                repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 15)).strftime("%Y-%m-%d")
-                repos[i]["exemptUntil"] = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
-            elif repos[i]["name"] == "KPPrivateArchiveTest":
-                # Make eligable for archive
-                repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
+            with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
+                f.write("<h1>Repositories to be Archived</h1><ul>")
 
-            f.write(f"<li>{repos[i]['name']} (<a href='{gh.get(repos[i]["apiUrl"], {}, False).json()["html_url"]}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repos[i]['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")
+                for i in range(0, len(repos)):
+                    # Update test_repositories.json dates
+                    
+                    # I know this isn't ideal but I need to make certain changes depending on each repo
+                    if repos[i]["name"] == "KPArchiveTest":
+                        # Make eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPArchiveTest2":
+                        # Make non-eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days - 1)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPInternalArchiveTest":
+                        # Make exempt from archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 15)).strftime("%Y-%m-%d")
+                        repos[i]["exemptUntil"] = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPPrivateArchiveTest":
+                        # Make eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
 
-        f.write(f"</ul><p>Total Repositories: {len(repos)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
+                    f.write(f"<li>{repos[i]['name']} (<a href='{gh.get(repos[i]["apiUrl"], {}, False).json()["html_url"]}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repos[i]['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")
 
-    with open("./repoarchivetool/test_data/test_repositories.json", "w") as f:
-        f.write(json.dumps(repos, indent=4))
+                f.write(f"</ul><p>Total Repositories: {len(repos)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
 
-    storage_interface.update_bucket_content(bucket_name, "repositories.json", "./repoarchivetool/test_data/test_repositories.json")
-    storage_interface.update_bucket_content(bucket_name, "recently_added.html", "./repoarchivetool/test_data/test_recently_added.html")
+            with open("./repoarchivetool/test_data/test_repositories.json", "w") as f:
+                f.write(json.dumps(repos, indent=4))
 
-    return flask.redirect("/manage_repositories")
+            storage_interface.update_bucket_content(bucket_name, "repositories.json", "./repoarchivetool/test_data/test_repositories.json")
+            storage_interface.update_bucket_content(bucket_name, "recently_added.html", "./repoarchivetool/test_data/test_recently_added.html")
+
+            return flask.redirect("/manage_repositories?msg=Test%20data%20inserted%20successfully")
+
+        else:
+            return flask.redirect("/manage_repositories?msg=Test%20data%20insertion%20cancelled")
+
+    else:
+        return flask.render_template("insertTestDataConfirmation.html")
 
 if __name__ == "__main__":
     # When running as a container the host must be set
