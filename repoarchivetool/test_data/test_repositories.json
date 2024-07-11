@@ -1,0 +1,58 @@
+[
+    {
+        "name": "KPArchiveTest",
+        "type": "public",
+        "contributors": [],
+        "apiUrl": "https://api.github.com/repos/ONS-Innovation/KPArchiveTest",
+        "lastCommit": "2024-04-04",
+        "dateAdded": "2024-06-10",
+        "exemptUntil": "1900-01-01",
+        "exemptReason": "",
+        "exemptBy": {
+            "name": "",
+            "email": ""
+        }
+    },
+    {
+        "name": "KPArchiveTest2",
+        "type": "public",
+        "contributors": [],
+        "apiUrl": "https://api.github.com/repos/ONS-Innovation/KPArchiveTest2",
+        "lastCommit": "2024-04-04",
+        "dateAdded": "2024-06-12",
+        "exemptUntil": "1900-01-01",
+        "exemptReason": "",
+        "exemptBy": {
+            "name": "",
+            "email": ""
+        }
+    },
+    {
+        "name": "KPInternalArchiveTest",
+        "type": "internal",
+        "contributors": [],
+        "apiUrl": "https://api.github.com/repos/ONS-Innovation/KPInternalArchiveTest",
+        "lastCommit": "2024-04-04",
+        "dateAdded": "2024-05-27",
+        "exemptUntil": "2024-10-09",
+        "exemptReason": "This repository is used to support other services within our team.",
+        "exemptBy": {
+            "name": "Kieran Pritchard",
+            "email": "kieran.pritchard@ons.gov.uk"
+        }
+    },
+    {
+        "name": "KPPrivateArchiveTest",
+        "type": "private",
+        "contributors": [],
+        "apiUrl": "https://api.github.com/repos/ONS-Innovation/KPPrivateArchiveTest",
+        "lastCommit": "2024-04-04",
+        "dateAdded": "2024-06-10",
+        "exemptUntil": "1900-01-01",
+        "exemptReason": "",
+        "exemptBy": {
+            "name": "",
+            "email": ""
+        }
+    }
+]
