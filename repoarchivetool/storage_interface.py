@@ -43,10 +43,18 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
         # Therefore we need to return True to indicate that the file should be created
         return True
     else:
-        last_modified = int(obj["LastModified"].strftime("%s"))
-        content_length = obj["ContentLength"]
+        s3_last_modified = int(obj["LastModified"].strftime("%s")) // 10
+        s3_content_length = obj["ContentLength"]
 
-        return last_modified != os.path.getmtime(filename) or content_length != os.path.getsize(filename)
+        try:
+            local_last_modified = os.path.getmtime(filename) // 10
+            local_content_length = os.path.getsize(filename)
+        except FileNotFoundError:
+            # FileNotFoundError is raised when the file does not exist locally
+            # Therefore, return True to indicate that the file should be created
+            return True
+
+        return s3_last_modified != local_last_modified or s3_content_length != local_content_length
 
 
 def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
@@ -71,7 +79,7 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     return True
 
 
-def update_bucket_content(bucket: str, filename: str) -> bool | ClientError:
+def update_bucket_content(bucket: str, filename: str, local_filename: str = "") -> bool | ClientError:
     """
         Uploads a given file to an S3 Bucket
 
@@ -84,10 +92,13 @@ def update_bucket_content(bucket: str, filename: str) -> bool | ClientError:
             Bool or ClientError
     """
 
+    if local_filename == "":
+        local_filename = filename
+
     s3 = get_s3_client()
 
     try:
-        response = s3.upload_file(filename, bucket, f"repo-archive/{filename}")
+        response = s3.upload_file(local_filename, bucket, f"repo-archive/{filename}")
     except ClientError as e:
         return e
     return True

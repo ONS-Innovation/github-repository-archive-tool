@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 import os
 from dateutil.relativedelta import relativedelta
 from typing import List
+import json
 
 import api_interface
 import storage_interface
@@ -23,10 +24,16 @@ bucket_name = f"{account}-github-audit-tool"
 
 def check_file_integrity(files: List[str], directory: str = "./"):
     """
-        Checks if storage files exist locally. 
-        If any files do not exist, try and download them from s3 bucket.
+        Makes sure local storage files are up to date with S3.
 
-        If they don't exist in either location, the application will make them as needed.
+        If the file does not exist locally or has changed in S3, try to download it.
+
+        If the download is successful, reupload the file to S3 to match the last modified dates.
+        
+        If the download is not successful, the file does not exist in S3.
+        Therefore, if the file exists locally, remove it as it is outdated.
+
+        If neither the file exists locally or in S3, nothing should happen as this is handled in the UI.
 
         ==========
 
@@ -38,7 +45,22 @@ def check_file_integrity(files: List[str], directory: str = "./"):
         file_path = os.path.join(directory, file)
 
         if not os.path.isfile(file_path) or storage_interface.has_file_changed(bucket_name, f"repo-archive/{file}", file):
-            storage_interface.get_bucket_content(bucket_name, file)
+
+            # If the file does not exist locally or has changed in S3, download it
+            download_successful = storage_interface.get_bucket_content(bucket_name, file)
+
+            if download_successful == True:
+                # Once downloaded, reupload it to match last modified date
+                storage_interface.update_bucket_content(bucket_name, file)
+            else:
+                # If download_successful != True, the file does not exist in S3
+                # This means that no repos have been archived yet.
+                # If it doesn't exist in S3 but does locally, remove the local file as it is outdated.
+
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+
+                # If it doesn't exist in either location, nothing should happen as this is handled in the UI
 
 def update_token():
     """
@@ -430,7 +452,7 @@ def archive_repos():
             repos.pop(i - pop_count)
             pop_count += 1
 
-        storage_interface.write_file("repositories.json", repos)
+        storage_interface.write_file(bucket_name, "repositories.json", repos)
         
         return flask.redirect(f'/recently_archived?msg=Batch%20{archive_instance["batchID"]}%20created')
     
@@ -605,6 +627,58 @@ def confirm_action():
         return flask.render_template("confirmAction.html", message=message, confirmUrl=confirm_url, cancelUrl=cancel_url)
 
     return flask.redirect("/")
+
+@app.route('/insert_test_data', methods=['POST', 'GET'])
+def insert_test_data():
+
+    if flask.request.method == "POST":
+        if flask.request.form["confirm_radio"] == "True":
+
+            # Create test_recently_added.html for test repositories
+            repos = storage_interface.read_file("./repoarchivetool/test_data/test_repositories.json")
+
+            domain = flask.request.url_root
+
+            gh = api_interface.api_controller(flask.session['pat'])
+
+            with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
+                f.write("<h1>Repositories to be Archived</h1><ul>")
+
+                for i in range(0, len(repos)):
+                    # Update test_repositories.json dates
+                    
+                    # I know this isn't ideal but I need to make certain changes depending on each repo
+                    if repos[i]["name"] == "KPArchiveTest":
+                        # Make eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPArchiveTest2":
+                        # Make non-eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days - 1)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPInternalArchiveTest":
+                        # Make exempt from archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 15)).strftime("%Y-%m-%d")
+                        repos[i]["exemptUntil"] = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
+                    elif repos[i]["name"] == "KPPrivateArchiveTest":
+                        # Make eligable for archive
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime("%Y-%m-%d")
+
+                    f.write(f"<li>{repos[i]['name']} (<a href='{gh.get(repos[i]["apiUrl"], {}, False).json()["html_url"]}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repos[i]['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>")
+
+                f.write(f"</ul><p>Total Repositories: {len(repos)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>")            
+
+            with open("./repoarchivetool/test_data/test_repositories.json", "w") as f:
+                f.write(json.dumps(repos, indent=4))
+
+            storage_interface.update_bucket_content(bucket_name, "repositories.json", "./repoarchivetool/test_data/test_repositories.json")
+            storage_interface.update_bucket_content(bucket_name, "recently_added.html", "./repoarchivetool/test_data/test_recently_added.html")
+
+            return flask.redirect("/manage_repositories?msg=Test%20data%20inserted%20successfully")
+
+        else:
+            return flask.redirect("/manage_repositories?msg=Test%20data%20insertion%20cancelled")
+
+    else:
+        return flask.render_template("insertTestDataConfirmation.html")
 
 if __name__ == "__main__":
     # When running as a container the host must be set
