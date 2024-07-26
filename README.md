@@ -26,8 +26,10 @@ Prior to running outside of Docker ensure you have the necessary environment var
 export AWS_ACCESS_KEY_ID=MYACCESSKEYID
 export AWS_SECRET_ACCESS_KEY=MYSECRETACCESSKEY
 export AWS_DEFAULT_REGION=eu-west-2
-export AWS_ACCOUNT_NAME=sdp-sandbox
+export AWS_SECRET_NAME=<aws_secret_name>
 export GITHUB_ORG=ONS-Innovation
+export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+export AWS_ACCOUNT_NAME=sdp-sandbox
 ```
 
 1. Navigate into the project's folder and create a virtual environment
@@ -104,6 +106,10 @@ code-repo-archive-tool % docker run -p 5000:5000 \
 -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
 -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
 -e AWS_DEFAULT_REGION=eu-west-2 \
+-e AWS_SECRET_NAME=<aws_secret_name> \
+-e GITHUB_ORG=ONS-Innovation \
+-e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
+-e AWS_ACCOUNT_NAME=sdp-sandbox
 repo-archive-tool
 ```
 

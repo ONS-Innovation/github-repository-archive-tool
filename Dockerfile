@@ -10,18 +10,12 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Make start_repo_tool.sh executable
-RUN chmod +x /app/start_repo_tool.sh
-
-# Install AWS CLI
-RUN pip install awscli
-
 # Run poetry install --without dev
 RUN poetry install --no-root 
 
 # Expose the port the app runs on
 EXPOSE 5000
 
-# Run the start_repo_tool.sh script
+# Run the tool
 # Note: ENTRYPOINT cannot be overriden by docker run command
-ENTRYPOINT ["/app/start_repo_tool.sh"]
+ENTRYPOINT ["poetry", "run", "python", "repoarchivetool/app.py"]
