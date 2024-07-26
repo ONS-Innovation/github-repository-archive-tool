@@ -6,6 +6,8 @@ from typing import List
 import json
 from requests import Response
 
+from functools import wraps
+
 import boto3
 
 import github_api_toolkit
@@ -33,6 +35,13 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 # AWS Bucket Name
 bucket_name = f"{account}-github-audit-tool"
 
+def load_config():
+    """Loads the feature configuration from the feature.json file.
+    """
+    with open("./config/feature.json", "r") as f:
+        app.config["FEATURES"] = json.load(f)["features"]
+
+load_config()
 
 def check_file_integrity(files: List[str], directory: str = "./"):
     """
@@ -649,6 +658,8 @@ def confirm_action():
 
 @app.route('/insert_test_data', methods=['POST', 'GET'])
 def insert_test_data():
+    if not app.config["FEATURES"]["test_data"]["enabled"]:
+        flask.abort(404)
 
     if flask.request.method == "POST":
         if flask.request.form["confirm_radio"] == "True":
