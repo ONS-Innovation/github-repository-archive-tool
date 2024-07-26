@@ -102,7 +102,7 @@ Run the image locally mapping local host port (5000) to container port (5000) an
 The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager.
 
 ```bash
-code-repo-archive-tool % docker run -p 5000:5000 \                
+docker run -p 5000:5000 \                
 -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
 -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
 -e AWS_DEFAULT_REGION=eu-west-2 \
