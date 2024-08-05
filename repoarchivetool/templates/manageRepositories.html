@@ -56,69 +56,60 @@
 
 {% else %}
 
-	<div class="ons-grid ons-u-mb-s">
-		<div class="ons-grid__col ons-col-6@m ">
-			<div class="ons-field">
-				<span class="ons-grid--flex  ons-input_search-button">
-					<label class="ons-label ons-label--placeholder" for="repoSearch">Search Repositories...</label>
-					<input type="search" id="repoSearch"
-						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
-						placeholder="Search Repositories..." />
-					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchTable('repoTable', 'repoSearch', 0)">
-						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
-								aria-hidden="true" fill="currentColor">
-								<path
-									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
-							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
-						</span>
-					</button>
-				</span>
+	<div class="ons-grid ons-u-mb-s" style="border: 2px solid black;">
+		<div class="ons-grid__col ons-col-6@m">
+			<div class="ons-u-mt-s">
+				<div class="ons-field">
+					<span class="ons-grid--flex  ons-input_search-button">
+						<label class="ons-label ons-label--placeholder" for="repoSearch">Search Repositories...</label>
+						<input type="search" id="repoSearch"
+							class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+							placeholder="Search Repositories..." />
+					</span>
+				</div>
 			</div>
-		</div>
-		
-		<div class="ons-grid__col ons-col-6@m ">
-			<div class="ons-field">
-				<span class="ons-grid--flex  ons-input_search-button">
-					<label class="ons-label ons-label--placeholder" for="contribSearch">Search Contributors...</label>
-					<input type="search" id="contribSearch"
-						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
-						placeholder="Search Contributors..."/>
-					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchContributors('repoTable', 'contribSearch', 2)">
-						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
-								aria-hidden="true" fill="currentColor">
-								<path
-									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
-							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
-						</span>
-					</button>
-				</span>
+
+			<div class="ons-u-mt-s">
+				<div class="ons-field">
+					<span class="ons-grid--flex  ons-input_search-button">
+						<label class="ons-label ons-label--placeholder" for="typeSearch">Search Repository Type...</label>
+						<input type="search" id="typeSearch"
+							class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+							placeholder="Search Repository Type..."/>
+					</span>
+				</div>
 			</div>
 		</div>
 
-		<div class="ons-grid__col ons-col-6@m ons-u-mt-s">
-			<div class="ons-field">
-				<span class="ons-grid--flex  ons-input_search-button">
-					<label class="ons-label ons-label--placeholder" for="typeSearch">Search Repository Type...</label>
-					<input type="search" id="typeSearch"
-						class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
-						placeholder="Search Repository Type..."/>
-					<button type="button" class="ons-btn ons-search__btn ons-btn--small" onclick="searchTable('repoTable', 'typeSearch', 1)">
-						<span class="ons-btn__inner"><svg class="ons-icon" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
-								aria-hidden="true" fill="currentColor">
-								<path
-									d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
-							</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
-						</span>
-					</button>
-				</span>
+		<div class="ons-grid__col ons-col-6@m">
+			<div class="ons-u-mt-s">
+				<div class="ons-field">
+					<span class="ons-grid--flex  ons-input_search-button">
+						<label class="ons-label ons-label--placeholder" for="contribSearch">Search Contributors...</label>
+						<input type="search" id="contribSearch"
+							class="ons-input ons-input--text ons-input-type__input ons-search__input ons-input--placeholder"
+							placeholder="Search Contributors..."/>
+					</span>
+				</div>
+			</div>
+
+			<div class="ons-u-mt-s">
+				<button type="button" class="ons-btn ons-search__btn" onclick="searchRepos()">
+					<span class="ons-btn__inner"><span class="ons-btn__text">Search</span><svg class="ons-icon ons-u-ml-xs" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"
+							aria-hidden="true" fill="currentColor">
+							<path
+								d="M11.86 10.23 8.62 6.99a4.63 4.63 0 1 0-6.34 1.64 4.55 4.55 0 0 0 2.36.64 4.65 4.65 0 0 0 2.33-.65l3.24 3.23a.46.46 0 0 0 .65 0l1-1a.48.48 0 0 0 0-.62Zm-5-3.32a3.28 3.28 0 0 1-2.31.93 3.22 3.22 0 1 1 2.35-.93Z" />
+						</svg><span class="ons-btn__text ons-u-vh@xxs@s"><span class="ons-u-vh">Search</span></span>
+					</span>
+				</button>
+			
+				<button type="button" class="ons-btn ons-btn--secondary ons-u-mb-s" onclick="window.location.reload();">
+					<span class="ons-btn__inner"><span class="ons-btn__text">Clear Filters</span>
+					</span>
+				</button>
 			</div>
 		</div>
 	</div>
-
-	<button type="button" class="ons-btn ons-btn--secondary ons-u-mb-s" onclick="window.location.reload();">
-		<span class="ons-btn__inner"><span class="ons-btn__text">Clear Filters</span>
-		</span>
-	</button>
 
 	<table id="repoTable" class="ons-table ons-table--sortable ons-table--compact" data-aria-sort="Sort by" data-aria-asc="ascending" data-aria-desc="descending" style="display: block; overflow-x: auto;">
 		<caption class="ons-table__caption">Repositories to Archive</caption>

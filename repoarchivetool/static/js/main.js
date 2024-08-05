@@ -1,4 +1,6 @@
 function insertNoResults(table){
+    // Inserts a no results message into the table
+
     messageRow = table.insertRow(2);
     messageRow.id = "noResults";
     messageRow.classList.add("ons-table__row");
@@ -11,6 +13,8 @@ function insertNoResults(table){
 }
 
 function deleteNoResults(table){
+    // Deletes the no results message from the table if it exists
+
     messageRow = document.getElementById("noResults");
     
     if(messageRow != null){
@@ -19,99 +23,111 @@ function deleteNoResults(table){
     }
 }
 
-function searchTable(tableID, searchbarID, columnIndex) {
-    searchBar = document.getElementById(searchbarID);
-    searchValue = searchBar.value.toUpperCase();
-    table = document.getElementById(tableID);
-    rows = table.getElementsByTagName("tr");
 
-    // Used to show or hide no results message. Removed 1 from length for heading row.
-    noOfResults = rows.length - 1;
-    rowsHidden = 0;
+function searchRepos(){
+    // Searches contents of the repo table in /manage_repositories based on the search inputs
 
-    // Loop through all table rows, and hide those who don't match the search query
-    for(i = 1; i < rows.length; i++){
-        rowData = rows[i].getElementsByTagName("td")[columnIndex];
+    repoName = document.getElementById("repoSearch").value.toUpperCase();
+    repoType = document.getElementById("typeSearch").value.toUpperCase();
+    contributorInput = document.getElementById("contribSearch").value.toUpperCase();
 
-        if(rowData){
-            rowValue = rowData.textContent || rowData.innerText;
+    table = document.getElementById("repoTable");
 
-            if(rowValue.toUpperCase().indexOf(searchValue) > -1){
-                rows[i].style.display = "";
-            }
-            else{
-                rows[i].style.display = "none";
-                rowsHidden++;
-            }
+    rows = table.tBodies[0].getElementsByTagName("tr");
+
+    // Try to delete the no results message if it exists
+    deleteNoResults(table);
+
+    // If all search inputs are empty, show all rows
+    if(repoName == "" && repoType == "" && contributorInput == ""){
+        for(i = 0; i < rows.length; i++){
+            rows[i].style.display = "";
         }
     }
+    else{
+        rowsShown = 0;
+
+        for(i = 0; i < rows.length; i++){
     
-    if(noOfResults == rowsHidden){
-        insertNoResults(table);
-    }
-    else {
-        deleteNoResults(table);
-    }
-}
+            // Get the data from the row
+            rowContents = rows[i].getElementsByTagName("td");
+        
+            // Hide the row by default
+            rows[i].style.display = "none";
+    
+            rowRepoName = rowContents[0].innerHTML.toUpperCase();
+            rowRepoType = rowContents[1].innerHTML.toUpperCase();
+    
+            rowContributors = rowContents[2].children;
 
-function searchContributors(tableID, searchbarID, columnIndex) {
-    searchBar = document.getElementById(searchbarID);
-    searchValue = searchBar.value.toUpperCase();
-    table = document.getElementById(tableID);
-    rows = table.getElementsByTagName("tr");
+            // Search for repo name and type
+            // If the repo name or type is found, show the row
+            if((rowRepoName.indexOf(repoName) > -1 | repoName == "") && (rowRepoType.indexOf(repoType) > -1 | repoType == "")){
+                rows[i].style.display = "";
+                rowsShown++;
+            }
 
-    // Used to show or hide no results message. Removed 1 from length for heading row.
-    noOfResults = rows.length - 1;
-    rowsHidden = 0;
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for(i = 1; i < rows.length; i++){
-        rowData = rows[i].getElementsByTagName("td")[columnIndex];
-
-        if(rowData){
-            rowChildren = rowData.children;
-
-            found = false;
-
-            for(const child of rowChildren){
-                contributorElement = child;
-                contributorName = contributorElement.ariaLabel;
-
-                if(contributorName.toUpperCase().indexOf(searchValue) > -1 && searchValue != ""){
-                    found = true;
-
-                    // Add a border to the contributor's avatar
-                    contributorElement.children[0].classList.add("highlight");
-                }
-                else {
-                    // Remove the border
-                    if(contributorElement.children[0].classList.contains("highlight")){
-                        contributorElement.children[0].classList.remove("highlight");
+            // if only searching for contributors, rehide row and decrement counter
+            if(repoName == "" && repoType == "" && contributorInput != ""){
+                rows[i].style.display = "none";
+                rowsShown--;
+            }
+    
+            // Search for contributors
+            if(contributorInput != ""){
+                contributorExists = false;
+        
+                for(contributor of rowContributors){
+                    contributorName = contributor.ariaLabel.toUpperCase();
+        
+                    // If the contributor is found, highlight the avatar
+                    // If not, try and remove the highlight
+                    if(contributorName.indexOf(contributorInput) > -1){
+                        contributor.children[0].classList.add("highlight");
+                        contributorExists = true;
+                    }
+                    else {
+                        if(contributor.children[0].classList.contains("highlight")){
+                            contributor.children[0].classList.remove("highlight");
+                        }
                     }
                 }
-            }      
-            
-            if(searchValue == ""){
-                found = true;
+    
+                // If search has been made for repo name or type, hide rows where the contributor doesn't exist
+                if (repoName != "" | repoType != ""){
+                    if(!contributorExists && contributorInput != ""){
+                        rows[i].style.display = "none";
+                    }
+                }
+                else {
+                    // If only searching on contributors, show the row if the contributor exists
+                    if(contributorExists | contributorInput == ""){
+                        rows[i].style.display = "";
+                        rowsShown++;
+                    }
+                }
             }
+            // If no search has been made for contributors, remove any highlights
+            else {
+                for(contributor of rowContributors){
+                    if(contributor.children[0].classList.contains("highlight")){
+                        contributor.children[0].classList.remove("highlight");
+                    }
+                }
+            }
+        }
 
-            if(found){
-                rows[i].style.display = "";
-            }
-            else{
-                rows[i].style.display = "none";
-                rowsHidden++;
-            }
+        // If no rows are shown, insert a no results message
+        if(rowsShown == 0){
+            insertNoResults(table);
+        }
+        else {
+            deleteNoResults(table);
         }
     }
 
-    if(noOfResults == rowsHidden){
-        insertNoResults(table);
-    }
-    else {
-        deleteNoResults(table);
-    }
 }
+
 
 function searchBatches(searchbarID){
     // Searches for a repo within a list of archive batches
@@ -153,6 +169,7 @@ function searchBatches(searchbarID){
 }
 
 function toggleRevertedBatches(){
+    // Toggles the visibility of reverted batches in /recently_archived
     checkbox = document.getElementById("hideReverted");
     hideReverted = checkbox.checked;
 

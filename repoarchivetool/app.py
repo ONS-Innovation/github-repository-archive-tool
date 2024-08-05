@@ -4,23 +4,44 @@ import os
 from dateutil.relativedelta import relativedelta
 from typing import List
 import json
+from requests import Response
 
-import api_interface
+from functools import wraps
+
+import boto3
+
+import github_api_toolkit
+
 import storage_interface
-import authentication_interface
+import data_retrieval
 
 archive_threshold_days = 30
 
 app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
 
-# Set variables from the environment
-account = os.getenv("AWS_ACCOUNT_NAME")
+# GiHub Organisation
 organisation = os.getenv("GITHUB_ORG") # "ONS-Innovation"
 
-# Global bucket name
+# GitHub App Client ID
+client_id = os.getenv("GITHUB_APP_CLIENT_ID")
+
+# AWS Secret Manager Secret Name for the .pem file
+secret_name = os.getenv("AWS_SECRET_NAME")
+secret_reigon = os.getenv("AWS_DEFAULT_REGION")
+
+account = os.getenv("AWS_ACCOUNT_NAME")
+
+# AWS Bucket Name
 bucket_name = f"{account}-github-audit-tool"
 
+def load_config():
+    """Loads the feature configuration from the feature.json file.
+    """
+    with open("./config/feature.json", "r") as f:
+        app.config["FEATURES"] = json.load(f)["features"]
+
+load_config()
 
 def check_file_integrity(files: List[str], directory: str = "./"):
     """
@@ -66,7 +87,13 @@ def update_token():
     """
         Updates the pat and token_expiration session variables with the new token information.
     """
-    response = authentication_interface.get_access_token(organisation)
+
+    session = boto3.Session()
+    secret_manager = session.client("secretsmanager", region_name=secret_reigon)
+
+    secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+
+    response = github_api_toolkit.get_token_as_installation(organisation, secret, client_id)
 
     if type(response) == tuple:
         token = response[0]
@@ -133,7 +160,7 @@ def find_repos():
     if flask.request.method == 'POST':
         try:
             # Create APIHandler instance
-            gh = api_interface.api_controller(flask.session['pat'])
+            gh = github_api_toolkit.github_interface(flask.session['pat'])
         
         except KeyError:
             return flask.render_template('error.html', error='Personal Access Token Undefined.')
@@ -145,7 +172,7 @@ def find_repos():
             date = flask.request.form['date']
             repo_type = flask.request.form['repoType']
 
-            new_repos = api_interface.get_organisation_repos(org, date, repo_type, gh)
+            new_repos = data_retrieval.get_organisation_repos(org, date, repo_type, gh)
 
             if type(new_repos) == str:
                 # Error Message Returned                
@@ -166,7 +193,7 @@ def find_repos():
 
             for repo in new_repos:
                 if not any(d["name"] == repo["name"] for d in stored_repos):
-                    contributor_list = api_interface.get_repo_contributors(gh, repo["contributorsUrl"])
+                    contributor_list = data_retrieval.get_repo_contributors(gh, repo["contributorsUrl"])
 
                     stored_repos.append({
                         "name": repo["name"],
@@ -365,7 +392,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     """
 
     try:
-        gh = api_interface.api_controller(flask.session['pat'])
+        gh = github_api_toolkit.github_interface(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', error='Personal Access Token Undefined.')
 
@@ -384,23 +411,24 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
             if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= archive_threshold_days:
                 response = gh.patch(repos[i]["apiUrl"], {"archived":True}, False)
 
-                if response.status_code == 200:
+                if type(response) == Response:
+                    if response.status_code == 200:
 
-                    archive_instance["repos"].append({
-                        "name": repos[i]["name"],
-                        "apiurl": repos[i]["apiUrl"],
-                        "status": "Success",
-                        "message": "Repository Archived Successfully."
-                    })
+                        archive_instance["repos"].append({
+                            "name": repos[i]["name"],
+                            "apiurl": repos[i]["apiUrl"],
+                            "status": "Success",
+                            "message": "Repository Archived Successfully."
+                        })
 
-                    repos_to_remove.append(i)
+                        repos_to_remove.append(i)
 
                 else:
                     archive_instance["repos"].append({
                         "name": repos[i]["name"],
                         "apiurl": repos[i]["apiUrl"],
                         "status": "Failed",
-                        "message": f"Error {response.status_code}: {response.json()["message"]}"
+                        "message": f"Error: {response}"
                     })
 
     return repos_to_remove, archive_instance
@@ -492,7 +520,7 @@ def recently_archived():
 
 
 # Functions used within undo_batch()
-def get_repository_information(gh: api_interface.api_controller, repo_to_undo: dict, batch_id: int) -> dict:
+def get_repository_information(gh: github_api_toolkit.github_interface, repo_to_undo: dict, batch_id: int) -> dict:
     """
         Gets information for a given repo_to_undo as part of the unarchive process.
 
@@ -509,8 +537,8 @@ def get_repository_information(gh: api_interface.api_controller, repo_to_undo: d
 
     response = gh.get(repo_to_undo["apiurl"], {}, False)
 
-    if response.status_code != 200:
-        return flask.render_template('error.html', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories")
+    if type(response) != Response:
+        return flask.render_template('error.html', error=f"Error: {response} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories")
 
     repo_json = response.json()
 
@@ -520,7 +548,7 @@ def get_repository_information(gh: api_interface.api_controller, repo_to_undo: d
     last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
     last_update = date(last_update.year, last_update.month, last_update.day)
 
-    contributor_list = api_interface.get_repo_contributors(gh, repo_json["contributors_url"])
+    contributor_list = data_retrieval.get_repo_contributors(gh, repo_json["contributors_url"])
 
     repository_information = {
         "name": repo_json["name"],
@@ -568,7 +596,7 @@ def undo_batch():
         with an appropriate error message.
     """
     try:
-        gh = api_interface.api_controller(flask.session['pat'])
+        gh = github_api_toolkit.github_interface(flask.session['pat'])
     except KeyError:
         return flask.render_template('error.html', error='Personal Access Token Undefined.')
 
@@ -592,8 +620,8 @@ def undo_batch():
             # Unarchive the repo
             response = gh.patch(batch_to_undo["repos"][i - pop_count]["apiurl"], {"archived": False}, False)
 
-            if response.status_code != 200:
-                return flask.render_template('error.html', error=f"Error {response.status_code}: {response.json()["message"]} <br> Point of Failure: Unarchiving batch {batch_id}, {batch_to_undo["repos"][i - pop_count]["name"]}")
+            if type(response) != Response:
+                return flask.render_template('error.html', error=f"Error: {response}")
 
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
                 # Add the repo to repositories.json
@@ -630,6 +658,8 @@ def confirm_action():
 
 @app.route('/insert_test_data', methods=['POST', 'GET'])
 def insert_test_data():
+    if not app.config["FEATURES"]["test_data"]["enabled"]:
+        flask.abort(404)
 
     if flask.request.method == "POST":
         if flask.request.form["confirm_radio"] == "True":
@@ -639,7 +669,7 @@ def insert_test_data():
 
             domain = flask.request.url_root
 
-            gh = api_interface.api_controller(flask.session['pat'])
+            gh = github_api_toolkit.github_interface(flask.session['pat'])
 
             with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")

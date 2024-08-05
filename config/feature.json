@@ -1,0 +1,7 @@
+{
+    "features": {
+        "test_data": {
+            "enabled": true
+        }
+    }
+}

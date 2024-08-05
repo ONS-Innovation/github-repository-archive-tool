@@ -340,6 +340,21 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "github_api_toolkit"
+version = "0.1.0"
+description = "A toolkit for interacting with the GitHub API"
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/ONS-Innovation/github-api-package.git"
+reference = "HEAD"
+resolved_reference = "d9d1cf493add9b3093d947385da4d6a6c0e2365e"
+
+[[package]]
 name = "idna"
 version = "3.6"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -662,4 +677,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e3b133931f542dbcc9c1670387e3561c339615d939a3dbc9723a8441c189b140"
+content-hash = "8201ad8d29ed0eac42b9f7b92b2c8e49f41fe177d827d7a89e64bfc73d5eb9c2"
