@@ -1,6 +1,6 @@
-// manageRepositories.html
-
 function insertNoResults(table){
+    // Inserts a no results message into the table
+
     messageRow = table.insertRow(2);
     messageRow.id = "noResults";
     messageRow.classList.add("ons-table__row");
@@ -13,6 +13,8 @@ function insertNoResults(table){
 }
 
 function deleteNoResults(table){
+    // Deletes the no results message from the table if it exists
+
     messageRow = document.getElementById("noResults");
     
     if(messageRow != null){
@@ -126,7 +128,6 @@ function searchRepos(){
 
 }
 
-// recentlyArchived.html
 
 function searchBatches(searchbarID){
     // Searches for a repo within a list of archive batches
@@ -168,6 +169,7 @@ function searchBatches(searchbarID){
 }
 
 function toggleRevertedBatches(){
+    // Toggles the visibility of reverted batches in /recently_archived
     checkbox = document.getElementById("hideReverted");
     hideReverted = checkbox.checked;
 
