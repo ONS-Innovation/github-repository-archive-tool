@@ -3,6 +3,44 @@ import datetime
 
 from github_api_toolkit import github_interface
 
+def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.date) -> bool | str:
+    """
+        Calculates whether a given repo should be archived or not.
+
+        ==========
+
+        Gets the given repository's information using the given repoUrl.
+        Gets the repository's pushed_at date and converts it from a string to a date object (now called lastUpdate).
+        Compares lastUpdate to compDate.
+        If lastUpdate is before compDate return True, otherwise False.
+
+        Args:
+            repo_url (str): The API URL of the repository.
+            comp_date (date): The date which repositories that have been committed prior to should be archived.
+
+        Returns:
+            str: An error message.
+            or
+            bool: Whether the repository should be archived or not.
+    """
+
+    archive_flag = False
+    repo_response = gh.get(repo_url, {}, False)
+
+    if type(repo_response) == requests.Response:   
+        if repo_response.status_code == 200:
+            repo_json = repo_response.json()
+            last_update = repo_json["pushed_at"]
+            last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
+            last_update = datetime.date(last_update.year, last_update.month, last_update.day)
+
+            archive_flag = True if last_update < comp_date else False
+        
+    else:
+        return f"Error: {repo_response} <br> Point of Failure: Getting Archive Flag."
+
+    return archive_flag
+
 def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_interface) -> str | list:
     """ 
         Gets all repositories which fit the given parameters.
@@ -34,46 +72,6 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
             list: A list of dictionaries containing information about the repositories collected from 
             the Github API.
     """
-
-    
-    def archive_flag(repo_url: str, comp_date: date) -> bool | str:
-        """
-            Calculates whether a given repo should be archived or not.
-
-            ==========
-
-            Gets the given repository's information using the given repoUrl.
-            Gets the repository's pushed_at date and converts it from a string to a date object (now called lastUpdate).
-            Compares lastUpdate to compDate.
-            If lastUpdate is before compDate return True, otherwise False.
-
-            Args:
-                repo_url (str): The API URL of the repository.
-                comp_date (date): The date which repositories that have been committed prior to should be archived.
-
-            Returns:
-                str: An error message.
-                or
-                bool: Whether the repository should be archived or not.
-        """
-
-        archive_flag = False
-        repo_response = gh.get(repo_url, {}, False)
-
-        if type(repo_response) == requests.Response:   
-            if repo_response.status_code == 200:
-                repo_json = repo_response.json()
-                last_update = repo_json["pushed_at"]
-                last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
-                last_update = datetime.date(last_update.year, last_update.month, last_update.day)
-
-                archive_flag = True if last_update < comp_date else False
-            
-        else:
-            return f"Error: {response} <br> Point of Failure: Getting Archive Flag."
-
-        return archive_flag
-
 
     # Test API Call
     response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": 1})
@@ -107,8 +105,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                     response = gh.get(f"/orgs/{org}/repos", {"sort": "pushed", "type": repo_type, "per_page": 2, "page": midpoint})
                     repos = response.json()
 
-                    min_repo_flag = archive_flag(repos[0]["url"], comp_date)
-                    max_repo_flag = archive_flag(repos[-1]["url"], comp_date)
+                    min_repo_flag = get_archive_flag(gh, repos[0]["url"], comp_date)
+                    max_repo_flag = get_archive_flag(gh, repos[-1]["url"], comp_date)
 
                     # If min or max flags are of type string, an error has occured
                     if type(min_repo_flag) == str:
