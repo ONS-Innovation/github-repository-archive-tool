@@ -1,0 +1,49 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36" version="24.7.6">
+  <diagram name="Page-1" id="pnx0hJKzSiqrIeHpiHD5">
+    <mxGraphModel dx="1178" dy="1071" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="_gAZQvvrP7qtMvys7ONW-1" value="Repository Archive Tool" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="720" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-10" value="Display&lt;div&gt;Information to&lt;/div&gt;&lt;div&gt;User&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="_gAZQvvrP7qtMvys7ONW-4" target="GHBPMivw4AcYWN9y76ed-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="_gAZQvvrP7qtMvys7ONW-4" value="Flask App" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=0;" parent="1" vertex="1">
+          <mxGeometry x="240" y="80" width="480" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="_gAZQvvrP7qtMvys7ONW-6" value="GitHub API" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="580" y="400" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_gAZQvvrP7qtMvys7ONW-7" value="S3&lt;div&gt;Bucket&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="260" y="400" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-6" value="Store Retrieved&lt;div&gt;GitHub Repository&lt;/div&gt;&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="GHBPMivw4AcYWN9y76ed-2" target="GHBPMivw4AcYWN9y76ed-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-2" value="data_retrieval.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="580" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-5" value="Update and Retrieve&lt;div&gt;Datasets&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="GHBPMivw4AcYWN9y76ed-3" target="_gAZQvvrP7qtMvys7ONW-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-3" value="storage_interface.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="260" y="120" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-7" value="Get Repository&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="GHBPMivw4AcYWN9y76ed-4" target="_gAZQvvrP7qtMvys7ONW-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-8" value="Repository&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="GHBPMivw4AcYWN9y76ed-4" target="GHBPMivw4AcYWN9y76ed-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-4" value="GitHub API Toolkit&lt;div&gt;(Imported)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="580" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GHBPMivw4AcYWN9y76ed-9" value="User" style="shape=umlActor;verticalLabelPosition=top;verticalAlign=bottom;html=1;outlineConnect=0;labelPosition=center;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="170" width="30" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,29 @@
+site_name: GitHub Repository Archive Tool
+
+repo_url: https://github.com/ONS-Innovation/github-repository-archive-tool
+repo_name: GitHub Repository Archive Tool
+
+nav:
+  - Home: 'index.md'
+  - Documentation: 'documentation.md'
+theme:
+  name: material
+  palette:
+    scheme: slate
+  features:
+    - content.code.copy
+
+  logo: ./branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png
+  favicon: ./branding/ONS-symbol_digital.svg
+
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

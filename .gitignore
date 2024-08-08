@@ -11,6 +11,9 @@ userlist.json
 # ignore repo-archive-github.pem
 repo-archive-github.pem
 
+# MkDocs Build
+site/
+
 # Local .terraform directories
 **/.terraform/*
 
