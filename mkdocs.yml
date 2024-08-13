@@ -1,0 +1,59 @@
+site_name: GitHub Repository Archive Tool
+
+repo_url: https://github.com/ONS-Innovation/github-repository-archive-tool
+repo_name: GitHub Repository Archive Tool
+
+nav:
+  - Home: 'index.md'
+  - Documentation: 'documentation.md'
+theme:
+  name: material
+  language: en
+
+  palette:
+    # toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to system preference
+
+  features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+
+    - search.suggest
+
+    - header.autohide
+    - content.code.copy
+
+  
+
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
