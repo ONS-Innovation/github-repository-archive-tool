@@ -351,8 +351,8 @@ develop = false
 [package.source]
 type = "git"
 url = "https://github.com/ONS-Innovation/github-api-package.git"
-reference = "HEAD"
-resolved_reference = "d9d1cf493add9b3093d947385da4d6a6c0e2365e"
+reference = "v1.0.0"
+resolved_reference = "3336b0cc5f8589e08853e1398dc925b0e6157207"
 
 [[package]]
 name = "idna"
@@ -677,4 +677,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "8201ad8d29ed0eac42b9f7b92b2c8e49f41fe177d827d7a89e64bfc73d5eb9c2"
+content-hash = "581ee887d5e4911957efec651440293f44f2998380fb6673552b0505a5e7b159"
