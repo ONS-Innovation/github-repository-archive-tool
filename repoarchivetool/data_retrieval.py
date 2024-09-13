@@ -1,14 +1,11 @@
-import requests
 import datetime
 
+import requests
 from github_api_toolkit import github_interface
 
 
-def get_archive_flag(
-    gh: github_interface, repo_url: str, comp_date: datetime.date
-) -> bool | str:
-    """
-    Calculates whether a given repo should be archived or not.
+def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.date) -> bool | str:
+    """Calculates whether a given repo should be archived or not.
 
     ==========
 
@@ -26,7 +23,6 @@ def get_archive_flag(
         or
         bool: Whether the repository should be archived or not.
     """
-
     archive_flag = False
     repo_response = gh.get(repo_url, {}, False)
 
@@ -35,9 +31,7 @@ def get_archive_flag(
             repo_json = repo_response.json()
             last_update = repo_json["pushed_at"]
             last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
-            last_update = datetime.date(
-                last_update.year, last_update.month, last_update.day
-            )
+            last_update = datetime.date(last_update.year, last_update.month, last_update.day)
 
             archive_flag = True if last_update < comp_date else False
 
@@ -47,11 +41,8 @@ def get_archive_flag(
     return archive_flag
 
 
-def get_organisation_repos(
-    org: str, date: str, repo_type: str, gh: github_interface
-) -> str | list:
-    """
-    Gets all repositories which fit the given parameters.
+def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_interface) -> str | list:
+    """Gets all repositories which fit the given parameters.
 
     ==========
 
@@ -80,7 +71,6 @@ def get_organisation_repos(
         list: A list of dictionaries containing information about the repositories collected from
         the Github API.
     """
-
     # Test API Call
     response = gh.get(
         f"/orgs/{org}/repos",
@@ -109,14 +99,9 @@ def get_organisation_repos(
             comp_date = x_date
 
             while not midpoint_found:
-                if (
-                    upper_pointer - lower_pointer != 1
-                    and upper_pointer - lower_pointer != 0
-                ):
+                if upper_pointer - lower_pointer != 1 and upper_pointer - lower_pointer != 0:
 
-                    midpoint = lower_pointer + round(
-                        (upper_pointer - lower_pointer) / 2
-                    )
+                    midpoint = lower_pointer + round((upper_pointer - lower_pointer) / 2)
 
                     response = gh.get(
                         f"/orgs/{org}/repos",
@@ -210,9 +195,7 @@ def get_organisation_repos(
                                     repo_json = repo_response.json()
 
                                     last_update = repo_json["pushed_at"]
-                                    last_update = datetime.datetime.strptime(
-                                        last_update, "%Y-%m-%dT%H:%M:%SZ"
-                                    )
+                                    last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
                                     last_update = datetime.date(
                                         last_update.year,
                                         last_update.month,
@@ -225,9 +208,7 @@ def get_organisation_repos(
 
                                     # If on the midpoint page, need to check repo date
                                     else:
-                                        archive_flag = (
-                                            True if last_update < comp_date else False
-                                        )
+                                        archive_flag = True if last_update < comp_date else False
 
                                     # If needs archiving and hasn't already been archived, add it to the archive list
                                     if not repo["archived"] and archive_flag:
@@ -237,9 +218,7 @@ def get_organisation_repos(
                                                 "type": repo["visibility"],
                                                 "apiUrl": repo["url"],
                                                 "lastCommitDate": str(last_update),
-                                                "contributorsUrl": repo[
-                                                    "contributors_url"
-                                                ],
+                                                "contributorsUrl": repo["contributors_url"],
                                                 "htmlUrl": repo["html_url"],
                                             }
                                         )
@@ -254,8 +233,7 @@ def get_organisation_repos(
 
 
 def get_repo_contributors(gh: github_interface, contributors_url: str) -> str | list:
-    """
-    Gets the list of contributors for a given repository.
+    """Gets the list of contributors for a given repository.
 
     ==========
 
@@ -269,7 +247,6 @@ def get_repo_contributors(gh: github_interface, contributors_url: str) -> str | 
         list: A list of dictionaries containing information about the contributors to the given
         repository collected from the Github API.
     """
-
     # Get contributors information
     response = gh.get(contributors_url, {}, False)
 

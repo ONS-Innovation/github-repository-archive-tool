@@ -1,19 +1,15 @@
-import flask
-from datetime import datetime, timedelta, date
-import os
-from dateutil.relativedelta import relativedelta
-from typing import List
 import json
-from requests import Response
-
-from functools import wraps
+import os
+from datetime import date, datetime, timedelta
+from typing import List
 
 import boto3
-
-import github_api_toolkit
-
-import storage_interface
 import data_retrieval
+import flask
+import github_api_toolkit
+import storage_interface
+from dateutil.relativedelta import relativedelta
+from requests import Response
 
 archive_threshold_days = 30
 
@@ -38,7 +34,7 @@ bucket_name = f"{account}-github-audit-tool"
 
 def load_config():
     """Loads the feature configuration from the feature.json file."""
-    with open("./config/feature.json", "r") as f:
+    with open("./config/feature.json") as f:
         app.config["FEATURES"] = json.load(f)["features"]
 
 
@@ -46,8 +42,7 @@ load_config()
 
 
 def check_file_integrity(files: List[str], directory: str = "./"):
-    """
-    Makes sure local storage files are up to date with S3.
+    """Makes sure local storage files are up to date with S3.
 
     If the file does not exist locally or has changed in S3, try to download it.
 
@@ -63,7 +58,6 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     Args:
         files_to_check (list): the list of files to check. This prevents unneeded calls to S3.
     """
-
     for file in files:
         file_path = os.path.join(directory, file)
 
@@ -72,37 +66,26 @@ def check_file_integrity(files: List[str], directory: str = "./"):
         ):
 
             # If the file does not exist locally or has changed in S3, download it
-            download_successful = storage_interface.get_bucket_content(
-                bucket_name, file
-            )
+            download_successful = storage_interface.get_bucket_content(bucket_name, file)
 
             if download_successful == True:
                 # Once downloaded, reupload it to match last modified date
                 storage_interface.update_bucket_content(bucket_name, file)
-            else:
-                # If download_successful != True, the file does not exist in S3
-                # This means that no repos have been archived yet.
-                # If it doesn't exist in S3 but does locally, remove the local file as it is outdated.
-
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+            elif os.path.isfile(file_path):
+                os.remove(file_path)
 
                 # If it doesn't exist in either location, nothing should happen as this is handled in the UI
 
 
 def update_token():
+    """Updates the pat and token_expiration session variables with the new token information.
     """
-    Updates the pat and token_expiration session variables with the new token information.
-    """
-
     session = boto3.Session()
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
 
     secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 
-    response = github_api_toolkit.get_token_as_installation(
-        organisation, secret, client_id
-    )
+    response = github_api_toolkit.get_token_as_installation(organisation, secret, client_id)
 
     if type(response) == tuple:
         token = response[0]
@@ -117,15 +100,12 @@ def update_token():
         # If type is not tuple, it is string
         # This means there is an error with the .pem file
 
-        return flask.render_template(
-            "error.html", error="There is an error with the .pem file."
-        )
+        return flask.render_template("error.html", error="There is an error with the .pem file.")
 
 
 @app.before_request
 def check_token():
-    """
-    Checks if the token stored in the session has expired. If it has, run update_token to get a new one.
+    """Checks if the token stored in the session has expired. If it has, run update_token to get a new one.
 
     This check doesn't run for /set_exempt_date or /success as these pages may be used by external users
     """
@@ -139,10 +119,8 @@ def check_token():
 
 @app.route("/", methods=["POST", "GET"])
 def index():
+    """Returns a render of index.html.
     """
-    Returns a render of index.html.
-    """
-
     return flask.render_template(
         "findRepositories.html",
         date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
@@ -157,8 +135,7 @@ def success():
 
 @app.route("/find_repositories", methods=["POST", "GET"])
 def find_repos():
-    """
-    Gets and stores any Github repositories, using api_controller.py, which fits the given parameters.
+    """Gets and stores any Github repositories, using api_controller.py, which fits the given parameters.
 
     ==========
 
@@ -182,9 +159,7 @@ def find_repos():
             gh = github_api_toolkit.github_interface(flask.session["pat"])
 
         except KeyError:
-            return flask.render_template(
-                "error.html", error="Personal Access Token Undefined."
-            )
+            return flask.render_template("error.html", error="Personal Access Token Undefined.")
 
         else:
             # Get form values
@@ -214,9 +189,7 @@ def find_repos():
 
             for repo in new_repos:
                 if not any(d["name"] == repo["name"] for d in stored_repos):
-                    contributor_list = data_retrieval.get_repo_contributors(
-                        gh, repo["contributorsUrl"]
-                    )
+                    contributor_list = data_retrieval.get_repo_contributors(gh, repo["contributorsUrl"])
 
                     stored_repos.append(
                         {
@@ -232,9 +205,7 @@ def find_repos():
                         }
                     )
 
-                    new_repos_to_archive.append(
-                        {"name": repo["name"], "url": repo["htmlUrl"]}
-                    )
+                    new_repos_to_archive.append({"name": repo["name"], "url": repo["htmlUrl"]})
 
                     repos_added += 1
 
@@ -262,8 +233,7 @@ def find_repos():
 
 @app.route("/manage_repositories")
 def manage_repos():
-    """
-    Returns a render of manageRepositories.html.
+    """Returns a render of manageRepositories.html.
 
     ==========
 
@@ -272,7 +242,6 @@ def manage_repos():
     This function can also be passed an arguement called reposAdded, which is used to
     display a success message when being redirected from findRepos().
     """
-
     # Check storage files exist and are up to date with S3
     check_file_integrity(["repositories.json"])
 
@@ -295,8 +264,7 @@ def manage_repos():
     for i in range(0, len(repos)):
         if (
             repos[i]["exemptUntil"] != "1900-01-01"
-            and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d")
-            < datetime.today()
+            and datetime.strptime(repos[i]["exemptUntil"], "%Y-%m-%d") < datetime.today()
         ):
             repos[i]["dateAdded"] = datetime.strftime(datetime.today(), "%Y-%m-%d")
             repos[i]["exemptUntil"] = "1900-01-01"
@@ -315,8 +283,7 @@ def manage_repos():
 
 @app.route("/clear_repositories")
 def clear_repos():
-    """
-    Removes all stored repositories by writing an empty list to repositories.json.
+    """Removes all stored repositories by writing an empty list to repositories.json.
 
     Returns a redirect to manage_repositories.
     """
@@ -368,18 +335,14 @@ def set_exempt_date():
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
     else:
-        return flask.render_template(
-            "setExemptDate.html", repoName=repo_name, message=""
-        )
+        return flask.render_template("setExemptDate.html", repoName=repo_name, message="")
 
     try:
         type(flask.session["pat"])
     except KeyError:
         return flask.redirect("/success")
     else:
-        return flask.redirect(
-            f"/manage_repositories?msg={repo_name}%20exempt%20date%20has%20been%20set"
-        )
+        return flask.redirect(f"/manage_repositories?msg={repo_name}%20exempt%20date%20has%20been%20set")
 
 
 @app.route("/clear_exempt_date")
@@ -402,9 +365,7 @@ def clear_exempt_date():
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
-    return flask.redirect(
-        f"/manage_repositories?msg={ repo_name }%20exempt%20date%20has%20been%20cleared"
-    )
+    return flask.redirect(f"/manage_repositories?msg={ repo_name }%20exempt%20date%20has%20been%20cleared")
 
 
 @app.route("/download_recently_added")
@@ -417,8 +378,7 @@ def download_recently_added():
 
 # Functions used within archive_repos()
 def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
-    """
-    Archives any repositories older than archive_threshold_days and are not exempt, then logs them in repos_to_remove and archive_instance which get returned.
+    """Archives any repositories older than archive_threshold_days and are not exempt, then logs them in repos_to_remove and archive_instance which get returned.
 
     ==========
 
@@ -430,13 +390,10 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
         repos_to_remove (list)
         archive_instance (list)
     """
-
     try:
         gh = github_api_toolkit.github_interface(flask.session["pat"])
     except KeyError:
-        return flask.render_template(
-            "error.html", error="Personal Access Token Undefined."
-        )
+        return flask.render_template("error.html", error="Personal Access Token Undefined.")
 
     archive_instance = {
         "batchID": batch_id,
@@ -450,9 +407,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     # Archive them
     for i in range(0, len(repos)):
         if repos[i]["exemptUntil"] == "1900-01-01":
-            if (
-                datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")
-            ).days >= archive_threshold_days:
+            if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= archive_threshold_days:
                 response = gh.patch(repos[i]["apiUrl"], {"archived": True}, False)
 
                 if type(response) == Response:
@@ -484,8 +439,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
 
 @app.route("/archive_repositories", methods=["POST", "GET"])
 def archive_repos():
-    """
-    Archives any repositories which are:
+    """Archives any repositories which are:
         - older than archive_threshold_days days within the system
         - have not been marked to be kept using the keep attribute in repositories.json
 
@@ -505,7 +459,6 @@ def archive_repos():
     with an appropriate error message.
 
     """
-
     # Check storage files exist and are up to date with S3
     check_file_integrity(["archived.json", "repositories.json"])
 
@@ -531,20 +484,15 @@ def archive_repos():
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
-        return flask.redirect(
-            f'/recently_archived?msg=Batch%20{archive_instance["batchID"]}%20created'
-        )
+        return flask.redirect(f'/recently_archived?msg=Batch%20{archive_instance["batchID"]}%20created')
 
     else:
-        return flask.redirect(
-            "/manage_repositories?msg=No%20repositories%20eligable%20for%20archive"
-        )
+        return flask.redirect("/manage_repositories?msg=No%20repositories%20eligable%20for%20archive")
 
 
 @app.route("/recently_archived")
 def recently_archived():
-    """
-    Returns a render of recentlyArchived.html.
+    """Returns a render of recentlyArchived.html.
 
     ==========
 
@@ -553,7 +501,6 @@ def recently_archived():
     This function can also be passed an arguement called batchID, which is used to
     display a success message when redirected from undoBatch().
     """
-
     # Check storage files exist and are up to date with S3
     check_file_integrity(["archived.json"])
 
@@ -579,11 +526,8 @@ def recently_archived():
 
 
 # Functions used within undo_batch()
-def get_repository_information(
-    gh: github_api_toolkit.github_interface, repo_to_undo: dict, batch_id: int
-) -> dict:
-    """
-    Gets information for a given repo_to_undo as part of the unarchive process.
+def get_repository_information(gh: github_api_toolkit.github_interface, repo_to_undo: dict, batch_id: int) -> dict:
+    """Gets information for a given repo_to_undo as part of the unarchive process.
 
     ==========
 
@@ -595,7 +539,6 @@ def get_repository_information(
     Returns:
         A dictionary of the repo_to_undo's information.
     """
-
     response = gh.get(repo_to_undo["apiurl"], {}, False)
 
     if type(response) != Response:
@@ -612,9 +555,7 @@ def get_repository_information(
     last_update = datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
     last_update = date(last_update.year, last_update.month, last_update.day)
 
-    contributor_list = data_retrieval.get_repo_contributors(
-        gh, repo_json["contributors_url"]
-    )
+    contributor_list = data_retrieval.get_repo_contributors(gh, repo_json["contributors_url"])
 
     repository_information = {
         "name": repo_json["name"],
@@ -633,8 +574,7 @@ def get_repository_information(
 
 @app.route("/undo_batch")
 def undo_batch():
-    """
-    Unarchives a batch of archived repositories.
+    """Unarchives a batch of archived repositories.
 
     ==========
 
@@ -662,9 +602,7 @@ def undo_batch():
     try:
         gh = github_api_toolkit.github_interface(flask.session["pat"])
     except KeyError:
-        return flask.render_template(
-            "error.html", error="Personal Access Token Undefined."
-        )
+        return flask.render_template("error.html", error="Personal Access Token Undefined.")
 
     batch_id = flask.request.args.get("batchID")
 
@@ -693,16 +631,9 @@ def undo_batch():
             if type(response) != Response:
                 return flask.render_template("error.html", error=f"Error: {response}")
 
-            if not any(
-                d["name"] == batch_to_undo["repos"][i - pop_count]["name"]
-                for d in stored_repos
-            ):
+            if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
                 # Add the repo to repositories.json
-                stored_repos.append(
-                    get_repository_information(
-                        gh, batch_to_undo["repos"][i - pop_count], batch_id
-                    )
-                )
+                stored_repos.append(get_repository_information(gh, batch_to_undo["repos"][i - pop_count], batch_id))
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
@@ -719,8 +650,7 @@ def undo_batch():
 
 @app.route("/confirm")
 def confirm_action():
-    """
-    If given message, confirmUrl and cancelUrl arguements, return a render of confirmAction.html
+    """If given message, confirmUrl and cancelUrl arguements, return a render of confirmAction.html
     If not passed either of the arguements, return redirect to /
 
     Used to confirm user actions (i.e deleting stored repository information)
@@ -749,9 +679,7 @@ def insert_test_data():
         if flask.request.form["confirm_radio"] == "True":
 
             # Create test_recently_added.html for test repositories
-            repos = storage_interface.read_file(
-                "./repoarchivetool/test_data/test_repositories.json"
-            )
+            repos = storage_interface.read_file("./repoarchivetool/test_data/test_repositories.json")
 
             domain = flask.request.url_root
 
@@ -766,27 +694,25 @@ def insert_test_data():
                     # I know this isn't ideal but I need to make certain changes depending on each repo
                     if repos[i]["name"] == "KPArchiveTest":
                         # Make eligable for archive
-                        repos[i]["dateAdded"] = (
-                            datetime.now() - timedelta(days=archive_threshold_days + 1)
-                        ).strftime("%Y-%m-%d")
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime(
+                            "%Y-%m-%d"
+                        )
                     elif repos[i]["name"] == "KPArchiveTest2":
                         # Make non-eligable for archive
-                        repos[i]["dateAdded"] = (
-                            datetime.now() - timedelta(days=archive_threshold_days - 1)
-                        ).strftime("%Y-%m-%d")
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days - 1)).strftime(
+                            "%Y-%m-%d"
+                        )
                     elif repos[i]["name"] == "KPInternalArchiveTest":
                         # Make exempt from archive
-                        repos[i]["dateAdded"] = (
-                            datetime.now() - timedelta(days=archive_threshold_days + 15)
-                        ).strftime("%Y-%m-%d")
-                        repos[i]["exemptUntil"] = (
-                            datetime.now() + timedelta(days=90)
-                        ).strftime("%Y-%m-%d")
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 15)).strftime(
+                            "%Y-%m-%d"
+                        )
+                        repos[i]["exemptUntil"] = (datetime.now() + timedelta(days=90)).strftime("%Y-%m-%d")
                     elif repos[i]["name"] == "KPPrivateArchiveTest":
                         # Make eligable for archive
-                        repos[i]["dateAdded"] = (
-                            datetime.now() - timedelta(days=archive_threshold_days + 1)
-                        ).strftime("%Y-%m-%d")
+                        repos[i]["dateAdded"] = (datetime.now() - timedelta(days=archive_threshold_days + 1)).strftime(
+                            "%Y-%m-%d"
+                        )
 
                     f.write(
                         f"<li>{repos[i]['name']} (<a href='{gh.get(repos[i]["apiUrl"], {}, False).json()["html_url"]}' target='_blank'>View Repository</a> - <a href='{domain}/set_exempt_date?repoName={repos[i]['name']}' target='_blank'>Mark Repository as Exempt</a>)</li>"
@@ -810,14 +736,10 @@ def insert_test_data():
                 "./repoarchivetool/test_data/test_recently_added.html",
             )
 
-            return flask.redirect(
-                "/manage_repositories?msg=Test%20data%20inserted%20successfully"
-            )
+            return flask.redirect("/manage_repositories?msg=Test%20data%20inserted%20successfully")
 
         else:
-            return flask.redirect(
-                "/manage_repositories?msg=Test%20data%20insertion%20cancelled"
-            )
+            return flask.redirect("/manage_repositories?msg=Test%20data%20insertion%20cancelled")
 
     else:
         return flask.render_template("insertTestDataConfirmation.html")

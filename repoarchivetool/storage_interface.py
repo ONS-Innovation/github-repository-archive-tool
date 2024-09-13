@@ -1,12 +1,12 @@
 import json
+import os
+
 import boto3
 from botocore.exceptions import ClientError
-import os
 
 
 def get_s3_client():
-    """
-    Returns an S3 Client
+    """Returns an S3 Client
 
     ==========
 
@@ -20,8 +20,7 @@ def get_s3_client():
 
 
 def has_file_changed(bucket: str, key: str, filename: str) -> bool:
-    """
-    Checks if a file in an S3 Bucket has changed
+    """Checks if a file in an S3 Bucket has changed
 
     ==========
 
@@ -33,7 +32,6 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
     Returns:
         bool
     """
-
     s3 = get_s3_client()
 
     try:
@@ -54,15 +52,11 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
             # Therefore, return True to indicate that the file should be created
             return True
 
-        return (
-            s3_last_modified != local_last_modified
-            or s3_content_length != local_content_length
-        )
+        return s3_last_modified != local_last_modified or s3_content_length != local_content_length
 
 
 def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
-    """
-    Downloads a given file from an S3 Bucket
+    """Downloads a given file from an S3 Bucket
 
     ==========
 
@@ -72,7 +66,6 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     Returns:
         Bool or ClientError
     """
-
     s3 = get_s3_client()
 
     try:
@@ -82,11 +75,8 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     return True
 
 
-def update_bucket_content(
-    bucket: str, filename: str, local_filename: str = ""
-) -> bool | ClientError:
-    """
-    Uploads a given file to an S3 Bucket
+def update_bucket_content(bucket: str, filename: str, local_filename: str = "") -> bool | ClientError:
+    """Uploads a given file to an S3 Bucket
 
     ==========
 
@@ -96,7 +86,6 @@ def update_bucket_content(
     Returns:
         Bool or ClientError
     """
-
     if local_filename == "":
         local_filename = filename
 
@@ -110,8 +99,7 @@ def update_bucket_content(
 
 
 def write_file(bucket: str, filename: str, content: list):
-    """
-    Writes to a given file in JSON
+    """Writes to a given file in JSON
 
     ==========
 
@@ -128,11 +116,8 @@ def write_file(bucket: str, filename: str, content: list):
     update_bucket_content(bucket, filename)
 
 
-def read_file(
-    filename: str, sort_field: str | None = None, reverse: bool = False
-) -> list:
-    """
-    Reads a given file
+def read_file(filename: str, sort_field: str | None = None, reverse: bool = False) -> list:
+    """Reads a given file
 
     ==========
 
@@ -145,7 +130,7 @@ def read_file(
         list
     """
     try:
-        with open(filename, "r") as f:
+        with open(filename) as f:
             contents = json.load(f)
 
             if sort_field != None:
