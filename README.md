@@ -47,7 +47,7 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
 3. Install the required dependencies
 
     ```bash
-    poetry install
+    make install
     ```
 
 4. Get the repo-archive-github.pem file and copy to the source code root directory (see "Getting a .pem file" below).
@@ -403,6 +403,11 @@ To destroy all resources the destroy **must happen in the following order, stora
 To view all commands
 ```bash
 make all
+```
+
+Before you can use any linting tools, you must have the dev dependencies installed
+```bash
+make install-dev
 ```
 
 To clean residue files
