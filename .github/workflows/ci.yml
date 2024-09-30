@@ -15,6 +15,10 @@ jobs:
   lint-test:
     name: Lint and Test
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ["pypy3.9", "pypy3.10", "3.9", "3.10", "3.11", "3.12"]
+    
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
@@ -23,8 +27,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version-file: .python-version
+          python-version: ${{ matrix.python-version }}
           cache: poetry
+        
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
 
       - name: Install dependencies
         run: make install-dev
