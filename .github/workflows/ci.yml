@@ -38,6 +38,9 @@ jobs:
 
       - name: Lint Python
         run: make lint
+
+      - name: Format Python
+        run: make format
       
       - name: Cleanup residue file
         run: make clean
