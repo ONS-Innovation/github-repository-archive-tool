@@ -56,7 +56,8 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     ==========
 
     Args:
-        files_to_check (list): the list of files to check. This prevents unneeded calls to S3.
+        files (list): the list of files to check. This prevents unneeded calls to S3.
+        directory (str): the directory where the files are stored. Defaults to "./".
     """
     for file in files:
         file_path = os.path.join(directory, file)
