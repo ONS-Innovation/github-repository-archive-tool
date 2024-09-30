@@ -79,8 +79,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
 
 
 def update_token():
-    """Updates the pat and token_expiration session variables with the new token information.
-    """
+    """Updates the pat and token_expiration session variables with the new token information."""
     session = boto3.Session()
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
 
@@ -120,8 +119,7 @@ def check_token():
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    """Returns a render of index.html.
-    """
+    """Returns a render of index.html."""
     return flask.render_template(
         "findRepositories.html",
         date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),

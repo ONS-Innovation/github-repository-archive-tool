@@ -23,7 +23,7 @@ format:  ## Format the code.
 
 .PHONY: black
 black:
-	poetry run black repoarchivetool
+	poetry run black --check repoarchivetool
 
 .PHONY: ruff
 ruff:
