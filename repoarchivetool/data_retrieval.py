@@ -42,7 +42,9 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     return archive_flag
 
 
-def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_interface) -> str | list:  # noqa: PLR0911 PLR0912 PLR0915 C901
+def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
+    org: str, date: str, repo_type: str, gh: github_interface
+) -> str | list:
     """Gets all repositories which fit the given parameters.
 
     ==========
@@ -79,7 +81,7 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
     )
 
     if isinstance(response, requests.Response):
-        if response.status_code == 200: # noqa: PLR2004
+        if response.status_code == 200:  # noqa: PLR2004
             # - Finds where the inputted date is in the list of repos (this position will be held in midpoint)
             # - After the midpoint is found, everything to the right of it can be archived as it is older than the inputted date
 
@@ -157,8 +159,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                         if len(repos) == 0:
                             return "No repositories found"
 
-                        min_repo_flag = archive_flag(repos[0]["url"], comp_date)
-                        max_repo_flag = archive_flag(repos[-1]["url"], comp_date)
+                        min_repo_flag = archive_flag(repos[0]["url"], comp_date)  # noqa: F821
+                        max_repo_flag = archive_flag(repos[-1]["url"], comp_date)  # noqa: F821
 
                     if min_repo_flag and max_repo_flag:
                         midpoint = lower_pointer
@@ -183,7 +185,7 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                 )
 
                 if isinstance(response, requests.Response):
-                    if response.status_code == 200: # noqa: PLR2004
+                    if response.status_code == 200:  # noqa: PLR2004
                         page_repos = response.json()
 
                         # For each repo in the page

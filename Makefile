@@ -18,16 +18,16 @@ clean: ## Clean the temporary files.
 
 .PHONY: format
 format:  ## Format the code.
-	poetry run black --check .
+	poetry run black .
 	poetry run ruff check . --fix
 
 .PHONY: black
 black:
-	poetry run black --check repoarchivetool
+	poetry run black --check .
 
 .PHONY: ruff
 ruff:
-	poetry run ruff check repoarchivetool
+	poetry run ruff check .
 
 .PHONY: ruff-fix
 ruff-fix:
@@ -35,7 +35,7 @@ ruff-fix:
 
 .PHONY: pylint
 pylint:
-	poetry run pylint repoarchivetool
+	poetry run pylint .
 
 .PHONY: lint
 lint:  ## Run Python linter
