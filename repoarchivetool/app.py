@@ -69,7 +69,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
             # If the file does not exist locally or has changed in S3, download it
             download_successful = storage_interface.get_bucket_content(bucket_name, file)
 
-            if download_successful == True:
+            if download_successful:
                 # Once downloaded, reupload it to match last modified date
                 storage_interface.update_bucket_content(bucket_name, file)
             elif os.path.isfile(file_path):
@@ -87,7 +87,7 @@ def update_token():
 
     response = github_api_toolkit.get_token_as_installation(organisation, secret, client_id)
 
-    if type(response) == tuple:
+    if isinstance(response, tuple):
         token = response[0]
         expiration = response[1]
 
@@ -169,7 +169,7 @@ def find_repos():
 
             new_repos = data_retrieval.get_organisation_repos(org, date, repo_type, gh)
 
-            if type(new_repos) == str:
+            if isinstance(new_repos, str):
                 # Error Message Returned
                 return flask.render_template("error.html", error=new_repos)
 
@@ -249,14 +249,14 @@ def manage_repos():
 
     repos_added = flask.request.args.get("reposAdded")
 
-    if repos_added == None:
+    if repos_added is None:  # noqa: SIM108
         repos_added = -1
     else:
         repos_added = int(repos_added)
 
     status_message = flask.request.args.get("msg")
 
-    if status_message == None:
+    if status_message is None:
         status_message = ""
 
     # When loading repos, check each repo to see if its exempt date has passed
@@ -294,7 +294,7 @@ def clear_repos():
 def set_exempt_date():
     repo_name = flask.request.args.get("repoName")
 
-    if repo_name == None:
+    if repo_name is None:
         return flask.redirect("/manage_repositories")
 
     if flask.request.method == "POST":
@@ -348,7 +348,7 @@ def set_exempt_date():
 def clear_exempt_date():
     repo_name = flask.request.args.get("repoName")
 
-    if repo_name != None:
+    if repo_name != None:  #  noqa: E711
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
 
@@ -405,12 +405,12 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     # For each repo, if keep is false and it was added to storage over archive_threshold_days days ago,
     # Archive them
     for i in range(0, len(repos)):
-        if repos[i]["exemptUntil"] == "1900-01-01":
+        if repos[i]["exemptUntil"] == "1900-01-01":  # noqa: SIM102
             if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= archive_threshold_days:
                 response = gh.patch(repos[i]["apiUrl"], {"archived": True}, False)
 
-                if type(response) == Response:
-                    if response.status_code == 200:
+                if isinstance(response, Response):
+                    if response.status_code == 200:  # noqa: PLR2004
 
                         archive_instance["repos"].append(
                             {
@@ -440,7 +440,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
 def archive_repos():
     """Archives any repositories which are:
         - older than archive_threshold_days days within the system
-        - have not been marked to be kept using the keep attribute in repositories.json
+        - have not been marked to be kept using the keep attribute in repositories.json.
 
     ==========
 
@@ -479,7 +479,7 @@ def archive_repos():
         pop_count = 0
         for i in repos_to_remove:
             repos.pop(i - pop_count)
-            pop_count += 1
+            pop_count += 1  # noqa: SIM113
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
@@ -508,12 +508,12 @@ def recently_archived():
 
     batch_id = flask.request.args.get("batchID")
 
-    if batch_id == None:
+    if batch_id is None:
         batch_id = ""
 
     status_message = flask.request.args.get("msg")
 
-    if status_message == None:
+    if status_message is None:
         status_message = ""
 
     return flask.render_template(
@@ -540,7 +540,7 @@ def get_repository_information(gh: github_api_toolkit.github_interface, repo_to_
     """
     response = gh.get(repo_to_undo["apiurl"], {}, False)
 
-    if type(response) != Response:
+    if type(response) != Response:  # noqa: E721
         return flask.render_template(
             "error.html",
             error=f"Error: {response} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories",
@@ -605,7 +605,7 @@ def undo_batch():
 
     batch_id = flask.request.args.get("batchID")
 
-    if batch_id != None:
+    if batch_id is not None:
         batch_id = int(batch_id)
 
         # Check storage files exist and are up to date with S3
@@ -627,7 +627,7 @@ def undo_batch():
                 False,
             )
 
-            if type(response) != Response:
+            if type(response) is not Response:
                 return flask.render_template("error.html", error=f"Error: {response}")
 
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
@@ -636,7 +636,7 @@ def undo_batch():
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
-            pop_count += 1
+            pop_count += 1  # noqa: SIM113
 
         # Write changes to storage
         storage_interface.write_file(bucket_name, "repositories.json", stored_repos)
@@ -650,7 +650,7 @@ def undo_batch():
 @app.route("/confirm")
 def confirm_action():
     """If given message, confirmUrl and cancelUrl arguements, return a render of confirmAction.html
-    If not passed either of the arguements, return redirect to /
+    If not passed either of the arguements, return redirect to / .
 
     Used to confirm user actions (i.e deleting stored repository information)
     """
@@ -658,7 +658,7 @@ def confirm_action():
     confirm_url = flask.request.args.get("confirmUrl")
     cancel_url = flask.request.args.get("cancelUrl")
 
-    if message != None and confirm_url != None and cancel_url != None:
+    if message != None and confirm_url != None and cancel_url != None:  # noqa: E711
         return flask.render_template(
             "confirmAction.html",
             message=message,
@@ -747,4 +747,4 @@ def insert_test_data():
 if __name__ == "__main__":
     # When running as a container the host must be set
     # to listen on all interfaces
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)  # noqa: S104 S201

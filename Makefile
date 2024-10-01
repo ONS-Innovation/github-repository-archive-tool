@@ -18,7 +18,7 @@ clean: ## Clean the temporary files.
 
 .PHONY: format
 format:  ## Format the code.
-	poetry run black .
+	poetry run black --check .
 	poetry run ruff check . --fix
 
 .PHONY: black
@@ -27,6 +27,10 @@ black:
 
 .PHONY: ruff
 ruff:
+	poetry run ruff check repoarchivetool
+
+.PHONY: ruff-fix
+ruff-fix:
 	poetry run ruff check repoarchivetool --fix
 
 .PHONY: pylint

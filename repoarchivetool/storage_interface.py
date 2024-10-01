@@ -6,7 +6,7 @@ from botocore.exceptions import ClientError
 
 
 def get_s3_client():
-    """Returns an S3 Client
+    """Returns an S3 Client.
 
     ==========
 
@@ -20,7 +20,7 @@ def get_s3_client():
 
 
 def has_file_changed(bucket: str, key: str, filename: str) -> bool:
-    """Checks if a file in an S3 Bucket has changed
+    """Checks if a file in an S3 Bucket has changed.
 
     ==========
 
@@ -56,12 +56,13 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
 
 
 def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
-    """Downloads a given file from an S3 Bucket
+    """Downloads a given file from an S3 Bucket.
 
     ==========
 
     Args:
         filename (str): The name of the file to download
+        bucket (str): The name of the bucket
 
     Returns:
         Bool or ClientError
@@ -76,12 +77,14 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
 
 
 def update_bucket_content(bucket: str, filename: str, local_filename: str = "") -> bool | ClientError:
-    """Uploads a given file to an S3 Bucket
+    """Uploads a given file to an S3 Bucket.
 
     ==========
 
     Args:
         filename (str): The name of the file to upload
+        bucket (str): The name of the bucket
+        local_filename (str): The name of the file to upload. If not provided, it will use and empty string
 
     Returns:
         Bool or ClientError
@@ -92,20 +95,21 @@ def update_bucket_content(bucket: str, filename: str, local_filename: str = "") 
     s3 = get_s3_client()
 
     try:
-        response = s3.upload_file(local_filename, bucket, f"repo-archive/{filename}")
+        response = s3.upload_file(local_filename, bucket, f"repo-archive/{filename}")  # noqa F841
     except ClientError as e:
         return e
     return True
 
 
 def write_file(bucket: str, filename: str, content: list):
-    """Writes to a given file in JSON
+    """Writes to a given file in JSON.
 
     ==========
 
     Args:
         filename (str): the name of the file to write to
         content (list): the data to be written as a list of dictionaries to mimic JSON
+        bucket (str): the name of the bucket to upload the file to
 
     returns:
         None
@@ -117,7 +121,7 @@ def write_file(bucket: str, filename: str, content: list):
 
 
 def read_file(filename: str, sort_field: str | None = None, reverse: bool = False) -> list:
-    """Reads a given file
+    """Reads a given file.
 
     ==========
 
@@ -133,7 +137,7 @@ def read_file(filename: str, sort_field: str | None = None, reverse: bool = Fals
         with open(filename) as f:
             contents = json.load(f)
 
-            if sort_field != None:
+            if sort_field != None:  # noqa E711
                 contents.sort(key=lambda x: x[sort_field])
 
             if reverse:
