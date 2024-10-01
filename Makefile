@@ -39,8 +39,8 @@ pylint:
 
 .PHONY: lint
 lint:  ## Run Python linter
-	make black
 	make ruff || true
+	make black
 	make pylint || true
 
 .PHONY: mypy
