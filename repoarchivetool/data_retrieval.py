@@ -42,7 +42,7 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     return archive_flag
 
 
-def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
+def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915 
     org: str, date: str, repo_type: str, gh: github_interface
 ) -> str | list:
     """Gets all repositories which fit the given parameters.
