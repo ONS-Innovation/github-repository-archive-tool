@@ -16,18 +16,18 @@ clean: ## Clean the temporary files.
 	rm -rf .ruff_cache
 	rm -rf megalinter-reports
 
-.PHONY: format
-format:  ## Format the code.
+.PHONY: lint
+lint:  ## Format the code.
 	poetry run black .
 	poetry run ruff check . --fix
 
 .PHONY: black
 black:
-	poetry run black --check .
+	poetry run black --check repoarchivetool
 
 .PHONY: ruff
 ruff:
-	poetry run ruff check .
+	poetry run ruff check repoarchivetool
 
 .PHONY: ruff-fix
 ruff-fix:
@@ -35,13 +35,13 @@ ruff-fix:
 
 .PHONY: pylint
 pylint:
-	poetry run pylint .
+	poetry run pylint repoarchivetool
 
-.PHONY: lint
-lint:  ## Run Python linter
-	make ruff || true
+.PHONY: lint-check
+lint-check:  ## Run Python linter
+	make ruff
 	make black
-	make pylint || true
+	make pylint
 
 .PHONY: mypy
 mypy:  ## Run mypy.
