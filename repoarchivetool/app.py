@@ -1,3 +1,6 @@
+"""Application to archive GitHub repositories."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
 import json
 import os
 from datetime import date, datetime, timedelta

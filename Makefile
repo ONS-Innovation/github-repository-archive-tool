@@ -17,7 +17,7 @@ clean: ## Clean the temporary files.
 	rm -rf megalinter-reports
 
 .PHONY: format
-lint:  ## Format the code.
+format:  ## Format the code.
 	poetry run black .
 	poetry run ruff check . --fix
 
