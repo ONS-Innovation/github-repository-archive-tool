@@ -23,21 +23,25 @@ format:  ## Format the code.
 
 .PHONY: black
 black:
-	poetry run black repoarchivetool
+	poetry run black --check repoarchivetool
 
 .PHONY: ruff
 ruff:
+	poetry run ruff check repoarchivetool
+
+.PHONY: ruff-fix
+ruff-fix:
 	poetry run ruff check repoarchivetool --fix
 
 .PHONY: pylint
 pylint:
 	poetry run pylint repoarchivetool
 
-.PHONY: lint
-lint:  ## Run Python linter
+.PHONY: lint-check
+lint-check:  ## Run Python linter
+	make ruff
 	make black
-	make ruff || true
-	make pylint || true
+	make pylint
 
 .PHONY: mypy
 mypy:  ## Run mypy.
