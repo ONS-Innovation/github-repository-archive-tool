@@ -16,7 +16,7 @@ clean: ## Clean the temporary files.
 	rm -rf .ruff_cache
 	rm -rf megalinter-reports
 
-.PHONY: lint
+.PHONY: format
 lint:  ## Format the code.
 	poetry run black .
 	poetry run ruff check . --fix
