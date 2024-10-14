@@ -1,6 +1,6 @@
 """Application to archive GitHub repositories."""
 
-# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, C0103, R1710, W0621, R1705, C0200, C0123
 import json
 import os
 from datetime import date, datetime, timedelta
@@ -37,7 +37,7 @@ bucket_name = f"{account}-github-audit-tool"
 
 def load_config():
     """Loads the feature configuration from the feature.json file."""
-    with open("./config/feature.json") as f:
+    with open("./config/feature.json", encoding="utf-8") as f:
         app.config["FEATURES"] = json.load(f)["features"]
 
 
@@ -132,6 +132,7 @@ def index():
 
 @app.route("/success")
 def success():
+    """Return success message template."""
     return flask.render_template("success.html")
 
 
@@ -216,7 +217,7 @@ def find_repos():
             domain = flask.request.url_root
 
             # Create html file to display which NEW repos will be archived
-            with open("./recently_added.html", "w") as f:
+            with open("./recently_added.html", "w", encoding="utf-8") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
                 for repo in new_repos_to_archive:
                     f.write(
@@ -295,6 +296,7 @@ def clear_repos():
 
 @app.route("/set_exempt_date", methods=["POST", "GET"])
 def set_exempt_date():
+    """Set exempt date for a given repository."""
     repo_name = flask.request.args.get("repoName")
 
     if repo_name is None:
@@ -349,9 +351,10 @@ def set_exempt_date():
 
 @app.route("/clear_exempt_date")
 def clear_exempt_date():
+    """Clears the exempt date for a given repository."""
     repo_name = flask.request.args.get("repoName")
 
-    if repo_name != None:  #  noqa: E711
+    if repo_name is not None:
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
 
@@ -372,6 +375,7 @@ def clear_exempt_date():
 
 @app.route("/download_recently_added")
 def download_recently_added():
+    """Download recently added."""
     # Check storage files exist and are up to date with S3
     check_file_integrity(["recently_added.html"])
 
@@ -661,7 +665,7 @@ def confirm_action():
     confirm_url = flask.request.args.get("confirmUrl")
     cancel_url = flask.request.args.get("cancelUrl")
 
-    if message != None and confirm_url != None and cancel_url != None:  # noqa: E711
+    if message is not None and confirm_url is not None and cancel_url is not None:
         return flask.render_template(
             "confirmAction.html",
             message=message,
@@ -674,6 +678,7 @@ def confirm_action():
 
 @app.route("/insert_test_data", methods=["POST", "GET"])
 def insert_test_data():
+    """Insert test data into the system."""
     if not app.config["FEATURES"]["test_data"]["enabled"]:
         flask.abort(404)
 
@@ -687,7 +692,7 @@ def insert_test_data():
 
             gh = github_api_toolkit.github_interface(flask.session["pat"])
 
-            with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
+            with open("./repoarchivetool/test_data/test_recently_added.html", "w", encoding="utf-8") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
 
                 for i in range(0, len(repos)):
@@ -724,7 +729,7 @@ def insert_test_data():
                     f"</ul><p>Total Repositories: {len(repos)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>"
                 )
 
-            with open("./repoarchivetool/test_data/test_repositories.json", "w") as f:
+            with open("./repoarchivetool/test_data/test_repositories.json", "w", encoding="utf-8") as f:
                 f.write(json.dumps(repos, indent=4))
 
             storage_interface.update_bucket_content(

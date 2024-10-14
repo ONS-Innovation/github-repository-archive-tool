@@ -1,4 +1,6 @@
-# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+"""Retrieves data from the Github API."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, R1705, R0914, E0601, R0911, R0912, R1710, R0915, R1702
 
 import datetime
 
@@ -36,7 +38,7 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
             last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
             last_update = datetime.date(last_update.year, last_update.month, last_update.day)
 
-            archive_flag = True if last_update < comp_date else False  # noqa: SIM210
+            archive_flag = last_update < comp_date
 
     else:
         return f"Error: {repo_response} <br> Point of Failure: Getting Archive Flag."

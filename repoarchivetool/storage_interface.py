@@ -1,3 +1,7 @@
+"""This module contains functions that interact with the S3 Bucket."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, W0612, R1705
+
 import json
 import os
 
@@ -36,7 +40,7 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
 
     try:
         obj = s3.get_object(Bucket=bucket, Key=key)
-    except ClientError as e:  # noqa F841
+    except ClientError:
         # ClientError is raised when the key does not exist in the bucket
         # Therefore we need to return True to indicate that the file should be created
         return True
@@ -114,7 +118,7 @@ def write_file(bucket: str, filename: str, content: list):
     returns:
         None
     """
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(json.dumps(content, indent=4))
 
     update_bucket_content(bucket, filename)
@@ -134,10 +138,10 @@ def read_file(filename: str, sort_field: str | None = None, reverse: bool = Fals
         list
     """
     try:
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             contents = json.load(f)
 
-            if sort_field != None:  # noqa E711
+            if sort_field is not None:
                 contents.sort(key=lambda x: x[sort_field])
 
             if reverse:
