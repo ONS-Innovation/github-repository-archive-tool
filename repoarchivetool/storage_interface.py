@@ -1,3 +1,7 @@
+"""This module contains functions that interact with the S3 Bucket."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, W0612, R1705
+
 import json
 import os
 
@@ -6,7 +10,7 @@ from botocore.exceptions import ClientError
 
 
 def get_s3_client():
-    """Returns an S3 Client
+    """Returns an S3 Client.
 
     ==========
 
@@ -20,7 +24,7 @@ def get_s3_client():
 
 
 def has_file_changed(bucket: str, key: str, filename: str) -> bool:
-    """Checks if a file in an S3 Bucket has changed
+    """Checks if a file in an S3 Bucket has changed.
 
     ==========
 
@@ -36,7 +40,7 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
 
     try:
         obj = s3.get_object(Bucket=bucket, Key=key)
-    except ClientError as e:  # noqa F841
+    except ClientError:
         # ClientError is raised when the key does not exist in the bucket
         # Therefore we need to return True to indicate that the file should be created
         return True
@@ -56,11 +60,12 @@ def has_file_changed(bucket: str, key: str, filename: str) -> bool:
 
 
 def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
-    """Downloads a given file from an S3 Bucket
+    """Downloads a given file from an S3 Bucket.
 
     ==========
 
     Args:
+        bucket (str): The name of the bucket
         filename (str): The name of the file to download
 
     Returns:
@@ -76,12 +81,14 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
 
 
 def update_bucket_content(bucket: str, filename: str, local_filename: str = "") -> bool | ClientError:
-    """Uploads a given file to an S3 Bucket
+    """Uploads a given file to an S3 Bucket.
 
     ==========
 
     Args:
+        bucket (str): The name of the bucket
         filename (str): The name of the file to upload
+        local_filename (str): The name of the file to upload. If not provided, it will use and empty string
 
     Returns:
         Bool or ClientError
@@ -92,32 +99,32 @@ def update_bucket_content(bucket: str, filename: str, local_filename: str = "") 
     s3 = get_s3_client()
 
     try:
-        response = s3.upload_file(local_filename, bucket, f"repo-archive/{filename}")
+        response = s3.upload_file(local_filename, bucket, f"repo-archive/{filename}")  # noqa F841
     except ClientError as e:
         return e
     return True
 
 
 def write_file(bucket: str, filename: str, content: list):
-    """Writes to a given file in JSON
+    """Writes to a given file in JSON.
 
     ==========
 
     Args:
+        bucket (str): the name of the bucket to upload the file to
         filename (str): the name of the file to write to
         content (list): the data to be written as a list of dictionaries to mimic JSON
-
     returns:
         None
     """
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(json.dumps(content, indent=4))
 
     update_bucket_content(bucket, filename)
 
 
 def read_file(filename: str, sort_field: str | None = None, reverse: bool = False) -> list:
-    """Reads a given file
+    """Reads a given file.
 
     ==========
 
@@ -130,10 +137,10 @@ def read_file(filename: str, sort_field: str | None = None, reverse: bool = Fals
         list
     """
     try:
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             contents = json.load(f)
 
-            if sort_field != None:
+            if sort_field is not None:
                 contents.sort(key=lambda x: x[sort_field])
 
             if reverse:

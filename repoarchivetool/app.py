@@ -1,6 +1,10 @@
+"""Application to archive GitHub repositories."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, C0103, R1710, W0621, R1705, C0200, C0123
 import json
 import os
 from datetime import date, datetime, timedelta
+from http import HTTPStatus
 from typing import List
 
 import boto3
@@ -34,7 +38,7 @@ bucket_name = f"{account}-github-audit-tool"
 
 def load_config():
     """Loads the feature configuration from the feature.json file."""
-    with open("./config/feature.json") as f:
+    with open("./config/feature.json", encoding="utf-8") as f:
         app.config["FEATURES"] = json.load(f)["features"]
 
 
@@ -56,7 +60,8 @@ def check_file_integrity(files: List[str], directory: str = "./"):
     ==========
 
     Args:
-        files_to_check (list): the list of files to check. This prevents unneeded calls to S3.
+        files (list): the list of files to check. This prevents unneeded calls to S3.
+        directory (str): the directory where the files are stored. Defaults to "./".
     """
     for file in files:
         file_path = os.path.join(directory, file)
@@ -68,7 +73,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
             # If the file does not exist locally or has changed in S3, download it
             download_successful = storage_interface.get_bucket_content(bucket_name, file)
 
-            if download_successful == True:
+            if download_successful:
                 # Once downloaded, reupload it to match last modified date
                 storage_interface.update_bucket_content(bucket_name, file)
             elif os.path.isfile(file_path):
@@ -78,8 +83,7 @@ def check_file_integrity(files: List[str], directory: str = "./"):
 
 
 def update_token():
-    """Updates the pat and token_expiration session variables with the new token information.
-    """
+    """Updates the pat and token_expiration session variables with the new token information."""
     session = boto3.Session()
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
 
@@ -87,7 +91,7 @@ def update_token():
 
     response = github_api_toolkit.get_token_as_installation(organisation, secret, client_id)
 
-    if type(response) == tuple:
+    if isinstance(response, tuple):
         token = response[0]
         expiration = response[1]
 
@@ -119,8 +123,7 @@ def check_token():
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    """Returns a render of index.html.
-    """
+    """Returns a render of index.html."""
     return flask.render_template(
         "findRepositories.html",
         date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
@@ -130,6 +133,7 @@ def index():
 
 @app.route("/success")
 def success():
+    """Return success message template."""
     return flask.render_template("success.html")
 
 
@@ -170,7 +174,7 @@ def find_repos():
 
             new_repos = data_retrieval.get_organisation_repos(org, date, repo_type, gh)
 
-            if type(new_repos) == str:
+            if isinstance(new_repos, str):
                 # Error Message Returned
                 return flask.render_template("error.html", error=new_repos)
 
@@ -214,7 +218,7 @@ def find_repos():
             domain = flask.request.url_root
 
             # Create html file to display which NEW repos will be archived
-            with open("./recently_added.html", "w") as f:
+            with open("./recently_added.html", "w", encoding="utf-8") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
                 for repo in new_repos_to_archive:
                     f.write(
@@ -250,14 +254,14 @@ def manage_repos():
 
     repos_added = flask.request.args.get("reposAdded")
 
-    if repos_added == None:
+    if repos_added is None:  # noqa: SIM108
         repos_added = -1
     else:
         repos_added = int(repos_added)
 
     status_message = flask.request.args.get("msg")
 
-    if status_message == None:
+    if status_message is None:
         status_message = ""
 
     # When loading repos, check each repo to see if its exempt date has passed
@@ -293,9 +297,10 @@ def clear_repos():
 
 @app.route("/set_exempt_date", methods=["POST", "GET"])
 def set_exempt_date():
+    """Set exempt date for a given repository."""
     repo_name = flask.request.args.get("repoName")
 
-    if repo_name == None:
+    if repo_name is None:
         return flask.redirect("/manage_repositories")
 
     if flask.request.method == "POST":
@@ -347,9 +352,10 @@ def set_exempt_date():
 
 @app.route("/clear_exempt_date")
 def clear_exempt_date():
+    """Clears the exempt date for a given repository."""
     repo_name = flask.request.args.get("repoName")
 
-    if repo_name != None:
+    if repo_name is not None:
         # Check storage files exist and are up to date with S3
         check_file_integrity(["repositories.json"])
 
@@ -370,6 +376,7 @@ def clear_exempt_date():
 
 @app.route("/download_recently_added")
 def download_recently_added():
+    """Download recently added."""
     # Check storage files exist and are up to date with S3
     check_file_integrity(["recently_added.html"])
 
@@ -406,12 +413,12 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
     # For each repo, if keep is false and it was added to storage over archive_threshold_days days ago,
     # Archive them
     for i in range(0, len(repos)):
-        if repos[i]["exemptUntil"] == "1900-01-01":
+        if repos[i]["exemptUntil"] == "1900-01-01":  # noqa: SIM102
             if (datetime.now() - datetime.strptime(repos[i]["dateAdded"], "%Y-%m-%d")).days >= archive_threshold_days:
                 response = gh.patch(repos[i]["apiUrl"], {"archived": True}, False)
 
-                if type(response) == Response:
-                    if response.status_code == 200:
+                if isinstance(response, Response):
+                    if response.status_code == HTTPStatus.OK:
 
                         archive_instance["repos"].append(
                             {
@@ -441,7 +448,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
 def archive_repos():
     """Archives any repositories which are:
         - older than archive_threshold_days days within the system
-        - have not been marked to be kept using the keep attribute in repositories.json
+        - have not been marked to be kept using the keep attribute in repositories.json.
 
     ==========
 
@@ -480,7 +487,7 @@ def archive_repos():
         pop_count = 0
         for i in repos_to_remove:
             repos.pop(i - pop_count)
-            pop_count += 1
+            pop_count += 1  # noqa: SIM113
 
         storage_interface.write_file(bucket_name, "repositories.json", repos)
 
@@ -509,12 +516,12 @@ def recently_archived():
 
     batch_id = flask.request.args.get("batchID")
 
-    if batch_id == None:
+    if batch_id is None:
         batch_id = ""
 
     status_message = flask.request.args.get("msg")
 
-    if status_message == None:
+    if status_message is None:
         status_message = ""
 
     return flask.render_template(
@@ -541,7 +548,7 @@ def get_repository_information(gh: github_api_toolkit.github_interface, repo_to_
     """
     response = gh.get(repo_to_undo["apiurl"], {}, False)
 
-    if type(response) != Response:
+    if type(response) != Response:  # noqa: E721
         return flask.render_template(
             "error.html",
             error=f"Error: {response} <br> Point of Failure: Restoring batch {batch_id}, {repo_to_undo["name"]} to stored repositories",
@@ -606,7 +613,7 @@ def undo_batch():
 
     batch_id = flask.request.args.get("batchID")
 
-    if batch_id != None:
+    if batch_id is not None:
         batch_id = int(batch_id)
 
         # Check storage files exist and are up to date with S3
@@ -628,7 +635,7 @@ def undo_batch():
                 False,
             )
 
-            if type(response) != Response:
+            if type(response) is not Response:
                 return flask.render_template("error.html", error=f"Error: {response}")
 
             if not any(d["name"] == batch_to_undo["repos"][i - pop_count]["name"] for d in stored_repos):
@@ -637,7 +644,7 @@ def undo_batch():
 
             # Remove the repo from archived.json
             archive_list[batch_id - 1]["repos"].pop(i - pop_count)
-            pop_count += 1
+            pop_count += 1  # noqa: SIM113
 
         # Write changes to storage
         storage_interface.write_file(bucket_name, "repositories.json", stored_repos)
@@ -651,7 +658,7 @@ def undo_batch():
 @app.route("/confirm")
 def confirm_action():
     """If given message, confirmUrl and cancelUrl arguements, return a render of confirmAction.html
-    If not passed either of the arguements, return redirect to /
+    If not passed either of the arguements, return redirect to / .
 
     Used to confirm user actions (i.e deleting stored repository information)
     """
@@ -659,7 +666,7 @@ def confirm_action():
     confirm_url = flask.request.args.get("confirmUrl")
     cancel_url = flask.request.args.get("cancelUrl")
 
-    if message != None and confirm_url != None and cancel_url != None:
+    if message is not None and confirm_url is not None and cancel_url is not None:
         return flask.render_template(
             "confirmAction.html",
             message=message,
@@ -672,6 +679,7 @@ def confirm_action():
 
 @app.route("/insert_test_data", methods=["POST", "GET"])
 def insert_test_data():
+    """Insert test data into the system."""
     if not app.config["FEATURES"]["test_data"]["enabled"]:
         flask.abort(404)
 
@@ -685,7 +693,7 @@ def insert_test_data():
 
             gh = github_api_toolkit.github_interface(flask.session["pat"])
 
-            with open("./repoarchivetool/test_data/test_recently_added.html", "w") as f:
+            with open("./repoarchivetool/test_data/test_recently_added.html", "w", encoding="utf-8") as f:
                 f.write("<h1>Repositories to be Archived</h1><ul>")
 
                 for i in range(0, len(repos)):
@@ -722,7 +730,7 @@ def insert_test_data():
                     f"</ul><p>Total Repositories: {len(repos)}</p><p>These repositories will be archived in <b>{archive_threshold_days} days</b>, unless marked as exempt.</p>"
                 )
 
-            with open("./repoarchivetool/test_data/test_repositories.json", "w") as f:
+            with open("./repoarchivetool/test_data/test_repositories.json", "w", encoding="utf-8") as f:
                 f.write(json.dumps(repos, indent=4))
 
             storage_interface.update_bucket_content(
@@ -748,4 +756,4 @@ def insert_test_data():
 if __name__ == "__main__":
     # When running as a container the host must be set
     # to listen on all interfaces
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)  # noqa: S104 S201

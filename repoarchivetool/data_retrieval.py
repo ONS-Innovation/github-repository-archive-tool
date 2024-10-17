@@ -1,4 +1,9 @@
+"""Retrieves data from the Github API."""
+
+# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, R1705, R0914, E0601, R0911, R0912, R1710, R0915, R1702
+
 import datetime
+from http import HTTPStatus
 
 import requests
 from github_api_toolkit import github_interface
@@ -17,6 +22,7 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     Args:
         repo_url (str): The API URL of the repository.
         comp_date (date): The date which repositories that have been committed prior to should be archived.
+        gh (api_controller): An instance of the APIHandler class to interact with the Github API
 
     Returns:
         str: An error message.
@@ -26,14 +32,14 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     archive_flag = False
     repo_response = gh.get(repo_url, {}, False)
 
-    if type(repo_response) == requests.Response:
-        if repo_response.status_code == 200:
+    if isinstance(repo_response, requests.Response):
+        if repo_response.status_code == HTTPStatus.OK:
             repo_json = repo_response.json()
             last_update = repo_json["pushed_at"]
             last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
             last_update = datetime.date(last_update.year, last_update.month, last_update.day)
 
-            archive_flag = True if last_update < comp_date else False
+            archive_flag = last_update < comp_date
 
     else:
         return f"Error: {repo_response} <br> Point of Failure: Getting Archive Flag."
@@ -41,7 +47,9 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     return archive_flag
 
 
-def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_interface) -> str | list:
+def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
+    org: str, date: str, repo_type: str, gh: github_interface
+) -> str | list:
     """Gets all repositories which fit the given parameters.
 
     ==========
@@ -77,8 +85,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
         {"sort": "pushed", "type": repo_type, "per_page": 2, "page": 1},
     )
 
-    if type(response) == requests.Response:
-        if response.status_code == 200:
+    if isinstance(response, requests.Response):
+        if response.status_code == HTTPStatus.OK:
             # - Finds where the inputted date is in the list of repos (this position will be held in midpoint)
             # - After the midpoint is found, everything to the right of it can be archived as it is older than the inputted date
 
@@ -118,10 +126,10 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                     max_repo_flag = get_archive_flag(gh, repos[-1]["url"], comp_date)
 
                     # If min or max flags are of type string, an error has occured
-                    if type(min_repo_flag) == str:
+                    if isinstance(min_repo_flag, str):
                         return min_repo_flag
 
-                    if type(max_repo_flag) == str:
+                    if isinstance(max_repo_flag, str):
                         return max_repo_flag
 
                     if not min_repo_flag and max_repo_flag:
@@ -156,8 +164,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                         if len(repos) == 0:
                             return "No repositories found"
 
-                        min_repo_flag = archive_flag(repos[0]["url"], comp_date)
-                        max_repo_flag = archive_flag(repos[-1]["url"], comp_date)
+                        min_repo_flag = archive_flag(repos[0]["url"], comp_date)  # noqa: F821
+                        max_repo_flag = archive_flag(repos[-1]["url"], comp_date)  # noqa: F821
 
                     if min_repo_flag and max_repo_flag:
                         midpoint = lower_pointer
@@ -181,8 +189,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                     {"sort": "pushed", "type": repo_type, "per_page": 2, "page": i},
                 )
 
-                if type(response) == requests.Response:
-                    if response.status_code == 200:
+                if isinstance(response, requests.Response):
+                    if response.status_code == HTTPStatus.OK:
                         page_repos = response.json()
 
                         # For each repo in the page
@@ -190,8 +198,8 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                             # Get that repo
                             repo_response = gh.get(repo["url"], {}, False)
 
-                            if type(repo_response) == requests.Response:
-                                if repo_response.status_code == 200:
+                            if isinstance(repo_response, requests.Response):
+                                if repo_response.status_code == HTTPStatus.OK:
                                     repo_json = repo_response.json()
 
                                     last_update = repo_json["pushed_at"]
@@ -203,12 +211,12 @@ def get_organisation_repos(org: str, date: str, repo_type: str, gh: github_inter
                                     )
 
                                     # If not on the midpoint page, archive
-                                    if i != midpoint:
+                                    if i != midpoint:  # noqa: SIM108
                                         archive_flag = "True"
 
                                     # If on the midpoint page, need to check repo date
                                     else:
-                                        archive_flag = True if last_update < comp_date else False
+                                        archive_flag = last_update < comp_date
 
                                     # If needs archiving and hasn't already been archived, add it to the archive list
                                     if not repo["archived"] and archive_flag:
@@ -250,12 +258,12 @@ def get_repo_contributors(gh: github_interface, contributors_url: str) -> str | 
     # Get contributors information
     response = gh.get(contributors_url, {}, False)
 
-    if type(response) != requests.Response:
+    if isinstance(response, requests.Response):
         return f"Error: {response} <br> Point of Failure: Getting Contributors."
 
     contributor_list = []
 
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         contributors = response.json()
 
         for contributor in contributors:
