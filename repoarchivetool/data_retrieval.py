@@ -3,6 +3,7 @@
 # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long, R1705, R0914, E0601, R0911, R0912, R1710, R0915, R1702
 
 import datetime
+from http import HTTPStatus
 
 import requests
 from github_api_toolkit import github_interface
@@ -32,7 +33,7 @@ def get_archive_flag(gh: github_interface, repo_url: str, comp_date: datetime.da
     repo_response = gh.get(repo_url, {}, False)
 
     if isinstance(repo_response, requests.Response):
-        if repo_response.status_code == 200:  # noqa: PLR2004
+        if repo_response.status_code == HTTPStatus.OK:
             repo_json = repo_response.json()
             last_update = repo_json["pushed_at"]
             last_update = datetime.datetime.strptime(last_update, "%Y-%m-%dT%H:%M:%SZ")
@@ -85,7 +86,7 @@ def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
     )
 
     if isinstance(response, requests.Response):
-        if response.status_code == 200:  # noqa: PLR2004
+        if response.status_code == HTTPStatus.OK:
             # - Finds where the inputted date is in the list of repos (this position will be held in midpoint)
             # - After the midpoint is found, everything to the right of it can be archived as it is older than the inputted date
 
@@ -189,7 +190,7 @@ def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
                 )
 
                 if isinstance(response, requests.Response):
-                    if response.status_code == 200:  # noqa: PLR2004
+                    if response.status_code == HTTPStatus.OK:
                         page_repos = response.json()
 
                         # For each repo in the page
@@ -198,7 +199,7 @@ def get_organisation_repos(  # noqa: C901 PLR0911 PLR0912 PLR0915
                             repo_response = gh.get(repo["url"], {}, False)
 
                             if isinstance(repo_response, requests.Response):
-                                if repo_response.status_code == 200:  # noqa: PLR2004
+                                if repo_response.status_code == HTTPStatus.OK:
                                     repo_json = repo_response.json()
 
                                     last_update = repo_json["pushed_at"]
@@ -262,7 +263,7 @@ def get_repo_contributors(gh: github_interface, contributors_url: str) -> str | 
 
     contributor_list = []
 
-    if response.status_code == 200:  # noqa: PLR2004
+    if response.status_code == HTTPStatus.OK:
         contributors = response.json()
 
         for contributor in contributors:
