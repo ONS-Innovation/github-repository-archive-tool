@@ -65,8 +65,8 @@ def get_bucket_content(bucket: str, filename: str) -> bool | ClientError:
     ==========
 
     Args:
-        filename (str): The name of the file to download
         bucket (str): The name of the bucket
+        filename (str): The name of the file to download
 
     Returns:
         Bool or ClientError
@@ -86,8 +86,8 @@ def update_bucket_content(bucket: str, filename: str, local_filename: str = "") 
     ==========
 
     Args:
-        filename (str): The name of the file to upload
         bucket (str): The name of the bucket
+        filename (str): The name of the file to upload
         local_filename (str): The name of the file to upload. If not provided, it will use and empty string
 
     Returns:
@@ -111,10 +111,9 @@ def write_file(bucket: str, filename: str, content: list):
     ==========
 
     Args:
+        bucket (str): the name of the bucket to upload the file to
         filename (str): the name of the file to write to
         content (list): the data to be written as a list of dictionaries to mimic JSON
-        bucket (str): the name of the bucket to upload the file to
-
     returns:
         None
     """

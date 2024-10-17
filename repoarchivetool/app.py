@@ -4,6 +4,7 @@
 import json
 import os
 from datetime import date, datetime, timedelta
+from http import HTTPStatus
 from typing import List
 
 import boto3
@@ -417,7 +418,7 @@ def get_archive_lists(batch_id: int, repos: list) -> tuple[list, list]:
                 response = gh.patch(repos[i]["apiUrl"], {"archived": True}, False)
 
                 if isinstance(response, Response):
-                    if response.status_code == 200:  # noqa: PLR2004
+                    if response.status_code == HTTPStatus.OK:
 
                         archive_instance["repos"].append(
                             {
