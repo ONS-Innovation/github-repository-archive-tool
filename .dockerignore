@@ -1,8 +1,16 @@
-# Files for docker to ignore when building images
+venv/
 
-venv
 repositories.json
 archived.json
 recently_added.html
-repo-archive-github.pem
-terraform/
+
+.github/*
+docs/*
+mkdocs_deployment/*
+terraform/*
+.gitignore
+CODEOWNERS
+Makefile
+mkdocs_requirements.txt
+mkdocs.yml
+README.md
