@@ -1,0 +1,490 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.2 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="25.0.2" pages="4">
+  <diagram id="YW_dTAG00VUPLTLv3vol" name="OldArchiveProcess">
+    <mxGraphModel dx="1434" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="AtrMLeQyLw8Z2ePJcN_J-1" value="Repository Archive Tool Redesign" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AtrMLeQyLw8Z2ePJcN_J-3" value="Existing Core User Journey" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="80" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-1" target="V8-1J6owQ9dcXVEKaWUY-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-1" value="Start" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-2" target="V8-1J6owQ9dcXVEKaWUY-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-2" value="Find Repositories Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-6" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-3" target="V8-1J6owQ9dcXVEKaWUY-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-14" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-3" target="V8-1J6owQ9dcXVEKaWUY-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-3" value="Search Button Pressed?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="440" y="180" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-7" target="V8-1J6owQ9dcXVEKaWUY-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-7" value="Collect Parameters from UI" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-9" target="V8-1J6owQ9dcXVEKaWUY-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-9" value="Get Repositories fitting parameters from GitHub REST API" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-11" target="V8-1J6owQ9dcXVEKaWUY-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-11" value="Store Repositories in S3" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-13" value="Manage Repositories Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-20" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-18" target="V8-1J6owQ9dcXVEKaWUY-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-22" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-18" value="Archive Button Pressed?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-13" target="V8-1J6owQ9dcXVEKaWUY-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-30" target="V8-1J6owQ9dcXVEKaWUY-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-30" value="Load first repository in the system" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-33" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-31" target="V8-1J6owQ9dcXVEKaWUY-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-37" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-31" target="V8-1J6owQ9dcXVEKaWUY-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-31" value="Has the Repo been in the system for &amp;gt;30 days?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="500" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-36" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-32" target="V8-1J6owQ9dcXVEKaWUY-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-40" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-32" target="V8-1J6owQ9dcXVEKaWUY-39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-32" value="Is the Repo exempt from archiving?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="500" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-35">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-35" value="Next Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-39" target="V8-1J6owQ9dcXVEKaWUY-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-39" value="Archive Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="520" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-41" target="V8-1J6owQ9dcXVEKaWUY-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-41" value="Add to Archive Batch" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="640" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-46" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-44" target="V8-1J6owQ9dcXVEKaWUY-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-48" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-44" target="V8-1J6owQ9dcXVEKaWUY-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-44" value="Is last repository in the system?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="740" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-47" target="V8-1J6owQ9dcXVEKaWUY-49">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-47" value="Upload Batch to S3" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="920" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-58" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-49" target="V8-1J6owQ9dcXVEKaWUY-57">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-49" value="Archive Batches Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="920" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="V8-1J6owQ9dcXVEKaWUY-51" target="V8-1J6owQ9dcXVEKaWUY-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-51" value="Remove from Repository List" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="760" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-55" value="Archive Process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="V8-1J6owQ9dcXVEKaWUY-57" value="End" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="920" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="Ce9BixeOItjrbrzLfUU8" name="OldUndoProcess">
+    <mxGraphModel dx="1434" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ExUhuPI1xIsPPg0xgSzK-1" value="Repository Archive Tool Redesign" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ExUhuPI1xIsPPg0xgSzK-2" value="Existing Core User Journey" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ExUhuPI1xIsPPg0xgSzK-3" value="Undo Process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="V9FYR5mVpKJBPpVGoLCe-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="stnyQEKO5T93ftwnOvTH-1" target="egrBQTVQ-6CBT2zyAyev-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="stnyQEKO5T93ftwnOvTH-1" value="Start" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="egrBQTVQ-6CBT2zyAyev-1" value="Archive Batches Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="zSHXLgAJli5MoYsc9CjJ-3" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="zSHXLgAJli5MoYsc9CjJ-1" target="egrBQTVQ-6CBT2zyAyev-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zSHXLgAJli5MoYsc9CjJ-5" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="zSHXLgAJli5MoYsc9CjJ-1" target="zSHXLgAJli5MoYsc9CjJ-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zSHXLgAJli5MoYsc9CjJ-1" value="Undo Batch Button Pressed?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="440" y="180" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="zSHXLgAJli5MoYsc9CjJ-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="egrBQTVQ-6CBT2zyAyev-1" target="zSHXLgAJli5MoYsc9CjJ-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="zSHXLgAJli5MoYsc9CjJ-4" target="7IY2n1vVimSk24tNCyZ3-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zSHXLgAJli5MoYsc9CjJ-4" value="Get the repositories within the batch" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="7IY2n1vVimSk24tNCyZ3-1" target="OAM6dBt-X5p2zIBGihS6-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7IY2n1vVimSk24tNCyZ3-1" value="Load the first repository within the batch" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-1" target="OAM6dBt-X5p2zIBGihS6-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-1" value="Unarchive the repository using GitHub REST API" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-7" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-2" target="OAM6dBt-X5p2zIBGihS6-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-8" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-2" target="OAM6dBt-X5p2zIBGihS6-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-2" value="Unarchived Successfully?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-4" value="Add Repository to Archive List" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-6" value="Log Error" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="520" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-1" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-3" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-9" target="0m46UrfxlzSGBiVLR1uE-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-9" value="Is last repository in the batch?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-4" target="OAM6dBt-X5p2zIBGihS6-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OAM6dBt-X5p2zIBGihS6-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="OAM6dBt-X5p2zIBGihS6-6" target="OAM6dBt-X5p2zIBGihS6-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="0m46UrfxlzSGBiVLR1uE-2" target="0m46UrfxlzSGBiVLR1uE-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-2" value="Update Batch Status" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="0m46UrfxlzSGBiVLR1uE-4" target="0m46UrfxlzSGBiVLR1uE-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-4" value="Reload Archive Batches Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="0m46UrfxlzSGBiVLR1uE-6" value="End" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="440" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="9phJDiZtUOcYYK65xBZv" name="NewArchiveProcess">
+    <mxGraphModel dx="1434" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4CDi1uMHLUlWSVyPN-Po-1" value="Repository Archive Tool Redesign" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="4CDi1uMHLUlWSVyPN-Po-2" value="Redesigned Core User Journey" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="4CDi1uMHLUlWSVyPN-Po-3" value="Archive Process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-16" target="UAL_EVVcSZQEB4ybLZiE-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-16" value="Start" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-18" target="UAL_EVVcSZQEB4ybLZiE-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-18" value="Load Current Non-Archived Repositories from GitHub GraphQL API" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-19" target="UAL_EVVcSZQEB4ybLZiE-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-19" value="Cache Repositories for 15 minutes" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-20" target="UAL_EVVcSZQEB4ybLZiE-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-20" value="Archive Repositories Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-21" target="UAL_EVVcSZQEB4ybLZiE-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-21" value="Load Repositories from Cache" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-26" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-24">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="320" />
+              <mxPoint x="600" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-24" value="Archive Button Pressed?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="440" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-30" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-27">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="300" y="480" />
+              <mxPoint x="600" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-32" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-27" target="UAL_EVVcSZQEB4ybLZiE-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-27" value="Has a repository been selected?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-28" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-24" target="UAL_EVVcSZQEB4ybLZiE-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-31" target="UAL_EVVcSZQEB4ybLZiE-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-31" value="Archive the first repository selected" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-37" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-33" target="UAL_EVVcSZQEB4ybLZiE-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-43" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-33">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="40" y="840" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="20" y="560" />
+              <mxPoint x="20" y="840" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-33" value="Is the last repository selected?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-35" target="UAL_EVVcSZQEB4ybLZiE-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-35" value="Next Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-38" value="Archive Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UAL_EVVcSZQEB4ybLZiE-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="UAL_EVVcSZQEB4ybLZiE-38" target="UAL_EVVcSZQEB4ybLZiE-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xYhTzUEJIpjNi3DZm27X-1" value="End" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="800" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="xYhTzUEJIpjNi3DZm27X-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="xYhTzUEJIpjNi3DZm27X-3" target="xYhTzUEJIpjNi3DZm27X-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xYhTzUEJIpjNi3DZm27X-3" value="Restart Process" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="STuFinKvgPJXYhBFTJFA" name="NewUndoProcess">
+    <mxGraphModel dx="1434" dy="854" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Ah_buuPgxLN_Y4PuY7kV-1" value="Repository Archive Tool Redesign" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Ah_buuPgxLN_Y4PuY7kV-2" value="Redesigned Core User Journey" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pBnD4SXnJBCXR6JBnpbt-1" value="Undo Process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="760" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-2" target="5iy5d8IE67s2pPobFEZm-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-2" value="Start" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-4" target="5iy5d8IE67s2pPobFEZm-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-4" value="Load Current Archived Repositories from GitHub GraphQL API" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-6" target="5iy5d8IE67s2pPobFEZm-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-6" value="Cache Repositories for 15 minutes" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-8" target="5iy5d8IE67s2pPobFEZm-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-8" value="Unarchive Repositories Page" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-10" target="5iy5d8IE67s2pPobFEZm-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-10" value="Load Repositories from Cache" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="640" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-11" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-12">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="320" />
+              <mxPoint x="600" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-12" value="Unarchive Button Pressed?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="440" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-13" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-15">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="300" y="480" />
+              <mxPoint x="600" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-14" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-15" target="5iy5d8IE67s2pPobFEZm-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-15" value="Has a repository been selected?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="340" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-16" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-12" target="5iy5d8IE67s2pPobFEZm-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-18" target="5iy5d8IE67s2pPobFEZm-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-18" value="Unarchive the first repository selected" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-19" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-21" target="5iy5d8IE67s2pPobFEZm-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-20" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-21">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="20" y="560" />
+              <mxPoint x="20" y="840" />
+            </Array>
+            <mxPoint x="40" y="840" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-21" value="Is the last repository selected?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-23" target="5iy5d8IE67s2pPobFEZm-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-23" value="Next Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-24" value="Unarchive Repository" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="240" y="680" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-24" target="5iy5d8IE67s2pPobFEZm-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-28" value="End" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.terminator;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="240" y="800" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="5iy5d8IE67s2pPobFEZm-29" target="5iy5d8IE67s2pPobFEZm-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5iy5d8IE67s2pPobFEZm-29" value="Restart Process" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="800" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
