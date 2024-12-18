@@ -2,6 +2,10 @@
 
 A Python Flask application to archive outdated organisation repositories.
 
+## Important Notice
+
+This repository is no longer maintained and has been archived. The functionality within this tool has been replaced by the [github-repository-archive-script](https://github.com/ONS-Innovation/github-repository-archive-script).
+
 ## Prerequisites
 
 This project uses poetry for package management, colima a license free tool for containerisation, the AWS cli commands for interacting with cloud services and Terraform for deploying changes.
